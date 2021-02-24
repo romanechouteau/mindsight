@@ -1,0 +1,27 @@
+{
+  "name": "mindsight",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "snowpack dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "snowpack": "^3.0.11"
+  },
+  "dependencies": {
+    "@canarise/snowpack-eslint-plugin": "^0.1.0",
+    "@marlonmarcello/snowpack-plugin-pug": "^1.0.3",
+    "@snowpack/plugin-optimize": "^0.2.13",
+    "@snowpack/plugin-typescript": "^1.2.1",
+    "dat.gui": "^0.7.7",
+    "snowpack-plugin-stylus": "^1.0.6",
+    "three": "^0.125.2",
+    "typescript": "^4.1.5"
+  }
+}
