@@ -19,13 +19,19 @@ export default class Suzanne {
     this.container = new Object3D()
     this.container.name = 'Suzanne'
 
-    this.createSuzanne()
+    this.init()
+  }
+
+  async init() {
+    await this.createSuzanne()
     this.setMovement()
   }
-  async createSuzanne() { 
+
+  async createSuzanne() {
     this.suzanne = (await loader.loadAsync(suzanneSrc)).scene
     this.container.add(this.suzanne)
   }
+
   setMovement() {
     this.time.on('tick', () => {
       this.suzanne.rotation.y += 0.005

@@ -1,13 +1,15 @@
-import { AxesHelper, Object3D } from 'three'
+import { AxesHelper, Object3D, WebGLRenderer } from 'three'
 
 import AmbientLightSource from './AmbientLight'
 import PointLightSource from './PointLight'
 import Suzanne from './Suzanne'
+import Character from './Character'
 
 export default class World {
   time: any
   debug: any
   container: Object3D
+  renderer: WebGLRenderer
   debugFolder: any
   loadDiv: any
   loadModels: any
@@ -15,10 +17,12 @@ export default class World {
   ambientlight: AmbientLightSource
   light: PointLightSource
   suzanne: Suzanne
+  character: Character
   constructor(options) {
     // Set options
     this.time = options.time
     this.debug = options.debug
+    this.renderer = options.renderer
 
     // Set up
     this.container = new Object3D()
@@ -35,7 +39,7 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
+    this.setCharacter()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -63,5 +67,12 @@ export default class World {
       time: this.time
     })
     this.container.add(this.suzanne.container)
+  }
+  setCharacter() {
+    this.character = new Character({
+      time: this.time,
+      renderer: this.renderer
+    })
+    this.container.add(this.character.container)
   }
 }
