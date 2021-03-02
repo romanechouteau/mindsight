@@ -67,7 +67,7 @@ class Mouse {
 
     onDown(event) {
         this.cursor[0] = (event.clientX / this.screenWidth - 0.5) * 2
-        this.cursor[1] = (event.clientY / this.screenHeight - 0.5) * 2
+        this.cursor[1] = - (event.clientY / this.screenHeight - 0.5) * 2
         this.lastCursor[0] = this.cursor[0]
         this.lastCursor[1] = this.cursor[1]
         this.isDown = true
@@ -90,7 +90,7 @@ class Mouse {
 
     onMouve(event) {
         this.cursor[0] = (event.clientX / this.screenWidth - 0.5) * 2
-        this.cursor[1] = (event.clientY / this.screenHeight - 0.5) * 2
+        this.cursor[1] = - (event.clientY / this.screenHeight - 0.5) * 2
         this.emitter.emit('mouve', this)
         if (this.isDown) { this.emitter.emit('drag', this) }
     }
