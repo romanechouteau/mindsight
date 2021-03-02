@@ -1,12 +1,21 @@
 import { AxesHelper, Object3D } from 'three'
 
-import AmbientLightSource from './AmbientLight'
-import PointLightSource from './PointLight'
+// @ts-ignore
+import Time from '@tools/Time'
+// @ts-ignore
+import Mouse from '@tools/Mouse'
+import Brush from './Brush'
+// @ts-ignore
+import Camera from '@js/Camera'
 import Suzanne from './Suzanne'
+import PointLightSource from './PointLight'
+import AmbientLightSource from './AmbientLight'
 
 export default class World {
-  time: any
+  time: Time
   debug: any
+  mouse: Mouse
+  camera: Camera
   container: Object3D
   debugFolder: any
   loadDiv: any
@@ -15,10 +24,13 @@ export default class World {
   ambientlight: AmbientLightSource
   light: PointLightSource
   suzanne: Suzanne
+  brush: Brush
   constructor(options) {
     // Set options
     this.time = options.time
     this.debug = options.debug
+    this.mouse = options.mouse
+    this.camera = options.camera
 
     // Set up
     this.container = new Object3D()
@@ -36,6 +48,7 @@ export default class World {
     this.setAmbientLight()
     this.setPointLight()
     this.setSuzanne()
+    this.setBrush()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -63,5 +76,13 @@ export default class World {
       time: this.time
     })
     this.container.add(this.suzanne.container)
+  }
+  setBrush() {
+    this.brush = new Brush({
+      mouse: this.mouse,
+      scene: this.container,
+      camera: this.camera,
+      time: this.time
+    })
   }
 }
