@@ -1,4 +1,4 @@
-import { Object3D, PointsMaterial, Raycaster, Vector2, Mesh, BoxBufferGeometry, MeshBasicMaterial, BufferGeometry, BufferAttribute } from 'three'
+import { Object3D, PointsMaterial, Raycaster, Vector2, Mesh, BoxBufferGeometry, MeshBasicMaterial, BufferGeometry, BufferAttribute, Points } from 'three'
 // @ts-ignore
 import Mouse from '@tools/Mouse'
 // @ts-ignore
@@ -15,8 +15,9 @@ export default class Brush {
   time: Time
   particles: Mesh
   isPainting: Boolean
-  painting: Mesh
+  painting: Points
   geometry: BufferGeometry
+  positions: number[]
 
   constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time }) {
     const { scene, mouse, camera, time } = options
@@ -27,6 +28,7 @@ export default class Brush {
     this.time = time
     this.isPainting = false
     this.geometry = new BufferGeometry()
+    this.positions = []
 
     this.material = new PointsMaterial({
       size: 0.02,
@@ -72,8 +74,8 @@ export default class Brush {
         this.particles.position.z = position.z
 
         if (this.isPainting) {
-          const oldPositions = Array.prototype.slice.call(this.geometry.attributes.position.array)
-          const positions = new Float32Array([...oldPositions, this.particles.position.x, this.particles.position.y, this.particles.position.z])
+          this.positions.push(position.x, position.y, position.z)
+          const positions = new Float32Array(this.positions)
           this.geometry.setAttribute(
             'position',
             new BufferAttribute(positions, 3)
@@ -87,17 +89,10 @@ export default class Brush {
     this.mouse.on('down', () => {
       this.isPainting = true
       this.geometry = new BufferGeometry()
-      const material = new MeshBasicMaterial({
-        color: "#ff0000"
-      })
 
-      const positions = new Float32Array([this.particles.position.x, this.particles.position.y, this.particles.position.z])
-      this.geometry.setAttribute(
-        'position',
-        new BufferAttribute(positions, 3)
-      )
+      this.positions = []
 
-      this.painting = new Mesh(this.geometry, material)
+      this.painting = new Points(this.geometry, this.material)
       this.scene.add(this.painting)
     })
   }
