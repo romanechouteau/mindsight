@@ -1,4 +1,4 @@
-import { Object3D, PerspectiveCamera } from 'three'
+import { Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneBufferGeometry } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 export default class Camera {
@@ -32,6 +32,12 @@ export default class Camera {
       1000
     )
     this.container.add(this.camera)
+
+    const plane = new PlaneBufferGeometry(10, 10)
+    const material = new MeshBasicMaterial({ color: 0x00ff00 })
+
+    this.container.add(new Mesh(plane, material));
+
     // Change camera aspect on resize
     this.sizes.on('resize', () => {
       this.camera.aspect =

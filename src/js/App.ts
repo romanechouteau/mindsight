@@ -13,6 +13,8 @@ import Camera from './Camera'
 // @ts-ignore
 import World from '@world/index'
 
+import Brush from './Brush'
+
 export default class App {
   canvas: any
   time: any
@@ -23,6 +25,7 @@ export default class App {
   camera: any
   debug: any
   world: any
+  brush: Brush
   constructor(options) {
     // Set options
     this.canvas = options.canvas
@@ -36,6 +39,8 @@ export default class App {
     this.setRenderer()
     this.setCamera()
     this.setWorld()
+
+    this.brush = new Brush(this.time)
   }
   setRenderer() {
     // Set scene

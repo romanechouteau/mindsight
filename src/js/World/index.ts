@@ -35,7 +35,7 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
+    // this.setSuzanne()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
