@@ -25,12 +25,14 @@ export default class World {
   light: PointLightSource
   suzanne: Suzanne
   brush: Brush
+  pixelRatio: number
   constructor(options) {
     // Set options
     this.time = options.time
     this.debug = options.debug
     this.mouse = options.mouse
     this.camera = options.camera
+    this.pixelRatio = options.pixelRatio
 
     // Set up
     this.container = new Object3D()
@@ -82,7 +84,8 @@ export default class World {
       mouse: this.mouse,
       scene: this.container,
       camera: this.camera,
-      time: this.time
+      time: this.time,
+      pixelRatio: this.pixelRatio
     })
   }
 }
