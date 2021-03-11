@@ -1,4 +1,4 @@
-import { Object3D, PointsMaterial, Raycaster, Vector2, Mesh, BoxBufferGeometry, MeshBasicMaterial, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending, Vector3 } from 'three'
 // @ts-ignore
 import Mouse from '@tools/Mouse'
 // @ts-ignore
@@ -18,51 +18,73 @@ export default class Brush {
   mouse: Mouse
   camera: Camera
   time: Time
-  particles: Mesh
+  particles: Points
   isPainting: Boolean
   painting: Points
   geometry: BufferGeometry
   positions: number[]
   pixelRatio: number
+  brushSize: number
+  brushCount: number
+  brushColor: Vector3
+  particleSize: number
 
-  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, pixelRatio: number }) {
-    const { scene, mouse, camera, time, pixelRatio } = options
+  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, pixelRatio: number, 
+    brushSize: number, brushCount: number, particleSize: number, brushColor: Vector3 }) {
+    const { scene, mouse, camera, time, pixelRatio, brushSize, brushCount, brushColor, particleSize } = options
 
+    this.time = time
     this.scene = scene
     this.mouse = mouse
     this.camera = camera
-    this.time = time
     this.pixelRatio = pixelRatio
-    this.isPainting = false
+
+    this.brushSize = brushSize ?? 0.3
+    this.brushCount = brushCount ?? 20
+    this.particleSize = particleSize ?? 20
+    this.brushColor = brushColor ?? new Vector3(1, 1, 1)
+
     this.geometry = new BufferGeometry()
+    this.raycaster = new Raycaster()
     this.positions = []
+    this.isPainting = false
+
     this.material = new ShaderMaterial({
       depthWrite: false,
       blending: AdditiveBlending,
       vertexColors: true,
       uniforms:
       {
-        uSize: { value: 6.0 * this.pixelRatio },
-        uTime: { value: 0. }
+        uSize: { value: this.particleSize * this.pixelRatio },
+        uTime: { value: 0. },
+        uColor: { value: this.brushColor }
       },
       vertexShader,
       fragmentShader
     })
 
-    const geometry = new BoxBufferGeometry(.5, .5, .5)
-    const material = new MeshBasicMaterial({
-      color: "#ff0000"
-    })
-
-    this.particles = new Mesh(geometry, material)
-    this.scene.add(this.particles)
-
-    this.raycaster = new Raycaster()
-
+    this.setBrush()
     this.listenCameraMove()
     this.setMovement()
     this.listenMouseDown()
     this.listenMouseUp()
+  }
+
+  setBrush() {
+    const count = 50
+    const geometry = new BufferGeometry()
+    const positions = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = Math.random() * this.brushSize
+      positions[i * 3 + 1] = Math.random() * this.brushSize
+      positions[i * 3 + 2] = Math.random() * this.brushSize
+    }
+    geometry.setAttribute(
+      'position',
+      new BufferAttribute(positions, 3)
+    )
+    this.particles = new Points(geometry, this.material)
+    this.scene.add(this.particles)
   }
 
   listenCameraMove() {
@@ -89,6 +111,12 @@ export default class Brush {
         this.particles.position.z = position.z
 
         if (this.isPainting) {
+          for (let i = 0; i < this.brushCount; i++) {
+            this.positions.push(
+              position.x + (Math.random() - 0.5) * this.brushSize, 
+              position.y + (Math.random() - 0.5) * this.brushSize, 
+              position.z + (Math.random() - 0.5) * this.brushSize)
+          }
           this.positions.push(position.x, position.y, position.z)
           const positions = new Float32Array(this.positions)
           this.geometry.setAttribute(
