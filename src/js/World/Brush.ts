@@ -1,4 +1,4 @@
-import { Object3D, PointsMaterial, Raycaster, Vector2, Mesh, BoxBufferGeometry, MeshBasicMaterial, BufferGeometry, BufferAttribute, Points } from 'three'
+import { Object3D, PointsMaterial, Raycaster, Vector2, Mesh, BoxBufferGeometry, MeshBasicMaterial, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending } from 'three'
 // @ts-ignore
 import Mouse from '@tools/Mouse'
 // @ts-ignore
@@ -6,10 +6,15 @@ import Time from '@tools/Time'
 // @ts-ignore
 import Camera from '@js/Camera'
 
+// @ts-ignore
+import vertexShader from '../../shaders/brushvert.glsl';
+// @ts-ignore
+import fragmentShader from '../../shaders/brushfrag.glsl';
+
 export default class Brush {
   raycaster: Raycaster
   scene: Object3D
-  material: PointsMaterial
+  material: ShaderMaterial
   mouse: Mouse
   camera: Camera
   time: Time
@@ -18,22 +23,30 @@ export default class Brush {
   painting: Points
   geometry: BufferGeometry
   positions: number[]
+  pixelRatio: number
 
-  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time }) {
-    const { scene, mouse, camera, time } = options
+  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, pixelRatio: number }) {
+    const { scene, mouse, camera, time, pixelRatio } = options
 
     this.scene = scene
     this.mouse = mouse
     this.camera = camera
     this.time = time
+    this.pixelRatio = pixelRatio
     this.isPainting = false
     this.geometry = new BufferGeometry()
     this.positions = []
-
-    this.material = new PointsMaterial({
-      size: 0.02,
-      sizeAttenuation: true,
-      color: '#FF0000'
+    this.material = new ShaderMaterial({
+      depthWrite: false,
+      blending: AdditiveBlending,
+      vertexColors: true,
+      uniforms:
+      {
+        uSize: { value: 6.0 * this.pixelRatio },
+        uTime: { value: 0. }
+      },
+      vertexShader,
+      fragmentShader
     })
 
     const geometry = new BoxBufferGeometry(.5, .5, .5)
@@ -47,7 +60,7 @@ export default class Brush {
     this.raycaster = new Raycaster()
 
     this.listenCameraMove()
-    this.listenMouseMove()
+    this.setMovement()
     this.listenMouseDown()
     this.listenMouseUp()
   }
@@ -61,8 +74,10 @@ export default class Brush {
     })
   }
 
-  listenMouseMove() {
+  setMovement() {
     this.time.on('tick', () => {
+      this.material.uniforms.uTime.value += 0.01
+
       const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
       this.raycaster.setFromCamera(cursor, this.camera.camera)
 
