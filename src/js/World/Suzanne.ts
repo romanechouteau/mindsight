@@ -22,7 +22,7 @@ export default class Suzanne {
     this.createSuzanne()
     this.setMovement()
   }
-  async createSuzanne() { 
+  async createSuzanne() {
     this.suzanne = (await loader.loadAsync(suzanneSrc)).scene
     this.container.add(this.suzanne)
   }

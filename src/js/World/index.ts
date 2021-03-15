@@ -1,12 +1,17 @@
 import { AxesHelper, Object3D } from 'three'
 
+// @ts-ignore
+import Mouse from '@tools/Mouse'
 import AmbientLightSource from './AmbientLight'
 import PointLightSource from './PointLight'
 import Suzanne from './Suzanne'
+import EyeTracking from './EyeTracking'
 
 export default class World {
   time: any
   debug: any
+  mouse: Mouse
+  camera: any
   container: Object3D
   debugFolder: any
   loadDiv: any
@@ -15,11 +20,17 @@ export default class World {
   ambientlight: AmbientLightSource
   light: PointLightSource
   suzanne: Suzanne
+  eyeTracking: EyeTracking
+  windowWidth: number
+  windowHeight: number
   constructor(options) {
     // Set options
     this.time = options.time
     this.debug = options.debug
-
+    this.mouse = options.mouse
+    this.camera = options.camera
+    this.windowWidth = options.windowWidth
+    this.windowHeight = options.windowHeight
     // Set up
     this.container = new Object3D()
     this.container.name = 'World'
@@ -35,7 +46,8 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
+    // this.setSuzanne()
+    this.setEyeTracking()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -63,5 +75,14 @@ export default class World {
       time: this.time
     })
     this.container.add(this.suzanne.container)
+  }
+  setEyeTracking() {
+    this.eyeTracking = new EyeTracking({
+      windowWidth: this.windowWidth,
+      windowHeight: this.windowHeight,
+      mouse: this.mouse,
+      camera: this.camera,
+    })
+    this.container.add(this.eyeTracking.container)
   }
 }
