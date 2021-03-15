@@ -1,4 +1,5 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending, Vector3 } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending, Color } from 'three'
+import * as dat from 'dat.gui'
 // @ts-ignore
 import Mouse from '@tools/Mouse'
 // @ts-ignore
@@ -11,56 +12,66 @@ import vertexShader from '../../shaders/brushvert.glsl';
 // @ts-ignore
 import fragmentShader from '../../shaders/brushfrag.glsl';
 
-export default class Brush {
-  raycaster: Raycaster
-  scene: Object3D
-  material: ShaderMaterial
-  mouse: Mouse
-  camera: Camera
-  time: Time
-  particles: Points
-  isPainting: Boolean
-  painting: Points
-  geometry: BufferGeometry
-  positions: number[]
-  pixelRatio: number
-  brushSize: number
-  brushCount: number
-  brushColor: Vector3
-  particleSize: number
+const configShaderMaterial = {
+  depthWrite: false,
+  blending: AdditiveBlending,
+  vertexColors: true,
+  vertexShader,
+  fragmentShader,
+}
 
-  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, pixelRatio: number, 
-    brushSize: number, brushCount: number, particleSize: number, brushColor: Vector3 }) {
-    const { scene, mouse, camera, time, pixelRatio, brushSize, brushCount, brushColor, particleSize } = options
+export default class Brush {
+  time: Time
+  debug: dat.GUI
+  scene: Object3D
+  mouse: Mouse
+  brush: Points
+  camera: Camera
+  params: {
+    brushSize: number,
+    brushCount: number,
+    particleSize: number,
+    brushColor: number
+  }
+  painting: Points
+  material: ShaderMaterial
+  positions: number[]
+  raycaster: Raycaster
+  pixelRatio: number
+  isPainting: Boolean
+  debugFolder: dat.GUI
+  brushGeometry: BufferGeometry
+  paintingGeometry: BufferGeometry
+
+  constructor(options: { debug: dat.GUI, scene: Object3D, mouse: Mouse, camera: Camera, time: Time, pixelRatio: number }) {
+    const { debug, scene, mouse, camera, time, pixelRatio } = options
 
     this.time = time
+    this.debug = debug
     this.scene = scene
     this.mouse = mouse
     this.camera = camera
     this.pixelRatio = pixelRatio
 
-    this.brushSize = brushSize ?? 0.3
-    this.brushCount = brushCount ?? 20
-    this.particleSize = particleSize ?? 20
-    this.brushColor = brushColor ?? new Vector3(1, 1, 1)
+    this.params = {
+      brushSize: 0.3,
+      brushCount: 10,
+      particleSize: 20,
+      brushColor: 0xFFFFFF,
+    }
 
-    this.geometry = new BufferGeometry()
     this.raycaster = new Raycaster()
     this.positions = []
     this.isPainting = false
-
+    this.paintingGeometry = new BufferGeometry()
     this.material = new ShaderMaterial({
-      depthWrite: false,
-      blending: AdditiveBlending,
-      vertexColors: true,
+      ...configShaderMaterial,
       uniforms:
       {
-        uSize: { value: this.particleSize * this.pixelRatio },
+        uSize: { value: this.params.particleSize * this.pixelRatio },
         uTime: { value: 0. },
-        uColor: { value: this.brushColor }
+        uColor: { value: new Color(this.params.brushColor) }
       },
-      vertexShader,
-      fragmentShader
     })
 
     this.setBrush()
@@ -68,31 +79,38 @@ export default class Brush {
     this.setMovement()
     this.listenMouseDown()
     this.listenMouseUp()
+    if (this.debug) {
+      this.setDebug()
+    }
+  }
+
+  getBrushPositions() {
+    const count = 50
+    const positions = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = Math.random() * this.params.brushSize
+      positions[i * 3 + 1] = Math.random() * this.params.brushSize
+      positions[i * 3 + 2] = Math.random() * this.params.brushSize
+    }
+    return positions
   }
 
   setBrush() {
-    const count = 50
-    const geometry = new BufferGeometry()
-    const positions = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = Math.random() * this.brushSize
-      positions[i * 3 + 1] = Math.random() * this.brushSize
-      positions[i * 3 + 2] = Math.random() * this.brushSize
-    }
-    geometry.setAttribute(
+    this.brushGeometry = new BufferGeometry()
+    this.brushGeometry.setAttribute(
       'position',
-      new BufferAttribute(positions, 3)
+      new BufferAttribute(this.getBrushPositions(), 3)
     )
-    this.particles = new Points(geometry, this.material)
-    this.scene.add(this.particles)
+    this.brush = new Points(this.brushGeometry, this.material)
+    this.scene.add(this.brush)
   }
 
   listenCameraMove() {
     this.camera.orbitControls.addEventListener('change', () => {
       const { rotation } = this.camera.camera
-      this.particles.rotation.x = rotation.x
-      this.particles.rotation.y = rotation.y
-      this.particles.rotation.z = rotation.z
+      this.brush.rotation.x = rotation.x
+      this.brush.rotation.y = rotation.y
+      this.brush.rotation.z = rotation.z
     })
   }
 
@@ -106,20 +124,19 @@ export default class Brush {
       const intersection = this.raycaster.intersectObject(this.camera.raycasterPlane)
       if (intersection[0]) {
         const position = intersection[0].point
-        this.particles.position.x = position.x
-        this.particles.position.y = position.y
-        this.particles.position.z = position.z
+        this.brush.position.x = position.x
+        this.brush.position.y = position.y
+        this.brush.position.z = position.z
 
         if (this.isPainting) {
-          for (let i = 0; i < this.brushCount; i++) {
+          for (let i = 0; i < this.params.brushCount; i++) {
             this.positions.push(
-              position.x + (Math.random() - 0.5) * this.brushSize, 
-              position.y + (Math.random() - 0.5) * this.brushSize, 
-              position.z + (Math.random() - 0.5) * this.brushSize)
+              position.x + (Math.random() - 0.5) * this.params.brushSize,
+              position.y + (Math.random() - 0.5) * this.params.brushSize,
+              position.z + (Math.random() - 0.5) * this.params.brushSize)
           }
-          this.positions.push(position.x, position.y, position.z)
           const positions = new Float32Array(this.positions)
-          this.geometry.setAttribute(
+          this.paintingGeometry.setAttribute(
             'position',
             new BufferAttribute(positions, 3)
           )
@@ -131,11 +148,10 @@ export default class Brush {
   listenMouseDown() {
     this.mouse.on('down', () => {
       this.isPainting = true
-      this.geometry = new BufferGeometry()
-
+      this.paintingGeometry = new BufferGeometry()
       this.positions = []
 
-      this.painting = new Points(this.geometry, this.material)
+      this.painting = new Points(this.paintingGeometry, this.material)
       this.scene.add(this.painting)
     })
   }
@@ -143,6 +159,45 @@ export default class Brush {
   listenMouseUp() {
     this.mouse.on('up', () => {
       this.isPainting = false
+      this.material = new ShaderMaterial({
+        ...configShaderMaterial,
+        uniforms:
+        {
+          uSize: { value: this.params.particleSize * this.pixelRatio },
+          uTime: { value: 0. },
+          uColor: { value: new Color(this.params.brushColor) }
+        },
+      })
+    })
+  }
+
+  setDebug() {
+    this.debugFolder = this.debug.addFolder('Brush')
+    this.debugFolder.open()
+
+    this.debugFolder
+      .add(this.params, 'brushSize', 0, 1, 0.01)
+      .name('Brush Size')
+      .onChange(() => {
+        this.brushGeometry.setAttribute(
+          'position',
+          new BufferAttribute(this.getBrushPositions(), 3)
+        )
+      })
+    this.debugFolder
+      .add(this.params, 'brushCount', 0, 50, 1)
+      .name('Brush Count')
+    this.debugFolder
+      .add(this.params, 'particleSize', 0, 50, 1)
+      .name('Particle Size')
+      .onChange(() => {
+        this.material.uniforms.uSize.value = this.params.particleSize * this.pixelRatio
+      })
+    this.debugFolder
+    .addColor(this.params, 'brushColor')
+    .name('Color')
+    .onChange(() => {
+      this.material.uniforms.uColor.value = new Color(this.params.brushColor)
     })
   }
 }

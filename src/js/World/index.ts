@@ -81,11 +81,12 @@ export default class World {
   }
   setBrush() {
     this.brush = new Brush({
+      time: this.time,
+      debug: this.debug,
       mouse: this.mouse,
       scene: this.container,
       camera: this.camera,
-      time: this.time,
-      pixelRatio: this.pixelRatio
+      pixelRatio: this.pixelRatio,
     })
   }
 }
