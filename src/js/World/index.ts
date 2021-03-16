@@ -8,6 +8,7 @@ import Brush from './Brush'
 // @ts-ignore
 import Camera from '@js/Camera'
 import Suzanne from './Suzanne'
+import Character from './Character'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 
@@ -25,6 +26,7 @@ export default class World {
   light: PointLightSource
   suzanne: Suzanne
   brush: Brush
+  character: Character
   pixelRatio: number
   constructor(options) {
     // Set options
@@ -49,8 +51,9 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
-    this.setBrush()
+    // this.setSuzanne()
+    // this.setBrush()
+    this.setCharacter()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -88,5 +91,12 @@ export default class World {
       camera: this.camera,
       pixelRatio: this.pixelRatio,
     })
+  }
+  setCharacter() {
+    this.character = new Character({
+      time: this.time,
+      pixelRatio: this.pixelRatio,
+    })
+    this.container.add(this.character.container)
   }
 }
