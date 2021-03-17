@@ -40,6 +40,7 @@ export default class Brush {
   pixelRatio: number
   isPainting: Boolean
   debugFolder: dat.GUI
+  paintedMaterials: ShaderMaterial[]
   brushGeometry: BufferGeometry
   paintingGeometry: BufferGeometry
 
@@ -63,6 +64,7 @@ export default class Brush {
     this.raycaster = new Raycaster()
     this.positions = []
     this.isPainting = false
+    this.paintedMaterials = []
     this.paintingGeometry = new BufferGeometry()
     this.material = new ShaderMaterial({
       ...configShaderMaterial,
@@ -117,6 +119,7 @@ export default class Brush {
   setMovement() {
     this.time.on('tick', () => {
       this.material.uniforms.uTime.value += 0.01
+      this.paintedMaterials.forEach(material => material.uniforms.uTime.value += 0.01)
 
       const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
       this.raycaster.setFromCamera(cursor, this.camera.camera)
@@ -159,6 +162,7 @@ export default class Brush {
   listenMouseUp() {
     this.mouse.on('up', () => {
       this.isPainting = false
+      this.paintedMaterials.push(this.material)
       this.material = new ShaderMaterial({
         ...configShaderMaterial,
         uniforms:
@@ -168,6 +172,7 @@ export default class Brush {
           uColor: { value: new Color(this.params.brushColor) }
         },
       })
+      this.brush.material = this.material
     })
   }
 
