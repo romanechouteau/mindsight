@@ -13,6 +13,12 @@ import Camera from './Camera'
 // @ts-ignore
 import World from '@world/index'
 
+import Stats from 'stats.js'
+
+const stats = new Stats()
+stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom)
+
 export default class App {
   canvas: any
   time: any
@@ -67,7 +73,9 @@ export default class App {
       // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one), 
       // which might cause some performance or batteries issues when testing on multiple browsers
       if (!(this.renderOnBlur?.activated && !document.hasFocus() ) ) {
+        stats.begin()
         this.renderer.render(this.scene, this.camera.camera)
+        stats.end()
       }
     })
 
