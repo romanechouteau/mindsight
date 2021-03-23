@@ -21,6 +21,7 @@ class Mouse {
     preventDamping: boolean
     on: Function
     off: Function
+    targeted: HTMLElement | null
 
     constructor(target?) {
         this.cursor = vec2.fromValues(0, 0)
@@ -37,6 +38,7 @@ class Mouse {
         this.isDown = false
         this.wheelDir = null
         this.emitter = {}
+        this.targeted = null
 
         Emitter(this.emitter)
         this.on = this.emitter.on.bind(this.emitter)
@@ -66,6 +68,7 @@ class Mouse {
     }
 
     onDown(event) {
+        this.targeted = event.target
         this.cursor[0] = (event.clientX / this.screenWidth - 0.5) * 2
         this.cursor[1] = - (event.clientY / this.screenHeight - 0.5) * 2
         this.lastCursor[0] = this.cursor[0]
@@ -75,6 +78,7 @@ class Mouse {
     }
 
     onUp(event) {
+        this.targeted = null
         this.isDown = false
         this.emitter.emit('up', this)
     }

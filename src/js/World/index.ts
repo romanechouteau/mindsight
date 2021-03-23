@@ -15,6 +15,7 @@ export default class World {
   time: Time
   debug: any
   mouse: Mouse
+  canvas: HTMLElement
   camera: Camera
   container: Object3D
   debugFolder: any
@@ -32,6 +33,7 @@ export default class World {
     this.debug = options.debug
     this.mouse = options.mouse
     this.camera = options.camera
+    this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
 
     // Set up
@@ -49,7 +51,7 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
+    // this.setSuzanne()
     this.setBrush()
   }
   setLoader() {
@@ -82,10 +84,10 @@ export default class World {
   setBrush() {
     this.brush = new Brush({
       time: this.time,
-      debug: this.debug,
       mouse: this.mouse,
       scene: this.container,
       camera: this.camera,
+      canvas: this.canvas,
       pixelRatio: this.pixelRatio,
     })
   }

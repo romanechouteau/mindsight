@@ -5,9 +5,10 @@ float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-void main() {vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
-  float offset = rand(vec2(position.x, position.z));
+  float offset = rand(vec2(gl_VertexID, gl_VertexID));
   modelPosition.y += sin(uTime + offset * 5.) * 0.05;
 
   vec4 viewPosition = viewMatrix * modelPosition;
