@@ -1,0 +1,46 @@
+body, html
+    margin: 0
+    padding: 0
+
+    .brushInterface
+        position: absolute
+        right: 0
+        top: 50%
+        transform: translateY(-50%)
+        padding: 16px
+        user-select: none
+
+        .dg
+            background: none
+
+            .close-button
+                display: none
+
+            li
+                background: none
+                border-left: none!important
+                border-bottom: none!important
+                margin: 8px
+                padding: 0
+
+                &.number
+                    & > div
+                        display: flex
+                        align-items: center
+
+                    input[type="text"]
+                        display: none
+
+                    .slider
+                        width: 100%
+                        background-color: rgba(255,255,255,0.5)
+                        height: 8px
+                        border-radius: 8px
+
+                        .slider-fg
+                            background-color: white
+                            border-radius: 8px
+
+                &.color
+                    input[type="text"]
+                        border-radius: 8px
