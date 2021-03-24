@@ -1,4 +1,4 @@
-import { Object3D } from 'three'
+import { Object3D, Mesh, MeshBasicMaterial, DoubleSide } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // @ts-ignore
 import groundSrc from '@models/angy_environment.glb'
@@ -9,7 +9,8 @@ export default class Ground {
   time: any
   assets: any
   container: Object3D
-  ground: any
+  ground: Object3D
+  fakeGround: Object3D
   constructor(options) {
     // Options
     this.time = options.time
@@ -24,6 +25,9 @@ export default class Ground {
 
   async createGround() {
     this.ground = (await loader.loadAsync(groundSrc)).scene
+    // this.fakeGround = this.ground.clone(true)
+    // this.fakeGround.children.forEach(mesh => (mesh as Mesh).material = new MeshBasicMaterial({ opacity: 0, side: DoubleSide }))
+    // this.container.add(this.fakeGround)
     this.container.add(this.ground)
   }
 }
