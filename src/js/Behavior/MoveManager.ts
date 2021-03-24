@@ -6,6 +6,7 @@ import Camera from '../Camera'
 // TODO: add app in global namespace
 import { Mouse } from '../Tools/Mouse'
 import Ground from "../World/Ground";
+import neuronBuilder from './NeuronBuilder'
 
 export default class MoveManager {
     raycaster: Raycaster
@@ -68,7 +69,7 @@ export default class MoveManager {
         this.mouse.on('click', () => {
             if (this.isLooking)
                 this.toggleLooking(false)
-            else
+            else {
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,
                     duration: this.lastIntersection.distance/5,
@@ -76,6 +77,8 @@ export default class MoveManager {
                     y: this.cursor.position.y,
                     z: this.cursor.position.z - 5,
                 })
+                neuronBuilder.spawnNeuron(this.cursor.position)
+            }
         })
     }
     handleLookAround() {
@@ -93,6 +96,7 @@ export default class MoveManager {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
     }
+    
     setFakeGround() {
 
         const ground = this.ground.children[0]
