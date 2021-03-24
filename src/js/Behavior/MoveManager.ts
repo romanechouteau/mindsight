@@ -1,32 +1,47 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2 } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
 // TODO: add app in global namespace
 import { Mouse } from '../Tools/Mouse'
-import Ground from "../World/Ground";
 import neuronBuilder from './NeuronBuilder'
+import moveCursorVertex from '../../shaders/moveCursorVert'
+import moveCursorFragment from '../../shaders/moveCursorFrag'
 
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
     camera: Camera
     ground: Object3D
+    cursorMaterial: ShaderMaterial
     cursor: Mesh
     lastIntersection: Intersection
     euler: Euler
     prevEuler: Euler
     isLooking: boolean
+    isMoving: boolean
     constructor({ camera, mouse }) {
+
+        this.cursorMaterial = new ShaderMaterial({
+            vertexShader: moveCursorVertex,
+            fragmentShader: moveCursorFragment,
+            uniforms: {
+                uTime: { value: 0. },
+            }
+        })
+
         this.raycaster = new Raycaster()
         this.mouse = mouse
         this.camera = camera
-        this.cursor = new Mesh( new BoxBufferGeometry(1, 1, 1), new MeshNormalMaterial() )
+        this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), this.cursorMaterial )
+        this.cursor.rotation.x = -Math.PI/2
+        // this.cursor.translateY(1)
         this.cursor.name = 'MoveCursor'
         this.euler = new Euler(0, 0, 0, 'YXZ')
         this.euler.setFromQuaternion( this.camera.container.quaternion )
         this.isLooking = false
+        this.isMoving = false
 
         this.setMoveCursor = this.setMoveCursor.bind(this)
         this.handleMove = this.handleMove.bind(this)
@@ -58,7 +73,11 @@ export default class MoveManager {
 
             this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
             if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
+            this.cursor.position.y += 0.1
             // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
+
+            // update shader
+            this.cursorMaterial.uniforms.uTime.value += 0.01
 
             // rotate camera
             this.camera.camera?.quaternion.setFromEuler( this.euler )
@@ -66,16 +85,19 @@ export default class MoveManager {
     }
 
     handleMove() {
+        if (this.isMoving) return
         this.mouse.on('click', () => {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
+                this.isMoving = true
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,
                     duration: this.lastIntersection.distance/5,
                     x: this.cursor.position.x,
                     y: this.cursor.position.y,
                     z: this.cursor.position.z - 5,
+                    onComplete: () => this.isMoving = false
                 })
                 neuronBuilder.spawnNeuron(this.cursor.position)
             }
