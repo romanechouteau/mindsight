@@ -1,11 +1,17 @@
 uniform vec3 uColor;
+uniform float uTime;
+
+varying float randomized;
+
+float rand(vec2 co){
+  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 void main()
 {
     float strength = distance(gl_PointCoord, vec2(0.5));
-    // strength *= 2.0;
-    strength = 1.0 - strength;
-    strength = pow(strength, 10.0);
+    float step = step(0.5, strength);
+    vec4 finalColor = mix(vec4(uColor, 1. - randomized), vec4(uColor,0.), step);
 
-    gl_FragColor = vec4(uColor, strength);
+    gl_FragColor = finalColor;
 }

@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
+        "target": "es5",
         "noImplicitAny": false,
         "removeComments": true,
         "preserveConstEnums": true,
@@ -18,6 +19,8 @@
             "@js": ["./src/js/"],
             "@tools": ["./src/js/Tools/"],
             "@world": ["./src/js/World/"],
+            "@store": ["src/js/Store"],
+            "@lib": ["src/js/Lib"],
         },
     },
     "paths": {
@@ -31,5 +34,7 @@
         "@js": ["./src/js/"],
         "@tools": ["./src/js/Tools/"],
         "@world": ["./src/js/World/"],
+        "@store": ["./src/js/store/"],
+        "@lib": ["./src/js/lib/"],
     },
 }
