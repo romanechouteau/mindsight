@@ -43,7 +43,7 @@ export default class App {
     this.time = new Time()
     this.sizes = new Sizes()
     // this.assets = new Assets()
-    this.mouse = Mouse
+    this.mouse = new Mouse()
 
     // ! Only state shall be accessed on global App namespace
     this.state = createState()

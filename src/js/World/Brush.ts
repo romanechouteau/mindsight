@@ -5,7 +5,7 @@ import { isEqual, map } from 'lodash'
 // @ts-ignore
 import store from '@store/index'
 // @ts-ignore
-import Mouse from '@tools/Mouse'
+import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 import Time from '@tools/Time'
 // @ts-ignore
