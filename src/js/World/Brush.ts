@@ -273,11 +273,14 @@ export default class Brush extends Component {
         <div class="paramsGroup bottomGroup">
           <div class="inputGroup checkbox">
             <label for="canDraw">Draw</label>
-            <input
-              type="checkbox"
-              name="canDraw"
-              id="canDraw"
-              ${store.state.brush.canDraw && 'checked'} />
+            <div class="toggle">
+              <input
+                type="checkbox"
+                name="canDraw"
+                id="canDraw"
+                ${store.state.brush.canDraw && 'checked'} />
+              <div class="slider"></div>
+            </div>
           </div>
         </div>
         <div class="paramsGroup">
@@ -348,7 +351,6 @@ export default class Brush extends Component {
       } else if (isEqual(type, 'checkbox')) {
         input.addEventListener('change', () => {
           const value = input.checked
-          console.log(value)
           store.dispatch('updateBrushParams', { param, value })
         })
       }
