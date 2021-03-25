@@ -14,8 +14,6 @@ class NeuronBuilder {
     }
 
     spawnNeuron(position: Vector3){
-        console.log('ye');
-        
         const neuronGeometry = new CylinderBufferGeometry(1, 1, 10, 32)
         const neuronMaterial = new MeshBasicMaterial( {color: 0xffff00} )
         const neuron = new Mesh(neuronGeometry, neuronMaterial)

@@ -1,4 +1,4 @@
-import { AxesHelper, Camera, Object3D } from 'three'
+import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
 import { Mouse } from '../Tools/Mouse'
 
 import AmbientLightSource from './AmbientLight'
@@ -46,6 +46,9 @@ export default class World {
     this.setPointLight()
     this.setGround()
     this.setUser()
+    setTimeout(() => {
+      this.setFog()
+    }, 50);
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -75,10 +78,16 @@ export default class World {
     })
     this.container.add(this.ground.container)
   }
+  setFog() {
+    const fog = new FogExp2(0x212121, 0.08)
+    // const fog = new Fog(0x212121, 0, 10)
+    App.scene.fog = fog
+  }
   setUser() {
     this.user = new User({
       camera: this.camera,
-      mouse: this.mouse
+      mouse: this.mouse,
+      ground: this.ground
     })
   }
 }

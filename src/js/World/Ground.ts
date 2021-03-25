@@ -1,4 +1,4 @@
-import { Object3D, Mesh, MeshBasicMaterial, DoubleSide } from 'three'
+import { Object3D, Mesh, MeshBasicMaterial, DoubleSide, Group, BoxBufferGeometry, MeshNormalMaterial, Vector3 } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // @ts-ignore
 import groundSrc from '@models/angy_environment.glb'
@@ -10,7 +10,8 @@ export default class Ground {
   assets: any
   container: Object3D
   ground: Object3D
-  fakeGround: Object3D
+  // fakeGround: Object3D
+  groundDeco: Group
   constructor(options) {
     // Options
     this.time = options.time
@@ -30,4 +31,14 @@ export default class Ground {
     // this.container.add(this.fakeGround)
     this.container.add(this.ground)
   }
+
+  // not needed anymore
+  // generateDeco(basePoint: Vector3) {
+  //   const decoGeometry = new BoxBufferGeometry(1, 1, 1)
+  //   const decoMaterial = new MeshNormalMaterial()
+  //   const deco = new Mesh(decoGeometry, decoMaterial)
+
+  //   deco.translateX(basePoint.x + Math.random() * 2)
+  //   deco.translateZ(basePoint.z + Math.random() * 2)
+  // }
 }

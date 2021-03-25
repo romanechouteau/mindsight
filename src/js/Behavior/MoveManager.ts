@@ -1,19 +1,25 @@
 import gsap from "gsap/all";
-import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
 // TODO: add app in global namespace
 import { Mouse } from '../Tools/Mouse'
 import neuronBuilder from './NeuronBuilder'
-import moveCursorVertex from '../../shaders/moveCursorVert'
-import moveCursorFragment from '../../shaders/moveCursorFrag'
+import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
+import moveCursorFragment from '../../shaders/moveCursorFrag.glsl'
+import groundVertex from '../../shaders/groundVert.glsl'
+import groundFragment from '../../shaders/groundFrag.glsl'
+import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
+import Ground from "../World/Ground";
 
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
     camera: Camera
     ground: Object3D
+    groundInstance: Ground
+    groundMaterial: ShaderMaterial
     cursorMaterial: ShaderMaterial
     cursor: Mesh
     lastIntersection: Intersection
@@ -21,7 +27,7 @@ export default class MoveManager {
     prevEuler: Euler
     isLooking: boolean
     isMoving: boolean
-    constructor({ camera, mouse }) {
+    constructor({ camera, mouse, ground }) {
 
         this.cursorMaterial = new ShaderMaterial({
             vertexShader: moveCursorVertex,
@@ -31,10 +37,23 @@ export default class MoveManager {
             }
         })
 
+        this.groundMaterial = new ShaderMaterial({
+            vertexShader: groundVertex,
+            fragmentShader: groundFragment,
+            uniforms: {
+                uTime: { value: 0. },
+                [`u${MOODS.JOY}Intensity`]: { value: 0. },
+                [`u${MOODS.FEAR}Intensity`]: { value: 0. },
+                [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
+                [`u${MOODS.ANGER}Intensity`]: { value: 0. },
+            }
+        })
+
         this.raycaster = new Raycaster()
         this.mouse = mouse
         this.camera = camera
-        this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), this.cursorMaterial )
+        this.groundInstance = ground
+        this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), new MeshNormalMaterial() )
         this.cursor.rotation.x = -Math.PI/2
         // this.cursor.translateY(1)
         this.cursor.name = 'MoveCursor'
@@ -44,6 +63,7 @@ export default class MoveManager {
         this.isMoving = false
 
         this.setMoveCursor = this.setMoveCursor.bind(this)
+        this.setGroundDeformation = this.setGroundDeformation.bind(this)
         this.handleMove = this.handleMove.bind(this)
         this.handleLookAround = this.handleLookAround.bind(this)
         this.setFakeGround = this.setFakeGround.bind(this)
@@ -55,6 +75,7 @@ export default class MoveManager {
 
         // TODO: make this geometry merging work
         setTimeout(this.setFakeGround, 500)
+        setTimeout(this.setGroundDeformation, 500)
         // this.setMoveCursor()
     }
 
@@ -84,6 +105,18 @@ export default class MoveManager {
         })
     }
 
+    // TODO: export to Ground class
+    setGroundDeformation() {
+        App.scene.getObjectByName('Sol').material = this.groundMaterial
+        App.state.time.on('tick', () => {
+            this.groundMaterial.uniforms.uTime.value += 0.01
+            for (const mood in moodPositions) {
+                const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
+                this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
+            }
+        })
+    }
+    
     handleMove() {
         if (this.isMoving) return
         this.mouse.on('click', () => {
@@ -100,6 +133,7 @@ export default class MoveManager {
                     onComplete: () => this.isMoving = false
                 })
                 neuronBuilder.spawnNeuron(this.cursor.position)
+                this.checkZoneStep(this.cursor.position)
             }
         })
     }
@@ -118,7 +152,35 @@ export default class MoveManager {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
     }
-    
+    // a zone is a part of the map corresponding to an emotion, a step is a part is why you see more zone elements appearing
+    checkZoneStep(destination: Vector3){
+        const distanceFromCenter = destination.distanceTo(new Vector3(0, 0, 0))
+        
+        console.log("🚀 ~ file: MoveManager.ts ~ line 136 ~ MoveManager ~ checkZoneStep ~ distanceTo", distanceFromCenter)
+
+        for (const [limitIndex, limit] of Object.entries(ZONES_LIMITS)) {
+            if (distanceFromCenter > limit) {
+                this.handleAppearZone(parseInt(limitIndex))
+                break;
+            }
+            
+        }
+    }
+    handleAppearZone(stepIndex: number) {
+        // switch(stepIndex) {
+        //     case 0: // furthest
+        //         break;
+        //     case 1:
+        //         this.groundInstance.
+        //         break;
+        //     case 2:
+        //         break;
+        //     default:
+        //         break;
+        // }
+
+        if (stepIndex === 0) App.state.nextStep()
+    }
     setFakeGround() {
 
         const ground = this.ground.children[0]
@@ -163,6 +225,6 @@ export default class MoveManager {
         // fakeGround.rotation.copy(this.ground.children[0].rotation)
 
         // fakeGround.matrix.copy(this.ground.children[0].matrix)
-        App.scene.add(fakeGround)
+        // App.scene.add(fakeGround)
     }
 }
