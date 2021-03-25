@@ -94,7 +94,8 @@ export default class Brush extends Component {
       {
         uSize: { value: store.state.brush.particleSize * this.pixelRatio },
         uTime: { value: 0. },
-        uColor: { value: this.getColorInGradient() }
+        uColor: { value: this.getColorInGradient() },
+        uOpacity: { value: 1. }
       },
     })
 
@@ -123,6 +124,15 @@ export default class Brush extends Component {
       this.paintedMaterials.forEach(material => material.uniforms.uTime.value += 0.01)
 
       if (isEqual(store.state.brush.canDraw, true)) {
+        const onCanvas = isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)
+        if (onCanvas && this.material.uniforms.uOpacity.value < 1) {
+          const value = this.material.uniforms.uOpacity.value += 0.06
+          this.material.uniforms.uOpacity.value = Math.min(value, 1)
+        } else if (!onCanvas && this.material.uniforms.uOpacity.value > 0) {
+          const value = this.material.uniforms.uOpacity.value -= 0.03
+          this.material.uniforms.uOpacity.value = Math.max(value, 0)
+        }
+
         const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
         this.raycaster.setFromCamera(cursor, this.camera.camera)
 
@@ -169,6 +179,7 @@ export default class Brush extends Component {
           }
         }
       } else {
+        this.brushPositions = []
         this.brushGeometry.setAttribute(
           'position',
           new BufferAttribute(new Float32Array(), 3)
@@ -179,7 +190,7 @@ export default class Brush extends Component {
 
   listenMouseDown() {
     this.mouse.on('down', () => {
-      if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, document.querySelector('.brushInterface'))) && isEqual(store.state.brush.canDraw, true)) {
+      if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)) && isEqual(store.state.brush.canDraw, true)) {
         this.isPainting = true
         this.paintingGeometry = new BufferGeometry()
         this.paintingPositions = []
@@ -201,7 +212,8 @@ export default class Brush extends Component {
           {
             uSize: { value: store.state.brush.particleSize * this.pixelRatio },
             uTime: { value: 0. },
-            uColor: { value: this.getColorInGradient() }
+            uColor: { value: this.getColorInGradient() },
+            uOpacity: { value: 1. }
           },
         })
         this.brush.material = this.material
