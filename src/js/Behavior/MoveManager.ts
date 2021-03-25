@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2 } from "three";
+import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, Object3D, Raycaster, Vector2 } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -7,21 +7,31 @@ import Camera from '../Camera'
 import { Mouse } from '../Tools/Mouse'
 import Ground from "../World/Ground";
 
+// @ts-ignore
+import store from '@store/index'
+
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
+    canvas: HTMLElement
     camera: Camera
     ground: Object3D
     cursor: Mesh
+    interfaceEmpty: HTMLElement
     lastIntersection: Intersection
     euler: Euler
     prevEuler: Euler
     isLooking: boolean
-    constructor({ camera, mouse }) {
+    cursorMaterial: MeshStandardMaterial
+    constructor({ camera, mouse, canvas }) {
         this.raycaster = new Raycaster()
         this.mouse = mouse
         this.camera = camera
-        this.cursor = new Mesh( new BoxBufferGeometry(1, 1, 1), new MeshNormalMaterial() )
+        this.canvas = canvas
+        this.interfaceEmpty = document.querySelector('.brushInterface')
+        this.cursorMaterial = new MeshStandardMaterial({ color: 0x111111, transparent: true })
+        this.cursor = new Mesh(new BoxBufferGeometry(1, 1, 1), this.cursorMaterial)
+        this.cursor.frustumCulled = false
         this.cursor.name = 'MoveCursor'
         this.euler = new Euler(0, 0, 0, 'YXZ')
         this.euler.setFromQuaternion( this.camera.container.quaternion )
@@ -52,20 +62,28 @@ export default class MoveManager {
 
         // @ts-ignore
         App.state.time.on('tick', () => {
-            const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
-            this.raycaster.setFromCamera(cursor, this.camera.camera)
+            if (store.state.brush.canDraw === false) {
+                this.cursorMaterial.opacity = 1
 
-            this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
-            if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
-            // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
+                const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
+                this.raycaster.setFromCamera(cursor, this.camera.camera)
 
-            // rotate camera
-            this.camera.camera?.quaternion.setFromEuler( this.euler )
+                this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
+                if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
+                // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
+
+                // rotate camera
+                this.camera.camera?.quaternion.setFromEuler( this.euler )
+                this.camera.raycasterPlane.quaternion.setFromEuler( this.euler )
+            } else {
+                this.cursorMaterial.opacity = 0
+            }
         })
     }
 
     handleMove() {
         this.mouse.on('click', () => {
+            if (store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (this.isLooking)
                 this.toggleLooking(false)
             else
@@ -80,10 +98,11 @@ export default class MoveManager {
     }
     handleLookAround() {
         this.mouse.on('down', () => {
+            if (store.state.brush.canDraw === true) return
             this.prevEuler = this.euler
         })
         this.mouse.on('drag', ev => {
-            if (this.camera.orbitControls.enabled) return
+            if (this.camera.orbitControls.enabled || store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (!this.isLooking) this.toggleLooking(true)
             this.euler.y = this.prevEuler.y - (this.mouse.lastCursor[0] - this.mouse.cursor[0])
             this.euler.x = this.prevEuler.x + (this.mouse.lastCursor[1] - this.mouse.cursor[1])
@@ -93,6 +112,7 @@ export default class MoveManager {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
     }
+
     setFakeGround() {
 
         const ground = this.ground.children[0]

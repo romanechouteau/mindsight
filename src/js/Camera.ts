@@ -1,4 +1,4 @@
-import { BackSide, Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry } from 'three'
+import { Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Matrix4 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 export default class Camera {
@@ -30,7 +30,7 @@ export default class Camera {
     this.camera = new PerspectiveCamera(
       75,
       this.sizes.viewport.width / this.sizes.viewport.height,
-      0.1,
+      0.001,
       1000
     )
     this.container.add(this.camera)
@@ -82,7 +82,9 @@ export default class Camera {
       transparent: true,
       opacity: 0
     })
+    geometry.applyMatrix4( new Matrix4().makeTranslation(-this.camera.position.x, -this.camera.position.y, -this.camera.position.z + 2) )
     this.raycasterPlane = new Mesh(geometry, material)
+    this.raycasterPlane.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z)
     this.raycasterPlane.rotation.x = rotation.x
     this.raycasterPlane.rotation.y = rotation.y
     this.raycasterPlane.rotation.z = rotation.z

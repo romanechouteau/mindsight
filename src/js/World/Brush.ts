@@ -1,4 +1,4 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, AdditiveBlending, Color } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
 import * as dat from 'dat.gui'
 import { isEqual, map } from 'lodash'
 
@@ -20,10 +20,11 @@ import fragmentShader from '@shaders/brushfrag.glsl';
 
 const configShaderMaterial = {
   depthWrite: false,
-  blending: AdditiveBlending,
+  depthTest: true,
   vertexColors: true,
   vertexShader,
   fragmentShader,
+  transparent: true
 }
 
 const colors = {
@@ -92,7 +93,8 @@ export default class Brush extends Component {
       ...configShaderMaterial,
       uniforms:
       {
-        uSize: { value: store.state.brush.particleSize * this.pixelRatio },
+        uParticleSize: { value: store.state.brush.particleSize * this.pixelRatio },
+        uSize: { value: store.state.brush.size },
         uTime: { value: 0. },
         uColor: { value: this.getColorInGradient() },
         uOpacity: { value: 1. }
@@ -196,6 +198,7 @@ export default class Brush extends Component {
         this.paintingPositions = []
 
         this.painting = new Points(this.paintingGeometry, this.material)
+        this.painting.frustumCulled = false
         this.scene.add(this.painting)
       }
     })
@@ -210,19 +213,21 @@ export default class Brush extends Component {
           ...configShaderMaterial,
           uniforms:
           {
-            uSize: { value: store.state.brush.particleSize * this.pixelRatio },
+            uParticleSize: { value: store.state.brush.particleSize * this.pixelRatio },
+            uSize: { value: store.state.brush.size },
             uTime: { value: 0. },
             uColor: { value: this.getColorInGradient() },
             uOpacity: { value: 1. }
           },
         })
         this.brush.material = this.material
+        this.brush.frustumCulled = false
       }
     })
   }
 
   render() {
-    const sizePosition = this.getThumbPosition(0, 1, store.state.brush.size)
+    const sizePosition = this.getThumbPosition(0, 0.7, store.state.brush.size)
     const countPosition = this.getThumbPosition(1, 50, store.state.brush.count)
     const particleSizePosition = this.getThumbPosition(1, 50, store.state.brush.particleSize)
 
@@ -247,7 +252,7 @@ export default class Brush extends Component {
                 class="circleRange"
                 id="size"
                 data-min="0"
-                data-max="1">
+                data-max="0.7">
               <div
                   class="rangeThumb"
                   style="top: ${sizePosition[0]}%; left: ${sizePosition[1]}%;"></div>
@@ -411,7 +416,11 @@ export default class Brush extends Component {
     }
 
     if (isEqual(param, 'particleSize')) {
-      return this.material.uniforms.uSize.value = this.params.particleSize * this.pixelRatio
+      return this.material.uniforms.uParticleSize.value = this.params.particleSize * this.pixelRatio
+    }
+
+    if (isEqual(param, 'size')) {
+      return this.material.uniforms.uSize.value = this.params.size
     }
 
     if (isEqual(param, 'color')) {

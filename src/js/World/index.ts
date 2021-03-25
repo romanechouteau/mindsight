@@ -92,7 +92,8 @@ export default class World {
   setUser() {
     this.user = new User({
       camera: this.camera,
-      mouse: this.mouse
+      mouse: this.mouse,
+      canvas: this.canvas
     })
   }
   setBrush() {

@@ -4,7 +4,7 @@ export default {
         count: 10,
         particleSize: 20,
         color: 1,
-        canDraw: true,
+        canDraw: false,
     },
     emotion: 'joy'
   };
