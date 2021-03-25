@@ -1,10 +1,10 @@
-import { vec2, vec3 } from 'gl-matrix'
+import { vec2 } from 'gl-matrix'
 import Emitter from 'event-emitter'
 import RAF from './raf'
 
 const _VEC2 = vec2.create()
 
-class Mouse {
+export class Mouse {
     cursor: vec2
     lastCursor: vec2
     velocity: vec2
@@ -52,13 +52,14 @@ class Mouse {
     initEvents() {
         this.target.addEventListener('touchstart', (event) => { this.onDown(event.touches[0]), { passive: false } })
         this.target.addEventListener('touchend', (event) => { this.onUp(event.touches[0]), { passive: false } })
-        this.target.addEventListener('touchmove', (event) => { event.preventDefault(); this.onMouve(event.touches[0]), { passive: false } })
+        this.target.addEventListener('touchmove', (event) => { event.preventDefault(); this.onMove(event.touches[0]), { passive: false } })
 
         this.target.addEventListener('mousedown', (event) => { this.onDown(event) })
-        this.target.addEventListener('mousemove', (event) => { this.onMouve(event) })
+        this.target.addEventListener('mousemove', (event) => { this.onMove(event) })
         this.target.addEventListener('mouseup', (event) => { this.onUp(event) })
 
         this.target.addEventListener('wheel', (event) => { this.onWheel(event) })
+        document.querySelector('canvas').addEventListener('drag', (event) => { console.log(event) })
 
         this.target.addEventListener('click', () => { this.emitter.emit('click') })
         this.target.addEventListener('resize', () => {
@@ -76,7 +77,7 @@ class Mouse {
         this.emitter.emit('down', this)
     }
 
-    onUp(event) {
+    onUp(event?) {
         this.isDown = false
         this.emitter.emit('up', this)
     }
@@ -90,11 +91,11 @@ class Mouse {
         this.emitter.emit('wheel', this)
     }
 
-    onMouve(event) {
+    onMove(event) {
         this.targeted = event.target
         this.cursor[0] = (event.clientX / this.screenWidth - 0.5) * 2
         this.cursor[1] = - (event.clientY / this.screenHeight - 0.5) * 2
-        this.emitter.emit('mouve', this)
+        this.emitter.emit('move', this)
         if (this.isDown) { this.emitter.emit('drag', this) }
     }
 

@@ -3,10 +3,13 @@ import { AxesHelper, Object3D } from 'three'
 // @ts-ignore
 import Time from '@tools/Time'
 // @ts-ignore
-import Mouse from '@tools/Mouse'
-import Brush from './Brush'
+import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 import Camera from '@js/Camera'
+
+import User from './User'
+import Brush from './Brush'
+import Ground from './Ground'
 import Suzanne from './Suzanne'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
@@ -26,7 +29,9 @@ export default class World {
   light: PointLightSource
   suzanne: Suzanne
   brush: Brush
+  ground: Ground
   pixelRatio: number
+  user: User
   constructor(options) {
     // Set options
     this.time = options.time
@@ -53,6 +58,8 @@ export default class World {
     this.setPointLight()
     // this.setSuzanne()
     this.setBrush()
+    this.setGround()
+    this.setUser()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -75,11 +82,18 @@ export default class World {
     })
     this.container.add(this.light.container)
   }
-  setSuzanne() {
-    this.suzanne = new Suzanne({
-      time: this.time
+  setGround() {
+    this.ground = new Ground({
+      time: this.time,
+      mouse: this.mouse
     })
-    this.container.add(this.suzanne.container)
+    this.container.add(this.ground.container)
+  }
+  setUser() {
+    this.user = new User({
+      camera: this.camera,
+      mouse: this.mouse
+    })
   }
   setBrush() {
     this.brush = new Brush({
