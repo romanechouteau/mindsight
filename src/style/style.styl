@@ -4,43 +4,125 @@ body, html
 
     .brushInterface
         position: absolute
-        right: 0
-        top: 50%
-        transform: translateY(-50%)
+        left: 0
+        bottom: 0
         padding: 16px
         user-select: none
+        color: white
+        display: flex
+        flex-direction: row
 
-        .dg
-            background: none
+        .paramsGroup
+            display: flex
+            flex-direction: column
 
-            .close-button
-                display: none
+            .inputGroup
+                display: flex
+                flex-direction: row
+                align-items: center
+                padding: 8px
+                display: flex
+                flex-direction: row
+                justify-content: space-between
 
-            li
-                background: none
-                border-left: none!important
-                border-bottom: none!important
-                margin: 8px
-                padding: 0
+                label, .label
+                    margin-right: 8px
 
-                &.number
-                    & > div
-                        display: flex
-                        align-items: center
+                input[type="range"]
+                    -webkit-appearance: none
+                    box-sizing: border-box
+                    outline: none
+                    padding: 0
+                    font: inherit
+                    cursor: pointer
+                    background-color: transparent
+                    background-image: linear-gradient(to right, #FFF, #FFF)
+                    background-size: 100% 5%
+                    background-repeat: no-repeat
+                    background-position: center
 
-                    input[type="text"]
+                    &::-webkit-slider-runnable-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-moz-range-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-ms-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        color: transparent
+                        background-color: transparent
+
+                    &::-webkit-slider-thumb
+                        -webkit-appearance: none
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-ms-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-progress
+                        height: 0
+                        background: transparent
+
+                    &::-ms-tooltip
                         display: none
 
-                    .slider
-                        width: 100%
-                        background-color: rgba(255,255,255,0.5)
-                        height: 8px
-                        border-radius: 8px
+                    &::-ms-fill-lower
+                        background: transparent
 
-                        .slider-fg
-                            background-color: white
-                            border-radius: 8px
+                    &::-ms-fill-upper
+                        background: transparent
 
-                &.color
-                    input[type="text"]
-                        border-radius: 8px
+                &.colorGroup
+                    height: 100%
+                    position: relative
+
+                    input
+                        position: absolute
+                        width: 120px
+                        right: -55px
+                        top: 32px
+                        background-color: transparent
+                        background-image: linear-gradient(to right, #0000FF, #00FF00, #FF0000)
+                        background-size: 100% 25%
+                        background-repeat: no-repeat
+                        background-position: center
+                        transform: rotate(-90deg)
+
+                        &::-webkit-slider-thumb
+                            height: 16px
+                            width: 2px
+                            border-radius: 0
+
+                        &::-moz-range-thumb
+                            height: 16px
+                            width: 2px
+                            border-radius: 0
+
+                        &::-ms-thumb
+                            height: 16px
+                            width: 2px
+                            border-radius: 0
+

@@ -6,9 +6,9 @@ module.exports = {
     mount: {
 
         public: "/",
-    
+
         src: "/dist",
-    
+
       },
     alias: {
         '@': './src/',
@@ -21,6 +21,8 @@ module.exports = {
         '@js': './src/js/',
         '@tools': './src/js/Tools/',
         '@world': './src/js/World/',
+        '@store': './src/js/Store/',
+        '@lib': './src/js/Lib/',
     },
     plugins: [
         '@snowpack/plugin-typescript',
@@ -40,7 +42,7 @@ module.exports = {
               }
             }
           ],
-          
+
     ],
     packageOptions: {
       polyfillNode: true,
