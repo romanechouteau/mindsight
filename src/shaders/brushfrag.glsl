@@ -1,5 +1,6 @@
 uniform vec3 uColor;
 uniform float uTime;
+uniform float uOpacity;
 
 varying float randomized;
 
@@ -11,7 +12,7 @@ void main()
 {
     float strength = distance(gl_PointCoord, vec2(0.5));
     float step = step(0.5, strength);
-    vec4 finalColor = mix(vec4(uColor, 1. - randomized), vec4(uColor,0.), step);
+    vec4 finalColor = mix(vec4(uColor, clamp(uOpacity - randomized, 0., 1.)), vec4(uColor,0.), step);
 
     gl_FragColor = finalColor;
 }
