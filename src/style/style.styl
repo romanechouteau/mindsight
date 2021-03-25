@@ -1,3 +1,6 @@
+*, *::before, *::after
+    box-sizing: border-box
+
 body, html
     margin: 0
     padding: 0
@@ -6,123 +9,190 @@ body, html
         position: absolute
         left: 0
         bottom: 0
+        width: 100%
         padding: 16px
         user-select: none
         color: white
         display: flex
         flex-direction: row
+        justify-content: space-between
+        align-items: flex-end
 
-        .paramsGroup
+        .paramsWrapper
             display: flex
-            flex-direction: column
+            flex-direction: row
 
-            .inputGroup
+            .paramsGroup
+                position: relative
                 display: flex
-                flex-direction: row
-                align-items: center
-                padding: 8px
-                display: flex
-                flex-direction: row
-                justify-content: space-between
+                flex-direction: column
+                margin-right: 16px
 
-                label, .label
-                    margin-right: 8px
+                &.bottomGroup
+                    justify-content: flex-end
 
-                input[type="range"]
-                    -webkit-appearance: none
-                    box-sizing: border-box
-                    outline: none
-                    padding: 0
-                    font: inherit
-                    cursor: pointer
-                    background-color: transparent
-                    background-image: linear-gradient(to right, #FFF, #FFF)
-                    background-size: 100% 5%
-                    background-repeat: no-repeat
-                    background-position: center
+                &.bigAndSmallCircles
+                    margin-right: 5vh
 
-                    &::-webkit-slider-runnable-track
-                        height: 100%
-                        border: none
-                        border-radius: 0
-                        background-color: transparent
+                .inputGroup
+                    display: flex
+                    flex-direction: row
+                    align-items: center
+                    padding: 8px
+                    display: flex
+                    flex-direction: row
+                    justify-content: space-between
 
-                    &::-moz-range-track
-                        height: 100%
-                        border: none
-                        border-radius: 0
-                        background-color: transparent
+                    label, .label
+                        margin-right: 8px
 
-                    &::-ms-track
-                        height: 100%
-                        border: none
-                        border-radius: 0
-                        color: transparent
-                        background-color: transparent
-
-                    &::-webkit-slider-thumb
+                    input[type="range"]
                         -webkit-appearance: none
-                        width: 8px
-                        height: 8px
-                        border: none
-                        border-radius: 4px
-                        background-color: white
-
-                    &::-moz-range-thumb
-                        width: 8px
-                        height: 8px
-                        border: none
-                        border-radius: 4px
-                        background-color: white
-
-                    &::-ms-thumb
-                        width: 8px
-                        height: 8px
-                        border: none
-                        border-radius: 4px
-                        background-color: white
-
-                    &::-moz-range-progress
-                        height: 0
-                        background: transparent
-
-                    &::-ms-tooltip
-                        display: none
-
-                    &::-ms-fill-lower
-                        background: transparent
-
-                    &::-ms-fill-upper
-                        background: transparent
-
-                &.colorGroup
-                    height: 100%
-                    position: relative
-
-                    input
-                        position: absolute
-                        width: 120px
-                        right: -55px
-                        top: 32px
+                        box-sizing: border-box
+                        outline: none
+                        padding: 0
+                        font: inherit
+                        cursor: pointer
                         background-color: transparent
-                        background-image: linear-gradient(to right, #0000FF, #00FF00, #FF0000)
-                        background-size: 100% 25%
+                        background-image: linear-gradient(to right, #FFF, #FFF)
+                        background-size: 100% 5%
                         background-repeat: no-repeat
                         background-position: center
-                        transform: rotate(-90deg)
+
+                        &::-webkit-slider-runnable-track
+                            height: 100%
+                            border: none
+                            border-radius: 0
+                            background-color: transparent
+
+                        &::-moz-range-track
+                            height: 100%
+                            border: none
+                            border-radius: 0
+                            background-color: transparent
+
+                        &::-ms-track
+                            height: 100%
+                            border: none
+                            border-radius: 0
+                            color: transparent
+                            background-color: transparent
 
                         &::-webkit-slider-thumb
-                            height: 16px
-                            width: 2px
-                            border-radius: 0
+                            -webkit-appearance: none
+                            width: 8px
+                            height: 8px
+                            border: none
+                            border-radius: 4px
+                            background-color: white
 
                         &::-moz-range-thumb
-                            height: 16px
-                            width: 2px
-                            border-radius: 0
+                            width: 8px
+                            height: 8px
+                            border: none
+                            border-radius: 4px
+                            background-color: white
 
                         &::-ms-thumb
-                            height: 16px
-                            width: 2px
-                            border-radius: 0
+                            width: 8px
+                            height: 8px
+                            border: none
+                            border-radius: 4px
+                            background-color: white
 
+                        &::-moz-range-progress
+                            height: 0
+                            background: transparent
+
+                        &::-ms-tooltip
+                            display: none
+
+                        &::-ms-fill-lower
+                            background: transparent
+
+                        &::-ms-fill-upper
+                            background: transparent
+
+                    &.colorGroup
+                        height: 100%
+                        position: relative
+
+                        input
+                            position: absolute
+                            width: 120px
+                            left: -60px
+                            bottom: 60px
+                            background-color: transparent
+                            background-size: 100% 25%
+                            background-repeat: no-repeat
+                            background-position: center
+                            transform: rotate(-90deg)
+
+                            &::-webkit-slider-thumb
+                                height: 16px
+                                width: 2px
+                                border-radius: 0
+
+                            &::-moz-range-thumb
+                                height: 16px
+                                width: 2px
+                                border-radius: 0
+
+                            &::-ms-thumb
+                                height: 16px
+                                width: 2px
+                                border-radius: 0
+
+                    &.circleRangeGroup
+                        display: flex
+                        flex-direction: column
+
+                        .label
+                            margin-bottom: 16px
+                            margin-right: 0
+
+
+                        .circleRange
+                            position: relative
+                            width: 25vh
+                            height: 25vh
+                            max-width: 200px
+                            max-height: 200px
+                            border-radius: 50%
+                            border-top: 1px solid white
+                            border-left: 1px solid white
+                            border-right: 1px solid white
+                            border-bottom: 1px solid transparent
+                            transform: rotate(45deg)
+                            cursor: pointer
+
+                            .rangeThumb
+                                position: absolute
+                                width: 12px
+                                height: 12px
+                                background-color: white
+                                border-radius: 50%
+                                transform: translate(-50%, -50%)
+
+                        &.smallCircle
+                            position: absolute
+                            bottom: 58%
+                            left: 68%
+
+                            .circleRange
+                                width: 15vh
+                                height: 15vh
+                                max-width: 120px
+                                max-height: 120px
+
+        .rightParams
+            padding-left: 16px
+            padding-top: 16px
+
+            .paramsGroup .inputGroup.circleRangeGroup
+                .circleRange
+                    transform: rotate(-45deg)
+
+        .leftParams
+            padding-top: 8vh
+            padding-right: 16px
