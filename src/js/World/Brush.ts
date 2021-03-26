@@ -105,6 +105,7 @@ export default class Brush extends Component {
     this.setMovement()
     this.listenMouseDown()
     this.listenMouseUp()
+    this.listenKeyboard()
     this.render()
   }
 
@@ -226,6 +227,17 @@ export default class Brush extends Component {
     })
   }
 
+  listenKeyboard() {
+    document.addEventListener('keyup', (event) => {
+      event.preventDefault()
+      const key = event.key || event.keyCode
+      if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
+        const checkbox = <HTMLInputElement> this.element.querySelector('#canDraw')
+        store.dispatch('updateBrushParams', { param: 'canDraw', value: !checkbox.checked })
+      }
+    })
+  }
+
   render() {
     const sizePosition = this.getThumbPosition(0, 0.7, store.state.brush.size)
     const countPosition = this.getThumbPosition(1, 50, store.state.brush.count)
@@ -314,7 +326,6 @@ export default class Brush extends Component {
       const isRounded = isEqual(range.getAttribute('data-round'), 'true')
 
       range.addEventListener('mousedown', (event: Event) => {
-        console.log('hello')
         const target = <HTMLInputElement>event.target
         const thumb = isEqual(target.className, 'rangeThumb') ? target : target.querySelector('.rangeThumb')
         const circle = isEqual(target.className, 'rangeThumb') ? <HTMLInputElement>target.parentNode : target
@@ -373,6 +384,18 @@ export default class Brush extends Component {
     this.updateParam(param)
   }
 
+  getThumbPosition(min, max, value) {
+    const start = 7
+    const end = 1
+    const angleTrigo = Math.PI / 4
+    const percentage = (value - min) / (max - min)
+    const number = start - (percentage * (start - end))
+    const angle = number * angleTrigo
+    const x = (Math.cos(angle) / 2 + 0.5) * 100
+    const y = (Math.sin(angle) / 2 + 0.5) * 100
+    return [x, y]
+  }
+
   getParamValue(event, center, min, max, isRounded, angleDecal) {
     const start = 7
     const end = 1
@@ -388,18 +411,6 @@ export default class Brush extends Component {
     const finalValue = Math.min(Math.max(value, min), max)
 
     return isRounded ? Math.round(finalValue) : finalValue
-  }
-
-  getThumbPosition(min, max, value) {
-    const start = 7
-    const end = 1
-    const angleTrigo = Math.PI / 4
-    const percentage = (value - min) / (max - min)
-    const number = start - (percentage * (start - end))
-    const angle = number * angleTrigo
-    const x = (Math.cos(angle) / 2 + 0.5) * 100
-    const y = (Math.sin(angle) / 2 + 0.5) * 100
-    return [x, y]
   }
 
   updateParam(param) {
