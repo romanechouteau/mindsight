@@ -39,30 +39,40 @@ export default class MoveManager {
             }
         })
 
-        // this.groundMaterial = new ShaderMaterial({
-        //     depthWrite: false,
-        //     blending: AdditiveBlending,
-        //     vertexColors: true,
-        //     vertexShader: groundVertex,
-        //     fragmentShader: groundFragment,
-        //     side: DoubleSide,
-        //     uniforms: {
-        //         uTime: { value: 0. },
-        //         [`u${MOODS.JOY}Intensity`]: { value: 0. },
-        //         [`u${MOODS.FEAR}Intensity`]: { value: 0. },
-        //         [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
-        //         [`u${MOODS.ANGER}Intensity`]: { value: 0. },
-        //     }
-        // })
+        this.groundMaterial = 
+        // new MeshStandardMaterial()
+        // this.groundMaterial.onBeforeCompile = (shader) => {
+        //     shader.uniforms.uTime = { value: 0 }
+        //     shader.vertexShader = 'uniform float uTime;\n' + shader.vertexShader;
+        //     shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', groundVertex)
 
-        ;(async () => {
-            this.groundMaterial = new MeshStandardMaterial({
-                // color: 0x0000ff,
-                side: DoubleSide,
-                displacementMap: await textureLoader.loadAsync(displacementMap),
-                displacementScale: 0.5,
-            })
-        })();
+        //     this.groundMaterial.userData.shader = shader;
+        // }
+        new ShaderMaterial({
+            // depthWrite: false,
+            // blending: AdditiveBlending,
+            // vertexColors: true,
+            vertexShader: groundVertex,
+            fragmentShader: groundFragment,
+            side: DoubleSide,
+            flatShading: false,
+            uniforms: {
+                uTime: { value: 0. },
+                [`u${MOODS.JOY}Intensity`]: { value: 0. },
+                [`u${MOODS.FEAR}Intensity`]: { value: 0. },
+                [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
+                [`u${MOODS.ANGER}Intensity`]: { value: 0. },
+            }
+        })
+
+        // ;(async () => {
+        //     this.groundMaterial = new MeshStandardMaterial({
+        //         // color: 0x0000ff,
+        //         side: DoubleSide,
+        //         displacementMap: await textureLoader.loadAsync(displacementMap),
+        //         displacementScale: 0.05,
+        //     })
+        // })();
 
 
         this.raycaster = new Raycaster()
@@ -125,13 +135,15 @@ export default class MoveManager {
     setGroundDeformation() {
         App.scene.getObjectByName('Plane').material = this.groundMaterial
         ;(App.scene.getObjectByName('Plane').material as MeshStandardMaterial).needsUpdate = true
-        // App.state.time.on('tick', () => {
-        //     this.groundMaterial.uniforms.uTime.value += 0.01
-        //     for (const mood in moodPositions) {
-        //         const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
-        //         this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
-        //     }
-        // })
+        App.state.time.on('tick', () => {
+            // const shader = this.groundMaterial.userData.shader
+            // if (shader) shader.uniforms.uTime.value += 0.1
+            this.groundMaterial.uniforms.uTime.value += 0.1
+            for (const mood in moodPositions) {
+                const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
+                this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
+            }
+        })
     }
     
     handleMove() {
