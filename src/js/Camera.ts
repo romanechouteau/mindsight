@@ -79,6 +79,8 @@ export default class Camera {
 
     const geometry = new PlaneGeometry(20, 20, 20)
     const material = new MeshBasicMaterial({
+      depthWrite: false,
+      depthTest: false,
       transparent: true,
       opacity: 0
     })
