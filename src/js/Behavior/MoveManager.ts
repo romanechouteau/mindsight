@@ -31,15 +31,15 @@ export default class MoveManager {
         this.setMoveCursor = this.setMoveCursor.bind(this)
         this.handleMove = this.handleMove.bind(this)
         this.handleLookAround = this.handleLookAround.bind(this)
-        this.setFakeGround = this.setFakeGround.bind(this)
-        
+        // this.setFakeGround = this.setFakeGround.bind(this)
+
         // TODO: wait for App mount
         setTimeout(this.setMoveCursor, 50)
         this.handleMove()
         this.handleLookAround()
 
         // TODO: make this geometry merging work
-        setTimeout(this.setFakeGround, 500)
+        // setTimeout(this.setFakeGround, 500)
         // this.setMoveCursor()
     }
 
@@ -50,7 +50,7 @@ export default class MoveManager {
         this.ground = App.scene.getObjectByName('Ground')
         // @ts-ignore
         App.scene.add(this.cursor)
-        
+
         // @ts-ignore
         App.state.time.on('tick', () => {
             const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
@@ -70,14 +70,17 @@ export default class MoveManager {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
+                const oldNeurons = neuronBuilder.spawnNeuron(this.cursor.position)
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,
                     duration: this.lastIntersection.distance/5,
                     x: this.cursor.position.x,
                     y: this.cursor.position.y,
                     z: this.cursor.position.z - 5,
+                    onComplete: neuronBuilder.removeNeurons,
+                    onCompleteParams: [oldNeurons]
                 })
-                neuronBuilder.spawnNeuron(this.cursor.position)
+
             }
         })
     }
@@ -85,8 +88,8 @@ export default class MoveManager {
         this.mouse.on('down', () => {
             this.prevEuler = this.euler
         })
-        this.mouse.on('drag', ev => {            
-            if (this.camera.orbitControls.enabled) return 
+        this.mouse.on('drag', ev => {
+            if (this.camera.orbitControls.enabled) return
             if (!this.isLooking) this.toggleLooking(true)
             this.euler.y = this.prevEuler.y - (this.mouse.lastCursor[0] - this.mouse.cursor[0])
             this.euler.x = this.prevEuler.x + (this.mouse.lastCursor[1] - this.mouse.cursor[1])
@@ -96,13 +99,13 @@ export default class MoveManager {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
     }
-    
+
     setFakeGround() {
 
         const ground = this.ground.children[0]
 
         const groundGeometries = (ground.children as Mesh[]).map(mesh => mesh.geometry.clone())
-        
+
         groundGeometries.forEach((geometry, i) => {
             geometry.translate(
                 ground.children[i].position.x,
@@ -112,7 +115,7 @@ export default class MoveManager {
             geometry.rotateX(ground.children[i].rotation.x)
             geometry.rotateY(ground.children[i].rotation.y)
             geometry.rotateZ(ground.children[i].rotation.z)
-                
+
             geometry.scale(
                 ground.children[i].scale.x,
                 ground.children[i].scale.y,
@@ -121,14 +124,14 @@ export default class MoveManager {
         })
 
         console.log('original');
-        
+
         console.log('_____');
         console.log(ground.children.map(mesh => mesh.geometry));
         console.log('_____');
         console.log('copied');
         console.log(groundGeometries);
-        
-        
+
+
         const groundGeometry = BufferGeometryUtils.mergeBufferGeometries(groundGeometries)
 
         // const fakesGroundMeshes = groundGeometries.map(geometry => new Mesh(geometry, new MeshBasicMaterial({ color: 0x00ff00 })))
