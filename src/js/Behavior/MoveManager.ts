@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -12,6 +12,8 @@ import groundVertex from '../../shaders/groundVert.glsl'
 import groundFragment from '../../shaders/groundFrag.glsl'
 import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
 import Ground from "../World/Ground";
+import displacementMap from '../../images/map2.png'
+import { textureLoader } from "../Tools/utils";
 
 export default class MoveManager {
     raycaster: Raycaster
@@ -37,17 +39,31 @@ export default class MoveManager {
             }
         })
 
-        this.groundMaterial = new ShaderMaterial({
-            vertexShader: groundVertex,
-            fragmentShader: groundFragment,
-            uniforms: {
-                uTime: { value: 0. },
-                [`u${MOODS.JOY}Intensity`]: { value: 0. },
-                [`u${MOODS.FEAR}Intensity`]: { value: 0. },
-                [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
-                [`u${MOODS.ANGER}Intensity`]: { value: 0. },
-            }
-        })
+        // this.groundMaterial = new ShaderMaterial({
+        //     depthWrite: false,
+        //     blending: AdditiveBlending,
+        //     vertexColors: true,
+        //     vertexShader: groundVertex,
+        //     fragmentShader: groundFragment,
+        //     side: DoubleSide,
+        //     uniforms: {
+        //         uTime: { value: 0. },
+        //         [`u${MOODS.JOY}Intensity`]: { value: 0. },
+        //         [`u${MOODS.FEAR}Intensity`]: { value: 0. },
+        //         [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
+        //         [`u${MOODS.ANGER}Intensity`]: { value: 0. },
+        //     }
+        // })
+
+        ;(async () => {
+            this.groundMaterial = new MeshStandardMaterial({
+                // color: 0x0000ff,
+                side: DoubleSide,
+                displacementMap: await textureLoader.loadAsync(displacementMap),
+                displacementScale: 0.5,
+            })
+        })();
+
 
         this.raycaster = new Raycaster()
         this.mouse = mouse
@@ -101,25 +117,28 @@ export default class MoveManager {
             this.cursorMaterial.uniforms.uTime.value += 0.01
 
             // rotate camera
-            this.camera.camera?.quaternion.setFromEuler( this.euler )
+            if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
         })
     }
 
     // TODO: export to Ground class
     setGroundDeformation() {
-        App.scene.getObjectByName('Sol').material = this.groundMaterial
-        App.state.time.on('tick', () => {
-            this.groundMaterial.uniforms.uTime.value += 0.01
-            for (const mood in moodPositions) {
-                const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
-                this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
-            }
-        })
+        App.scene.getObjectByName('Plane').material = this.groundMaterial
+        ;(App.scene.getObjectByName('Plane').material as MeshStandardMaterial).needsUpdate = true
+        // App.state.time.on('tick', () => {
+        //     this.groundMaterial.uniforms.uTime.value += 0.01
+        //     for (const mood in moodPositions) {
+        //         const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
+        //         this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
+        //     }
+        // })
     }
     
     handleMove() {
-        if (this.isMoving) return
+        if (this.isMoving) return;
         this.mouse.on('click', () => {
+            if (this.camera.orbitControls.enabled) return;
+            if (this.lastIntersection === undefined) return;
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
@@ -203,16 +222,7 @@ export default class MoveManager {
                 ground.children[i].scale.z
             )
         })
-
-        console.log('original');
-        
-        console.log('_____');
-        console.log(ground.children.map(mesh => mesh.geometry));
-        console.log('_____');
-        console.log('copied');
-        console.log(groundGeometries);
-        
-        
+          
         const groundGeometry = BufferGeometryUtils.mergeBufferGeometries(groundGeometries)
 
         // const fakesGroundMeshes = groundGeometries.map(geometry => new Mesh(geometry, new MeshBasicMaterial({ color: 0x00ff00 })))

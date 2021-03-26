@@ -10,7 +10,7 @@ class NeuronBuilder {
             this.container = new Group()
             this.container.name = 'NeuronContainer'
             App.scene.add(this.container)
-        }, 50);
+        }, 100);
     }
 
     spawnNeuron(position: Vector3){
