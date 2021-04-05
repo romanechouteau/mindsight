@@ -272,18 +272,6 @@ export default class Brush extends Component {
 
     this.element.innerHTML = `
       <div class="paramsGroup bigAndSmallCircles">
-        <div class="inputGroup colorGroup">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            name="color2"
-            id="color2"
-            value="${store.state.brush.color}"
-            style="background-image: linear-gradient(to right, ${map(colors[store.state.emotion], color =>
-              `rgb(${color[0]}, ${color[1]}, ${color[2]})`)})" />
-        </div>
         <div class="inputGroup circleRangeGroup">
           <div class="label">Brush size</div>
           <div
