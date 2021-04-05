@@ -1,6 +1,6 @@
 import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
 import * as dat from 'dat.gui'
-import { isEqual, map, reduce, last, nth, slice, first } from 'lodash'
+import { isEqual, map, reduce, nth, slice, first, get } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -27,32 +27,24 @@ const configShaderMaterial = {
   transparent: true
 }
 
-const angles = [
-  null,
-  Math.PI * 4 / 3 + (3 * Math.PI / 2),
-  Math.PI * 2 / 3 + (3 * Math.PI / 2),
-  0 + (3 * Math.PI / 2)
-]
-
-const origins = [
-  [0, 0],
-  [Math.cos(Math.PI * 2 / 3), Math.sin(Math.PI * 2 / 3)],
-  [Math.cos(Math.PI * 4 / 3), Math.sin(Math.PI * 4 / 3)],
-  [1, 0]
-]
-
-const originPercentage = [
-  null,
-  Math.sqrt(Math.pow(Math.cos(Math.PI * 2 / 3) / 2 + 0.5, 2) + Math.pow(- Math.sin(Math.PI * 2 / 3) / 2 + 0.5, 2)) / 2 * 100,
-  Math.sqrt(Math.pow(Math.cos(Math.PI * 4 / 3) / 2 + 0.5, 2) + Math.pow(Math.sin(Math.PI * 4 / 3) / 2 + 0.5, 2)) / 2 * 100,
-  null
-]
-
-const percentages = [
-  100,
-  45,
-  45,
-  45
+const colorPalette = [
+  {
+    angle: Math.PI * 4 / 3 + (3 * Math.PI / 2),
+    origin: [Math.cos(Math.PI * 2 / 3), Math.sin(Math.PI * 2 / 3)],
+    originPercentage: Math.sqrt(Math.pow(Math.cos(Math.PI * 2 / 3) / 2 + 0.5, 2) + Math.pow(- Math.sin(Math.PI * 2 / 3) / 2 + 0.5, 2)) / 2 * 100,
+    percentage: 45
+  },
+  {
+    angle: Math.PI * 2 / 3 + (3 * Math.PI / 2),
+    origin: [Math.cos(Math.PI * 4 / 3), Math.sin(Math.PI * 4 / 3)],
+    originPercentage: Math.sqrt(Math.pow(Math.cos(Math.PI * 4 / 3) / 2 + 0.5, 2) + Math.pow(Math.sin(Math.PI * 4 / 3) / 2 + 0.5, 2)) / 2 * 100,
+    percentage: 45
+   },
+  {
+    angle: 0 + (3 * Math.PI / 2),
+    origin: [1, 0],
+    percentage: 45
+  }
 ]
 
 const colors = {
@@ -290,10 +282,9 @@ export default class Brush extends Component {
               id="color"
               style="
               background-color: rgb(${first(colors[store.state.emotion])});
-              background-image: linear-gradient(${nth(angles, 2)}rad, rgb(${nth(colors[store.state.emotion], 2)}), rgb(${nth(colors[store.state.emotion], 2)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 2)}%),
-              linear-gradient(${nth(angles, 1)}rad, rgb(${nth(colors[store.state.emotion], 1)}), rgb(${nth(colors[store.state.emotion], 1)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 1)}%),
-              linear-gradient(${last(angles)}rad, rgb(${last(colors[store.state.emotion])}), transparent ${last(percentages)}%);">
-
+              background-image: ${map(colorPalette, (color, i) =>
+                `linear-gradient(${get(color, 'angle', 0)}rad, rgb(${nth(colors[store.state.emotion], i + 1)}), rgb(${nth(colors[store.state.emotion], i + 1)}) ${get(color, 'originPercentage', 0)}%, transparent ${get(color, 'percentage', 0)}%)`
+              )};">
             <div
                 class="rangeThumb"
                 style="top: ${colorPosition[1]}%; left: ${colorPosition[0]}%;"></div>
@@ -346,10 +337,8 @@ export default class Brush extends Component {
       const isRounded = isEqual(range.getAttribute('data-round'), 'true')
 
       range.addEventListener('mousedown', (event: Event) => {
-        const target = <HTMLInputElement>event.target
-        const thumb = isEqual(target.className, 'rangeThumb') ? target : target.querySelector('.rangeThumb')
-        const circle = isEqual(target.className, 'rangeThumb') ? <HTMLInputElement>target.parentNode : target
-        const circleBox = circle.getBoundingClientRect()
+        const thumb = range.querySelector('.rangeThumb')
+        const circleBox = range.getBoundingClientRect()
         const center = [circleBox.left + (circleBox.width / 2), circleBox.top + (circleBox.height / 2)]
         const angleDecal = Math.PI / 4
 
@@ -541,9 +530,9 @@ export default class Brush extends Component {
   getColorInGradient() {
     const palette = [
       { color: colors[store.state.emotion][0] },
-      ...map(slice(colors[store.state.emotion], 1), (color, i) => {
-        const origin = origins[i + 1]
-        const percentage = percentages[i + 1]
+      ...map(colorPalette, (color, i) => {
+        const origin = get(color, 'origin', 0)
+        const percentage = get(color, 'percentage', 0)
 
         const slopeAngle = origin[1] / origin[0]
 
@@ -555,18 +544,18 @@ export default class Brush extends Component {
 
         const clampedDistance = distance > 1 ? 1 : distance
         const proximity = 1 - clampedDistance
-        return { color, proximity }
+        return { color: colors[store.state.emotion][i + 1], proximity }
       })
     ]
     const totalWeight = reduce(slice(palette, 1), (acc, color) => acc + color.proximity, 0)
     palette[0].proximity = 1 - totalWeight
-    const r = reduce(palette, (acc, color, i) => {
+    const r = reduce(palette, (acc, color) => {
       return acc + color.color[0] * color.proximity
     }, 0)
-    const g = reduce(palette, (acc, color, i) => {
+    const g = reduce(palette, (acc, color) => {
       return acc + color.color[1] * color.proximity
     }, 0)
-    const b = reduce(palette, (acc, color, i) => {
+    const b = reduce(palette, (acc, color) => {
       return acc + color.color[2] * color.proximity
     }, 0)
     return new Color(r / 255, g / 255, b / 255)
