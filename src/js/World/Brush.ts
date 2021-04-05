@@ -1,6 +1,6 @@
 import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
 import * as dat from 'dat.gui'
-import { isEqual, map, reduce, last, nth, slice } from 'lodash'
+import { isEqual, map, reduce, last, nth, slice, first } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -289,7 +289,7 @@ export default class Brush extends Component {
               class="colorRange"
               id="color"
               style="
-              background-color: red;
+              background-color: rgb(${first(colors[store.state.emotion])});
               background-image: linear-gradient(${nth(angles, 2)}rad, rgb(${nth(colors[store.state.emotion], 2)}), rgb(${nth(colors[store.state.emotion], 2)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 2)}%),
               linear-gradient(${nth(angles, 1)}rad, rgb(${nth(colors[store.state.emotion], 1)}), rgb(${nth(colors[store.state.emotion], 1)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 1)}%),
               linear-gradient(${last(angles)}rad, rgb(${last(colors[store.state.emotion])}), transparent ${last(percentages)}%);">
