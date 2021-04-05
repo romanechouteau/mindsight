@@ -3,7 +3,7 @@ export default {
         size: 0.3,
         count: 10,
         particleSize: 20,
-        color: 1,
+        color: [0, 0],
         canDraw: false,
     },
     emotion: 'joy'

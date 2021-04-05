@@ -1,6 +1,6 @@
 import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
 import * as dat from 'dat.gui'
-import { isEqual, map } from 'lodash'
+import { isEqual, map, reduce, last, nth, slice } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -27,8 +27,36 @@ const configShaderMaterial = {
   transparent: true
 }
 
+const angles = [
+  null,
+  Math.PI * 4 / 3 + (3 * Math.PI / 2),
+  Math.PI * 2 / 3 + (3 * Math.PI / 2),
+  0 + (3 * Math.PI / 2)
+]
+
+const origins = [
+  [0, 0],
+  [Math.cos(Math.PI * 2 / 3), Math.sin(Math.PI * 2 / 3)],
+  [Math.cos(Math.PI * 4 / 3), Math.sin(Math.PI * 4 / 3)],
+  [1, 0]
+]
+
+const originPercentage = [
+  null,
+  Math.sqrt(Math.pow(Math.cos(Math.PI * 2 / 3) / 2 + 0.5, 2) + Math.pow(- Math.sin(Math.PI * 2 / 3) / 2 + 0.5, 2)) / 2 * 100,
+  Math.sqrt(Math.pow(Math.cos(Math.PI * 4 / 3) / 2 + 0.5, 2) + Math.pow(Math.sin(Math.PI * 4 / 3) / 2 + 0.5, 2)) / 2 * 100,
+  null
+]
+
+const percentages = [
+  100,
+  45,
+  45,
+  45
+]
+
 const colors = {
-  joy: [[0, 0, 255], [0, 255, 0], [255, 0, 0]]
+  joy: [[255, 0, 0], [255, 255, 0], [0, 255, 255], [85, 0, 255]]
 }
 
 const lastPositions = 5
@@ -240,56 +268,53 @@ export default class Brush extends Component {
 
   render() {
     const sizePosition = this.getThumbPosition(0, 0.7, store.state.brush.size)
-    const countPosition = this.getThumbPosition(1, 50, store.state.brush.count)
-    const particleSizePosition = this.getThumbPosition(1, 50, store.state.brush.particleSize)
+    const colorPosition = this.getThumbColorPosition(store.state.brush.color)
 
     this.element.innerHTML = `
-      <div class="paramsWrapper leftParams">
-        <div class="paramsGroup bigAndSmallCircles">
-          <div class="inputGroup circleRangeGroup smallCircle">
-            <div class="label">Particle size</div>
-            <div
+      <div class="paramsGroup bigAndSmallCircles">
+        <div class="inputGroup colorGroup">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            name="color2"
+            id="color2"
+            value="${store.state.brush.color}"
+            style="background-image: linear-gradient(to right, ${map(colors[store.state.emotion], color =>
+              `rgb(${color[0]}, ${color[1]}, ${color[2]})`)})" />
+        </div>
+        <div class="inputGroup circleRangeGroup">
+          <div class="label">Brush size</div>
+          <div
               class="circleRange"
-              id="particleSize"
-              data-min="1"
-              data-max="50">
-              <div
-                  class="rangeThumb"
-                  style="top: ${particleSizePosition[0]}%; left: ${particleSizePosition[1]}%;"></div>
-            </div>
-          </div>
-          <div class="inputGroup circleRangeGroup">
-            <div class="label">Brush size</div>
+              id="size"
+              data-min="0"
+              data-max="0.7">
             <div
-                class="circleRange"
-                id="size"
-                data-min="0"
-                data-max="0.7">
-              <div
-                  class="rangeThumb"
-                  style="top: ${sizePosition[0]}%; left: ${sizePosition[1]}%;"></div>
-            </div>
+                class="rangeThumb"
+                style="top: ${sizePosition[1]}%; left: ${sizePosition[0]}%;"></div>
           </div>
         </div>
-        <div class="paramsGroup">
-          <div class="inputGroup colorGroup">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              name="color"
+        <div class="inputGroup colorRangeGroup">
+          <div
+              class="colorRange"
               id="color"
-              value="${store.state.brush.color}"
-              style="background-image: linear-gradient(to right, ${map(colors[store.state.emotion], color =>
-                `rgb(${color[0]}, ${color[1]}, ${color[2]})`)})" />
+              style="
+              background-color: red;
+              background-image: linear-gradient(${nth(angles, 2)}rad, rgb(${nth(colors[store.state.emotion], 2)}), rgb(${nth(colors[store.state.emotion], 2)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 2)}%),
+              linear-gradient(${nth(angles, 1)}rad, rgb(${nth(colors[store.state.emotion], 1)}), rgb(${nth(colors[store.state.emotion], 1)}) ${nth(originPercentage, 2)}%, transparent ${nth(percentages, 1)}%),
+              linear-gradient(${last(angles)}rad, rgb(${last(colors[store.state.emotion])}), transparent ${last(percentages)}%);">
+
+            <div
+                class="rangeThumb"
+                style="top: ${colorPosition[1]}%; left: ${colorPosition[0]}%;"></div>
           </div>
         </div>
       </div>
-      <div class="paramsWrapper rightParams">
-        <div class="paramsGroup bottomGroup">
-          <div class="inputGroup checkbox">
-            <label for="canDraw">Draw</label>
+      <div class="paramsGroup">
+        <div class="inputGroup checkbox">
+          <div class="checkboxWrapper">
             <div class="toggle">
               <input
                 type="checkbox"
@@ -299,22 +324,29 @@ export default class Brush extends Component {
               <div class="slider"></div>
             </div>
           </div>
+          <label for="canDraw">Draw</label>
         </div>
-        <div class="paramsGroup">
-          <div class="inputGroup circleRangeGroup">
-            <div class="label">Density</div>
-            <div
-              class="circleRange"
-              id="count"
-              data-orientation="right"
-              data-round="true"
-              data-min="1"
-              data-max="50">
-              <div
-                  class="rangeThumb"
-                  style="top: ${countPosition[0]}%; left: ${countPosition[1]}%;"></div>
-            </div>
-          </div>
+        <div class="inputGroup">
+        <input
+        type="range"
+        min="1"
+        max="50"
+        step="1"
+        name="particleSize"
+        id="particleSize"
+        value="${store.state.brush.particleSize}" />
+        <label for="particleSize">Particle size</label>
+        </div>
+        <div class="inputGroup">
+          <input
+            type="range"
+            min="1"
+            max="50"
+            step="1"
+            name="count"
+            id="count"
+            value="${store.state.brush.count}" />
+          <label for="count">Density</label>
         </div>
       </div>
     `
@@ -331,12 +363,39 @@ export default class Brush extends Component {
         const circle = isEqual(target.className, 'rangeThumb') ? <HTMLInputElement>target.parentNode : target
         const circleBox = circle.getBoundingClientRect()
         const center = [circleBox.left + (circleBox.width / 2), circleBox.top + (circleBox.height / 2)]
-        const angleDecal = isEqual(circle.getAttribute('data-orientation'), 'right') ? - Math.PI / 4 : Math.PI / 4
+        const angleDecal = Math.PI / 4
 
         this.updateRange(event, param, thumb, center, min, max, isRounded, angleDecal)
 
         const handleMouseMove = (mouseEvent: MouseEvent) => {
           this.updateRange(mouseEvent, param, thumb, center, min, max, isRounded, angleDecal)
+        }
+
+        document.addEventListener('mousemove', handleMouseMove)
+
+        document.addEventListener('mouseup', () => {
+          document.removeEventListener('mousemove', handleMouseMove)
+
+          store.dispatch('updateBrushParams', { param, value: this.params[param] })
+        }, { once: true })
+      })
+    })
+
+    this.element.querySelectorAll('.colorRange').forEach((range) => {
+      const param = range.id
+
+      range.addEventListener('mousedown', (event: Event) => {
+        const target = <HTMLInputElement>event.target
+        const thumb = isEqual(target.className, 'rangeThumb') ? target : target.querySelector('.rangeThumb')
+        const circle = isEqual(target.className, 'rangeThumb') ? <HTMLInputElement>target.parentNode : target
+        const circleBox = circle.getBoundingClientRect()
+        const radius = circleBox.width / 2
+        const center = [circleBox.left + radius, circleBox.top + radius]
+
+        this.updateColorRange(event, param, thumb, center, radius)
+
+        const handleMouseMove = (mouseEvent: MouseEvent) => {
+          this.updateColorRange(mouseEvent, param, thumb, center, radius)
         }
 
         document.addEventListener('mousemove', handleMouseMove)
@@ -377,8 +436,19 @@ export default class Brush extends Component {
     const value = this.getParamValue(event, center, min, max, isRounded, angleDecal)
     const position = this.getThumbPosition(min, max, value)
 
-    thumb.style.top = `${position[0]}%`
-    thumb.style.left = `${position[1]}%`
+    thumb.style.left = `${position[0]}%`
+    thumb.style.top = `${position[1]}%`
+
+    this.params[param] = value
+    this.updateParam(param)
+  }
+
+  updateColorRange(event, param, thumb, center, radius) {
+    const value = this.getColorValue(event, center, radius)
+    const position = this.getThumbColorPosition(value)
+
+    thumb.style.left = `${position[0]}%`
+    thumb.style.top = `${position[1]}%`
 
     this.params[param] = value
     this.updateParam(param)
@@ -391,8 +461,29 @@ export default class Brush extends Component {
     const percentage = (value - min) / (max - min)
     const number = start - (percentage * (start - end))
     const angle = number * angleTrigo
-    const x = (Math.cos(angle) / 2 + 0.5) * 100
-    const y = (Math.sin(angle) / 2 + 0.5) * 100
+    const x = (Math.sin(angle) / 2 + 0.5) * 100
+    const y = (Math.cos(angle) / 2 + 0.5) * 100
+    return [x, y]
+  }
+
+  getThumbColorPosition(value) {
+    const x = (value[0] / 2 + 0.5) * 100
+    const y = (- value[1] / 2 + 0.5) * 100
+    return [x, y]
+  }
+
+  getColorValue(event, center, radius) {
+    const position = [event.clientX, event.clientY]
+    const angle = Math.atan2(position[0] - center[0], position[1] - center[1])
+    const borderX = Math.abs(Math.sin(angle) * radius)
+    const borderY = Math.abs(Math.cos(angle) * radius)
+
+    const clampedX = Math.max(Math.min(position[0] - center[0], borderX), -borderX)
+    const clampedY = Math.max(Math.min(center[1] - position[1], borderY), -borderY)
+
+    const x = clampedX / radius
+    const y = clampedY / radius
+
     return [x, y]
   }
 
@@ -441,13 +532,55 @@ export default class Brush extends Component {
     return
   }
 
+  getCoordsIntersect(origin, position, slopeAngle) {
+    if (isEqual(slopeAngle, 0)) {
+      const xIntersect = origin[0]
+      const yIntersect = position[1]
+      return [xIntersect, yIntersect]
+    }
+
+    const slopeTangent = -1 / slopeAngle
+    const bTangent = - (slopeTangent * origin[0]) + origin[1]
+
+    const bPerpendicular = - (slopeAngle * position[0]) + position[1]
+    const perpendicular = (x) => slopeAngle * x + bPerpendicular
+
+    const xIntersect = (bTangent - bPerpendicular) / (slopeAngle - slopeTangent)
+    const yIntersect = perpendicular(xIntersect)
+    return [xIntersect, yIntersect]
+  }
+
   getColorInGradient() {
-    const palette = colors[store.state.emotion]
-    const share = 1 / (palette.length - 1)
-    const indexFirst = Math.floor(this.params.color / share)
-    const indexLast = Math.ceil(this.params.color / share)
-    const percentage = (this.params.color - (share * indexFirst)) * (palette.length - 1)
-    const color = map(palette[indexFirst], (colorFrag, i) => (Math.round(colorFrag * (1 - percentage) + palette[indexLast][i] * percentage) / 255))
-    return new Color(...color)
+    const palette = [
+      { color: colors[store.state.emotion][0] },
+      ...map(slice(colors[store.state.emotion], 1), (color, i) => {
+        const origin = origins[i + 1]
+        const percentage = percentages[i + 1]
+
+        const slopeAngle = origin[1] / origin[0]
+
+        const [xIntersect, yIntersect] = this.getCoordsIntersect(origin, this.params.color, slopeAngle)
+
+        const distanceX = Math.abs(this.params.color[0] - xIntersect)
+        const distanceY = Math.abs(this.params.color[1] - yIntersect)
+        const distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2))
+
+        const clampedDistance = distance > 1 ? 1 : distance
+        const proximity = 1 - clampedDistance
+        return { color, proximity }
+      })
+    ]
+    const totalWeight = reduce(slice(palette, 1), (acc, color) => acc + color.proximity, 0)
+    palette[0].proximity = 1 - totalWeight
+    const r = reduce(palette, (acc, color, i) => {
+      return acc + color.color[0] * color.proximity
+    }, 0)
+    const g = reduce(palette, (acc, color, i) => {
+      return acc + color.color[1] * color.proximity
+    }, 0)
+    const b = reduce(palette, (acc, color, i) => {
+      return acc + color.color[2] * color.proximity
+    }, 0)
+    return new Color(r / 255, g / 255, b / 255)
   }
 }

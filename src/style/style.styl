@@ -10,7 +10,6 @@ body, html
         position: absolute
         left: 0
         bottom: 0
-        width: 100%
         padding: 16px
         padding-top: 10vh
         user-select: none
@@ -22,35 +21,34 @@ body, html
         background-image:
             linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7))
 
-
-        .paramsWrapper
+        .paramsGroup
+            position: relative
             display: flex
-            flex-direction: row
-            align-items: flex-end
+            flex-direction: column
+            margin-right: 16px
 
-            .paramsGroup
-                position: relative
+            &.bottomGroup
+                justify-content: flex-end
+
+            &.bigAndSmallCircles
+                margin-left: 5vh
+
+            .inputGroup
                 display: flex
-                flex-direction: column
-                margin-right: 16px
+                flex-direction: row
+                align-items: center
+                padding: 8px
+                display: flex
+                flex-direction: row
+                justify-content: space-between
 
-                &.bottomGroup
+                label, .label
+                    margin-left: 16px
+
+                .checkboxWrapper
+                    width: 130px
+                    display: flex
                     justify-content: flex-end
-
-                &.bigAndSmallCircles
-                    margin-right: 5vh
-
-                .inputGroup
-                    display: flex
-                    flex-direction: row
-                    align-items: center
-                    padding: 8px
-                    display: flex
-                    flex-direction: row
-                    justify-content: space-between
-
-                    label, .label
-                        margin-right: 8px
 
                     .toggle
                         position relative
@@ -92,153 +90,117 @@ body, html
                                 &::before
                                     right: 0
 
-                    input[type="range"]
-                        -webkit-appearance: none
-                        box-sizing: border-box
-                        outline: none
-                        padding: 0
-                        font: inherit
-                        cursor: pointer
-                        background-color: transparent
-                        background-image: linear-gradient(to right, #FFF, #FFF)
-                        background-size: 100% 5%
-                        background-repeat: no-repeat
-                        background-position: center
+                input[type="range"]
+                    -webkit-appearance: none
+                    box-sizing: border-box
+                    width: 130px
+                    margin: 0
+                    outline: none
+                    padding: 0
+                    font: inherit
+                    cursor: pointer
+                    background-color: transparent
+                    background-image: linear-gradient(to right, #FFF, #FFF)
+                    background-size: 100% 5%
+                    background-repeat: no-repeat
+                    background-position: center
 
-                        &::-webkit-slider-runnable-track
-                            height: 100%
-                            border: none
-                            border-radius: 0
-                            background-color: transparent
-
-                        &::-moz-range-track
-                            height: 100%
-                            border: none
-                            border-radius: 0
-                            background-color: transparent
-
-                        &::-ms-track
-                            height: 100%
-                            border: none
-                            border-radius: 0
-                            color: transparent
-                            background-color: transparent
-
-                        &::-webkit-slider-thumb
-                            -webkit-appearance: none
-                            width: 8px
-                            height: 8px
-                            border: none
-                            border-radius: 4px
-                            background-color: white
-
-                        &::-moz-range-thumb
-                            width: 8px
-                            height: 8px
-                            border: none
-                            border-radius: 4px
-                            background-color: white
-
-                        &::-ms-thumb
-                            width: 8px
-                            height: 8px
-                            border: none
-                            border-radius: 4px
-                            background-color: white
-
-                        &::-moz-range-progress
-                            height: 0
-                            background: transparent
-
-                        &::-ms-tooltip
-                            display: none
-
-                        &::-ms-fill-lower
-                            background: transparent
-
-                        &::-ms-fill-upper
-                            background: transparent
-
-                    &.colorGroup
+                    &::-webkit-slider-runnable-track
                         height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-moz-range-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-ms-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        color: transparent
+                        background-color: transparent
+
+                    &::-webkit-slider-thumb
+                        -webkit-appearance: none
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-ms-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-progress
+                        height: 0
+                        background: transparent
+
+                    &::-ms-tooltip
+                        display: none
+
+                    &::-ms-fill-lower
+                        background: transparent
+
+                    &::-ms-fill-upper
+                        background: transparent
+
+                &.circleRangeGroup, &.colorRangeGroup
+                    display: flex
+                    flex-direction: column
+
+                    .label
+                        margin-bottom: 16px
+                        margin-left: 0
+
+                    .circleRange
                         position: relative
+                        width: 25vh
+                        height: 25vh
+                        max-width: 200px
+                        max-height: 200px
+                        border-radius: 50%
+                        border-top: 1px solid white
+                        border-left: 1px solid white
+                        border-right: 1px solid white
+                        border-bottom: 1px solid transparent
+                        transform: rotate(45deg)
+                        cursor: pointer
 
-                        input
-                            position: absolute
-                            width: 120px
-                            left: -60px
-                            bottom: 60px
-                            background-color: transparent
-                            background-size: 100% 25%
-                            background-repeat: no-repeat
-                            background-position: center
-                            transform: rotate(-90deg)
+                    .rangeThumb
+                        position: absolute
+                        width: 12px
+                        height: 12px
+                        background-color: white
+                        border-radius: 50%
+                        transform: translate(-50%, -50%)
 
-                            &::-webkit-slider-thumb
-                                height: 16px
-                                width: 2px
-                                border-radius: 0
+                &.colorRangeGroup
+                    position: absolute
+                    bottom: 0
+                    left: -10%
 
-                            &::-moz-range-thumb
-                                height: 16px
-                                width: 2px
-                                border-radius: 0
-
-                            &::-ms-thumb
-                                height: 16px
-                                width: 2px
-                                border-radius: 0
-
-                    &.circleRangeGroup
-                        display: flex
-                        flex-direction: column
-
-                        .label
-                            margin-bottom: 16px
-                            margin-right: 0
-
-
-                        .circleRange
-                            position: relative
-                            width: 25vh
-                            height: 25vh
-                            max-width: 200px
-                            max-height: 200px
-                            border-radius: 50%
-                            border-top: 1px solid white
-                            border-left: 1px solid white
-                            border-right: 1px solid white
-                            border-bottom: 1px solid transparent
-                            transform: rotate(45deg)
-                            cursor: pointer
-
-                            .rangeThumb
-                                position: absolute
-                                width: 12px
-                                height: 12px
-                                background-color: white
-                                border-radius: 50%
-                                transform: translate(-50%, -50%)
-
-                        &.smallCircle
-                            position: absolute
-                            bottom: 58%
-                            left: 68%
-
-                            .circleRange
-                                width: 15vh
-                                height: 15vh
-                                max-width: 120px
-                                max-height: 120px
-
-        .rightParams
-            padding-left: 16px
-            padding-top: 16px
-
-            .paramsGroup .inputGroup.circleRangeGroup
-                .circleRange
-                    transform: rotate(-45deg)
-
-        .leftParams
-            padding-top: 8vh
-            padding-right: 16px
+                    .colorRange
+                        position: relative
+                        width: 10vh
+                        height: 10vh
+                        max-width: 120px
+                        max-height: 120px
+                        border-radius: 50%
+                        cursor: pointer
+                        background-color: red
+                        background-image: linear-gradient(to bottom, #ffff00, transparent 45%)
