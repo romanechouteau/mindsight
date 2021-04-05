@@ -33,12 +33,6 @@ const angles = [
   2 * Math.PI,
 ]
 
-const percentages = [
-  0.45,
-  0.45,
-  0.45
-]
-
 const colors = {
   joy: [[255, 0, 0], [255, 255, 0], [0, 255, 255], [85, 0, 255]]
 }
@@ -422,7 +416,7 @@ export default class Brush extends Component {
       const endY = (- Math.sin(angle + Math.PI) * 0.5 + 0.5) * paletteSize
       const grd = ctx.createLinearGradient(x, y, endX, endY)
       grd.addColorStop(0, `rgba(${nth(colors[store.state.emotion], i + 1)}, 1)`)
-      grd.addColorStop(nth(percentages, i), `rgba(${nth(colors[store.state.emotion], i + 1)}, 0)`)
+      grd.addColorStop(0.45, `rgba(${nth(colors[store.state.emotion], i + 1)}, 0)`)
       ctx.fillStyle = grd
       ctx.fill()
     })
