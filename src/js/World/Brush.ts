@@ -53,6 +53,11 @@ const colors = {
 
 const lastPositions = 5
 
+const random = (index) => {
+  const number = Math.sin(index * 12.9898 + index * 78.233) * 43758.5453
+  return number - Math.floor(number);
+}
+
 export default class Brush extends Component {
   time: Time
   scene: Object3D
@@ -67,6 +72,7 @@ export default class Brush extends Component {
   raycaster: Raycaster
   pixelRatio: number
   isPainting: Boolean
+  brushPreview: NodeListOf<SVGCircleElement>
   brushGeometry: BufferGeometry
   brushPositions: number[]
   particlesOffset: number[]
@@ -274,6 +280,10 @@ export default class Brush extends Component {
             <div
                 class="rangeThumb"
                 style="top: ${sizePosition[1]}%; left: ${sizePosition[0]}%;"></div>
+            <div class="brushPreview">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              </svg>
+            </div>
           </div>
         </div>
         <div class="inputGroup colorRangeGroup">
@@ -329,6 +339,8 @@ export default class Brush extends Component {
         </div>
       </div>
     `
+
+    this.renderBrushPreview()
 
     this.element.querySelectorAll('.circleRange').forEach((range) => {
       const param = range.id
@@ -407,6 +419,43 @@ export default class Brush extends Component {
         })
       }
     });
+  }
+
+  getBrushPreviewParam(param, i, value?) {
+    if (isEqual(param, 'size')) {
+      const randomAngle = random(i * i) * Math.PI * 2
+      const randomDist = random(i * i + 1)
+      const x = Math.cos(randomAngle) * randomDist
+      const y = Math.sin(randomAngle) * randomDist
+      return [50 - ((x * this.params.size) * 70), 50 - ((y * this.params.size) * 70)]
+    }
+
+    if (isEqual(param, 'particleSize')) {
+      return Math.max(this.params.particleSize * 0.1  * (1 + (random(i * 2) - 0.3)), 0.5)
+    }
+
+    if (isEqual(param, 'color')) {
+      const transparency = i <= this.params.count * 3 ? 1 - random(i * 8) * 0.7 : 0
+      return `rgba(${value.r * 255}, ${value.g * 255}, ${value.b * 255}, ${transparency})`
+    }
+  }
+
+  renderBrushPreview() {
+    const brushPreviewSvg = <HTMLElement> this.element.querySelector('.brushPreview svg')
+    const color = this.getColorInGradient()
+
+    brushPreviewSvg.innerHTML = ''
+    for (let i = 0; i < 50 * 3; i++) {
+      const [x, y] = <number[]> this.getBrushPreviewParam('size', i)
+      brushPreviewSvg.innerHTML += `
+        <circle
+          cx="${x}"
+          cy="${y}"
+          r="${this.getBrushPreviewParam('particleSize', i)}"
+          style="fill: ${this.getBrushPreviewParam('color', i, color)};"/>
+      `
+    }
+    this.brushPreview = brushPreviewSvg.querySelectorAll('circle')
   }
 
   updateRange(event, param, thumb, center, min, max, isRounded, angleDecal) {
@@ -491,19 +540,39 @@ export default class Brush extends Component {
             Math.random() - 0.5
           )
       }
+      const color = this.getColorInGradient()
+      this.brushPreview.forEach((elem, i) => {
+        elem.style.fill = <string> this.getBrushPreviewParam('color', i, color)
+      })
+
       return this.particlesOffset
     }
 
     if (isEqual(param, 'particleSize')) {
+      this.brushPreview.forEach((elem, i) => {
+        elem.setAttribute('r', `${this.getBrushPreviewParam('particleSize', i)}`)
+      })
+
       return this.material.uniforms.uParticleSize.value = this.params.particleSize * this.pixelRatio
     }
 
     if (isEqual(param, 'size')) {
+      this.brushPreview.forEach((elem, i) => {
+        const [x, y] = <number[]> this.getBrushPreviewParam('size', i)
+        elem.setAttribute('cx', `${x}`)
+        elem.setAttribute('cy', `${y}`)
+      })
       return this.material.uniforms.uSize.value = this.params.size
     }
 
     if (isEqual(param, 'color')) {
-      return this.material.uniforms.uColor.value = this.getColorInGradient()
+      const color = this.getColorInGradient()
+
+      this.brushPreview.forEach((elem, i) => {
+        elem.style.fill = <string> this.getBrushPreviewParam('color', i, color)
+      })
+
+      return this.material.uniforms.uColor.value = color
     }
 
     return
