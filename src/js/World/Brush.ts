@@ -3,13 +3,13 @@ import * as dat from 'dat.gui'
 import { isEqual, nth, first, debounce } from 'lodash'
 
 // @ts-ignore
-import store from '@store/index'
-// @ts-ignore
-import { Mouse } from '@tools/Mouse'
-// @ts-ignore
 import Time from '@tools/Time'
 // @ts-ignore
+import store from '@store/index'
+// @ts-ignore
 import Camera from '@js/Camera'
+// @ts-ignore
+import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 import Component from '@lib/Component'
 
