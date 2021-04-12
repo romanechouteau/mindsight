@@ -170,7 +170,7 @@ export default class MoveManager {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
-                const oldNeurons = neuronBuilder.spawnNeuron(this.cursor.position)
+                const oldNeurons = store.state.scene === 2 ? neuronBuilder.spawnNeuron(this.cursor.position) : []
                 this.isMoving = true
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,

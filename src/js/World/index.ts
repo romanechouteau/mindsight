@@ -1,4 +1,5 @@
 import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
+import { isUndefined } from 'lodash'
 import { Mouse } from '../Tools/Mouse'
 
 // @ts-ignore
@@ -9,13 +10,17 @@ import { Mouse } from '@tools/Mouse'
 import Camera from '@js/Camera'
 
 import User from './User'
+// @ts-ignore
+import store from '@store/index'
 import Brush from './Brush'
 import Ground from './Ground'
 import Suzanne from './Suzanne'
+// @ts-ignore
+import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 
-export default class World {
+export default class World extends Component {
   time: Time
   debug: any
   mouse: Mouse
@@ -34,6 +39,10 @@ export default class World {
   pixelRatio: number
   user: User
   constructor(options) {
+    super({
+      store
+    })
+
     // Set options
     this.time = options.time
     this.debug = options.debug
@@ -58,9 +67,9 @@ export default class World {
     this.setAmbientLight()
     this.setPointLight()
     // this.setSuzanne()
-    this.setBrush()
     this.setGround()
     this.setUser()
+    this.render()
     setTimeout(() => {
       this.setFog()
     }, 50);
@@ -115,5 +124,11 @@ export default class World {
       canvas: this.canvas,
       pixelRatio: this.pixelRatio,
     })
+  }
+
+  render() {
+    if (store.state.scene === 3 && isUndefined(this.brush)) {
+      this.setBrush()
+    }
   }
 }
