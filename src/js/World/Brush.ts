@@ -364,7 +364,7 @@ export default class Brush extends Component {
       range.addEventListener('mousedown', (event: Event) => {
         const thumb = range.querySelector('.rangeThumb')
         const circleBox = range.getBoundingClientRect()
-        const radius = paletteSize / 2
+        const radius = circleBox.width / 2
         const center = [circleBox.left + radius, circleBox.top + radius]
 
         this.updateColorRange(event, param, thumb, center, radius)
@@ -523,8 +523,8 @@ export default class Brush extends Component {
   getColorValue(event, center, radius) {
     const position = [event.clientX, event.clientY]
     const angle = Math.atan2(position[0] - center[0], position[1] - center[1])
-    const borderX = Math.floor(Math.abs(Math.sin(angle) * radius))
-    const borderY = Math.floor(Math.abs(Math.cos(angle) * radius))
+    const borderX = Math.abs(Math.sin(angle) * radius)
+    const borderY = Math.abs(Math.cos(angle) * radius)
 
     const clampedX = Math.max(Math.min(position[0] - center[0], borderX), -borderX)
     const clampedY = Math.max(Math.min(center[1] - position[1], borderY), -borderY)
@@ -587,8 +587,8 @@ export default class Brush extends Component {
     const [xPercent, yPercent] = this.params.color
     const size = this.palette.width
 
-    const x = Math.floor(xPercent / 100 * size)
-    const y = Math.floor(yPercent / 100 * size)
+    const x = xPercent >= 50 ? Math.floor(xPercent / 100 * (size - 1)) : Math.ceil(xPercent / 100 * (size - 1))
+    const y = yPercent >= 50 ? Math.floor(yPercent / 100 * (size - 1)) : Math.ceil(yPercent / 100 * (size - 1))
     const pixel = (y * (size * 4)) + (x * 4)
 
     const r = this.palette.data[pixel]
