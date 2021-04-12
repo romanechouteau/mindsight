@@ -182,6 +182,15 @@ body, html
                         transform: rotate(45deg)
                         cursor: pointer
 
+                        & .brushPreview
+                            position: absolute
+                            width: 100%
+                            height: 100%
+                            top: 50%
+                            left: 50%
+                            border-radius: 50%
+                            overflow: hidden
+                            transform: translate(-50%, -50%) rotate(-45deg)
                     .rangeThumb
                         position: absolute
                         width: 12px
