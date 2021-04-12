@@ -6,6 +6,8 @@ import Sizes from '@tools/Sizes'
 // // @ts-ignore
 // import Time from '@tools/Time'
 // @ts-ignore
+import { Mouse } from '@tools/Mouse'
+// @ts-ignore
 // import Assets from '@tools/Loader'
 
 // @ts-ignore
@@ -14,7 +16,6 @@ import Camera from './Camera'
 import World from '@world/index'
 
 import Stats from 'stats.js'
-import mouse, { Mouse } from './Tools/Mouse'
 import Time from './Tools/Time'
 import { createState, State } from './World/State'
 
@@ -33,7 +34,6 @@ export default class App {
   debug: any
   world: any
   mouse: Mouse
-
   state: { time: Time }
   constructor(options) {
     // Set options
@@ -43,7 +43,7 @@ export default class App {
     this.time = new Time()
     this.sizes = new Sizes()
     // this.assets = new Assets()
-    this.mouse = mouse
+    this.mouse = new Mouse()
 
     // ! Only state shall be accessed on global App namespace
     this.state = createState()
@@ -52,6 +52,7 @@ export default class App {
     this.setRenderer()
     this.setCamera()
     this.setWorld()
+
   }
   setRenderer() {
     // Set scene
@@ -80,9 +81,9 @@ export default class App {
     // Set RequestAnimationFrame with 60fps
     this.time.on('tick', () => {
       // When tab is not visible (tab is not active or window is minimized), browser stops requesting animation frames. Thus, this does not work
-      // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one), 
+      // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one),
       // which might cause some performance or batteries issues when testing on multiple browsers
-      if (!(this.renderOnBlur?.activated && !document.hasFocus() ) ) {
+      if (!(this.renderOnBlur?.activated && !document.hasFocus())) {
         stats.begin()
         this.renderer.render(this.scene, this.camera.camera)
         stats.end()
@@ -116,7 +117,8 @@ export default class App {
       mouse: this.mouse,
       camera: this.camera,
       pixelRatio: this.renderer.getPixelRatio(),
-    //   assets: this.assets,
+      canvas: this.canvas
+      //   assets: this.assets,
     })
     // Add world to scene
     this.scene.add(this.world.container)

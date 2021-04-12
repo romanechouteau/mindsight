@@ -1,0 +1,212 @@
+*, *::before, *::after
+    box-sizing: border-box
+
+body, html
+    margin: 0
+    padding: 0
+    overflow: hidden
+
+    .brushInterface
+        position: absolute
+        left: 0
+        bottom: 0
+        width: 100%
+        padding: 16px
+        padding-top: 10vh
+        user-select: none
+        color: white
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: flex-end
+        background-image:
+            linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7))
+
+        .paramsGroup
+            position: relative
+            display: flex
+            flex-direction: column
+            margin-right: 16px
+
+            &.bottomGroup
+                justify-content: flex-end
+
+            &.bigAndSmallCircles
+                margin-left: 5vh
+
+            .inputGroup
+                display: flex
+                flex-direction: row
+                align-items: center
+                padding: 8px
+                display: flex
+                flex-direction: row
+                justify-content: space-between
+
+                label, .label
+                    margin-left: 16px
+
+                .checkboxWrapper
+                    width: 130px
+                    display: flex
+                    justify-content: flex-end
+
+                    .toggle
+                        position relative
+                        width: 48px
+                        height: 24px
+                        border-radius: 16px
+                        overflow: hidden
+
+                        input[type="checkbox"]
+                            position relative
+                            width: 100%
+                            height: 100%
+                            margin: 0
+                            z-index: 1
+                            opacity: 0
+                            cursor: pointer
+
+                            & + .slider
+                                position: absolute
+                                top: 0
+                                left: 0
+                                width: 100%
+                                height: 100%
+                                background-color: rgba(255,255,255, 0.05)
+
+                                &::before
+                                    content: ''
+                                    position: absolute
+                                    height: 100%
+                                    width: 50%
+                                    padding: 2px
+                                    border-radius: 50%
+                                    background-color: white
+                                    background-clip: content-box
+
+                            &:checked + .slider
+                                background-color: rgba(255,255,255, 0.5)
+
+                                &::before
+                                    right: 0
+
+                input[type="range"]
+                    -webkit-appearance: none
+                    box-sizing: border-box
+                    width: 130px
+                    margin: 0
+                    outline: none
+                    padding: 0
+                    font: inherit
+                    cursor: pointer
+                    background-color: transparent
+                    background-image: linear-gradient(to right, #FFF, #FFF)
+                    background-size: 100% 5%
+                    background-repeat: no-repeat
+                    background-position: center
+
+                    &::-webkit-slider-runnable-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-moz-range-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        background-color: transparent
+
+                    &::-ms-track
+                        height: 100%
+                        border: none
+                        border-radius: 0
+                        color: transparent
+                        background-color: transparent
+
+                    &::-webkit-slider-thumb
+                        -webkit-appearance: none
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-ms-thumb
+                        width: 8px
+                        height: 8px
+                        border: none
+                        border-radius: 4px
+                        background-color: white
+
+                    &::-moz-range-progress
+                        height: 0
+                        background: transparent
+
+                    &::-ms-tooltip
+                        display: none
+
+                    &::-ms-fill-lower
+                        background: transparent
+
+                    &::-ms-fill-upper
+                        background: transparent
+
+                &.circleRangeGroup, &.colorRangeGroup
+                    display: flex
+                    flex-direction: column
+
+                    .label
+                        margin-bottom: 16px
+                        margin-left: 0
+
+                    .circleRange
+                        position: relative
+                        width: 25vh
+                        height: 25vh
+                        max-width: 200px
+                        max-height: 200px
+                        border-radius: 50%
+                        border-top: 1px solid white
+                        border-left: 1px solid white
+                        border-right: 1px solid white
+                        border-bottom: 1px solid transparent
+                        transform: rotate(45deg)
+                        cursor: pointer
+
+                        & .brushPreview
+                            position: absolute
+                            width: 100%
+                            height: 100%
+                            top: 50%
+                            left: 50%
+                            border-radius: 50%
+                            overflow: hidden
+                            transform: translate(-50%, -50%) rotate(-45deg)
+                    .rangeThumb
+                        position: absolute
+                        width: 12px
+                        height: 12px
+                        background-color: white
+                        border-radius: 50%
+                        transform: translate(-50%, -50%)
+
+                &.colorRangeGroup
+                    position: absolute
+                    bottom: 0
+                    left: -10%
+
+                    .colorRange
+                        position: relative
+                        max-width: 120px
+                        max-height: 120px
+                        border-radius: 50%
+                        cursor: pointer

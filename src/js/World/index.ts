@@ -1,14 +1,26 @@
 import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
 import { Mouse } from '../Tools/Mouse'
 
-import AmbientLightSource from './AmbientLight'
-import Ground from './Ground'
-import PointLightSource from './PointLight'
+// @ts-ignore
+import Time from '@tools/Time'
+// @ts-ignore
+import { Mouse } from '@tools/Mouse'
+// @ts-ignore
+import Camera from '@js/Camera'
+
 import User from './User'
+import Brush from './Brush'
+import Ground from './Ground'
+import Suzanne from './Suzanne'
+import PointLightSource from './PointLight'
+import AmbientLightSource from './AmbientLight'
 
 export default class World {
-  time: any
+  time: Time
   debug: any
+  mouse: Mouse
+  canvas: HTMLElement
+  camera: Camera
   container: Object3D
   debugFolder: any
   loadDiv: any
@@ -16,9 +28,9 @@ export default class World {
   progress: any
   ambientlight: AmbientLightSource
   light: PointLightSource
+  suzanne: Suzanne
+  brush: Brush
   ground: Ground
-  mouse: Mouse
-  camera: Camera
   pixelRatio: number
   user: User
   constructor(options) {
@@ -27,6 +39,7 @@ export default class World {
     this.debug = options.debug
     this.mouse = options.mouse
     this.camera = options.camera
+    this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
 
     // Set up
@@ -44,6 +57,8 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
+    // this.setSuzanne()
+    this.setBrush()
     this.setGround()
     this.setUser()
     setTimeout(() => {
@@ -87,7 +102,18 @@ export default class World {
     this.user = new User({
       camera: this.camera,
       mouse: this.mouse,
-      ground: this.ground
+      ground: this.ground,
+      canvas: this.canvas
+    })
+  }
+  setBrush() {
+    this.brush = new Brush({
+      time: this.time,
+      mouse: this.mouse,
+      scene: this.container,
+      camera: this.camera,
+      canvas: this.canvas,
+      pixelRatio: this.pixelRatio,
     })
   }
 }

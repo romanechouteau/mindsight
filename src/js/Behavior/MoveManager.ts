@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending } from "three";
+import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -15,21 +15,26 @@ import Ground from "../World/Ground";
 import displacementMap from '../../images/map2.png'
 import { textureLoader } from "../Tools/utils";
 
+// @ts-ignore
+import store from '@store/index'
+
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
+    canvas: HTMLElement
     camera: Camera
     ground: Object3D
     groundInstance: Ground
     groundMaterial: ShaderMaterial
     cursorMaterial: ShaderMaterial
     cursor: Mesh
+    interfaceEmpty: HTMLElement
     lastIntersection: Intersection
     euler: Euler
     prevEuler: Euler
     isLooking: boolean
     isMoving: boolean
-    constructor({ camera, mouse, ground }) {
+    constructor({ camera, mouse, ground, canvas }) {
 
         this.cursorMaterial = new ShaderMaterial({
             vertexShader: moveCursorVertex,
@@ -78,9 +83,13 @@ export default class MoveManager {
         this.raycaster = new Raycaster()
         this.mouse = mouse
         this.camera = camera
+        this.canvas = canvas
+        this.interfaceEmpty = document.querySelector('.brushInterface')
         this.groundInstance = ground
         this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), new MeshNormalMaterial() )
         this.cursor.rotation.x = -Math.PI/2
+        this.cursor.frustumCulled = false
+
         // this.cursor.translateY(1)
         this.cursor.name = 'MoveCursor'
         this.euler = new Euler(0, 0, 0, 'YXZ')
@@ -114,19 +123,26 @@ export default class MoveManager {
 
         // @ts-ignore
         App.state.time.on('tick', () => {
-            const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
-            this.raycaster.setFromCamera(cursor, this.camera.camera)
+            if (store.state.brush.canDraw === false) {
+                this.cursorMaterial.opacity = 1
 
-            this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
-            if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
-            this.cursor.position.y += 0.1
-            // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
+                const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
+                this.raycaster.setFromCamera(cursor, this.camera.camera)
 
-            // update shader
-            this.cursorMaterial.uniforms.uTime.value += 0.01
+                this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
+                if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
+                this.cursor.position.y += 0.1
+                // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
 
-            // rotate camera
-            if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
+                // update shader
+                this.cursorMaterial.uniforms.uTime.value += 0.01
+
+                // rotate camera
+                if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
+                this.camera.raycasterPlane.quaternion.setFromEuler( this.euler )
+            } else {
+                this.cursorMaterial.opacity = 0
+            }
         })
     }
 
@@ -150,6 +166,7 @@ export default class MoveManager {
         this.mouse.on('click', () => {
             if (this.camera.orbitControls.enabled) return;
             if (this.lastIntersection === undefined) return;
+            if (store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
@@ -174,10 +191,11 @@ export default class MoveManager {
     }
     handleLookAround() {
         this.mouse.on('down', () => {
+            if (store.state.brush.canDraw === true) return
             this.prevEuler = this.euler
         })
         this.mouse.on('drag', ev => {
-            if (this.camera.orbitControls.enabled) return
+            if (this.camera.orbitControls.enabled || store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (!this.isLooking) this.toggleLooking(true)
             this.euler.y = this.prevEuler.y - (this.mouse.lastCursor[0] - this.mouse.cursor[0])
             this.euler.x = this.prevEuler.x + (this.mouse.lastCursor[1] - this.mouse.cursor[1])
