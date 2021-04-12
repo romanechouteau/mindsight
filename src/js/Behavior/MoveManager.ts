@@ -44,7 +44,7 @@ export default class MoveManager {
             }
         })
 
-        this.groundMaterial = 
+        this.groundMaterial =
         // new MeshStandardMaterial()
         // this.groundMaterial.onBeforeCompile = (shader) => {
         //     shader.uniforms.uTime = { value: 0 }
@@ -160,7 +160,7 @@ export default class MoveManager {
             }
         })
     }
-    
+
     handleMove() {
         if (this.isMoving) return;
         this.mouse.on('click', () => {
@@ -184,7 +184,6 @@ export default class MoveManager {
                     }
                 })
 
-                neuronBuilder.spawnNeuron(this.cursor.position)
                 this.checkZoneStep(this.cursor.position)
             }
         })
@@ -208,7 +207,7 @@ export default class MoveManager {
     // a zone is a part of the map corresponding to an emotion, a step is a part is why you see more zone elements appearing
     checkZoneStep(destination: Vector3){
         const distanceFromCenter = destination.distanceTo(new Vector3(0, 0, 0))
-        
+
         console.log("🚀 ~ file: MoveManager.ts ~ line 136 ~ MoveManager ~ checkZoneStep ~ distanceTo", distanceFromCenter)
 
         for (const [limitIndex, limit] of Object.entries(ZONES_LIMITS)) {
@@ -216,7 +215,7 @@ export default class MoveManager {
                 this.handleAppearZone(parseInt(limitIndex))
                 break;
             }
-            
+
         }
     }
     handleAppearZone(stepIndex: number) {
@@ -256,7 +255,7 @@ export default class MoveManager {
                 ground.children[i].scale.z
             )
         })
-          
+
         const groundGeometry = BufferGeometryUtils.mergeBufferGeometries(groundGeometries)
 
         // const fakesGroundMeshes = groundGeometries.map(geometry => new Mesh(geometry, new MeshBasicMaterial({ color: 0x00ff00 })))
