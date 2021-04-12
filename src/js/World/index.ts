@@ -1,8 +1,10 @@
-import { AxesHelper, Object3D } from 'three'
+import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
+import { Mouse } from '../Tools/Mouse'
 
 import AmbientLightSource from './AmbientLight'
+import Ground from './Ground'
 import PointLightSource from './PointLight'
-import Suzanne from './Suzanne'
+import User from './User'
 
 export default class World {
   time: any
@@ -14,11 +16,18 @@ export default class World {
   progress: any
   ambientlight: AmbientLightSource
   light: PointLightSource
-  suzanne: Suzanne
+  ground: Ground
+  mouse: Mouse
+  camera: Camera
+  pixelRatio: number
+  user: User
   constructor(options) {
     // Set options
     this.time = options.time
     this.debug = options.debug
+    this.mouse = options.mouse
+    this.camera = options.camera
+    this.pixelRatio = options.pixelRatio
 
     // Set up
     this.container = new Object3D()
@@ -35,7 +44,11 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
-    this.setSuzanne()
+    this.setGround()
+    this.setUser()
+    setTimeout(() => {
+      this.setFog()
+    }, 50);
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -58,10 +71,23 @@ export default class World {
     })
     this.container.add(this.light.container)
   }
-  setSuzanne() {
-    this.suzanne = new Suzanne({
-      time: this.time
+  setGround() {
+    this.ground = new Ground({
+      time: this.time,
+      mouse: this.mouse
     })
-    this.container.add(this.suzanne.container)
+    this.container.add(this.ground.container)
+  }
+  setFog() {
+    const fog = new FogExp2(0x212121, 0.08)
+    // const fog = new Fog(0x212121, 0, 10)
+    App.scene.fog = fog
+  }
+  setUser() {
+    this.user = new User({
+      camera: this.camera,
+      mouse: this.mouse,
+      ground: this.ground
+    })
   }
 }
