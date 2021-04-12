@@ -1,6 +1,6 @@
 import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
 import * as dat from 'dat.gui'
-import { isEqual, nth, first } from 'lodash'
+import { isEqual, nth, first, debounce } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -122,6 +122,7 @@ export default class Brush extends Component {
     this.listenMouseDown()
     this.listenMouseUp()
     this.listenKeyboard()
+    window.addEventListener('resize', debounce(() => this.render(), 150))
   }
 
   setBrush() {
