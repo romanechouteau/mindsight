@@ -61,7 +61,7 @@ export default class App {
       canvas: this.canvas,
       alpha: true,
       antialias: true,
-      powerPreference: 'high-performance',
+      powerPreference: 'low-power',
     })
     this.renderer.outputEncoding = sRGBEncoding
     this.renderer.gammaFactor = 2.2

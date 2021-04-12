@@ -1,34 +1,95 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2 } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
 // TODO: add app in global namespace
 import { Mouse } from '../Tools/Mouse'
-import Ground from "../World/Ground";
 import neuronBuilder from './NeuronBuilder'
+import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
+import moveCursorFragment from '../../shaders/moveCursorFrag.glsl'
+import groundVertex from '../../shaders/groundVert.glsl'
+import groundFragment from '../../shaders/groundFrag.glsl'
+import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
+import Ground from "../World/Ground";
+import displacementMap from '../../images/map2.png'
+import { textureLoader } from "../Tools/utils";
 
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
     camera: Camera
     ground: Object3D
+    groundInstance: Ground
+    groundMaterial: ShaderMaterial
+    cursorMaterial: ShaderMaterial
     cursor: Mesh
     lastIntersection: Intersection
     euler: Euler
     prevEuler: Euler
     isLooking: boolean
-    constructor({ camera, mouse }) {
+    isMoving: boolean
+    constructor({ camera, mouse, ground }) {
+
+        this.cursorMaterial = new ShaderMaterial({
+            vertexShader: moveCursorVertex,
+            fragmentShader: moveCursorFragment,
+            uniforms: {
+                uTime: { value: 0. },
+            }
+        })
+
+        this.groundMaterial = 
+        // new MeshStandardMaterial()
+        // this.groundMaterial.onBeforeCompile = (shader) => {
+        //     shader.uniforms.uTime = { value: 0 }
+        //     shader.vertexShader = 'uniform float uTime;\n' + shader.vertexShader;
+        //     shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', groundVertex)
+
+        //     this.groundMaterial.userData.shader = shader;
+        // }
+        new ShaderMaterial({
+            // depthWrite: false,
+            // blending: AdditiveBlending,
+            // vertexColors: true,
+            vertexShader: groundVertex,
+            fragmentShader: groundFragment,
+            side: DoubleSide,
+            flatShading: false,
+            uniforms: {
+                uTime: { value: 0. },
+                [`u${MOODS.JOY}Intensity`]: { value: 0. },
+                [`u${MOODS.FEAR}Intensity`]: { value: 0. },
+                [`u${MOODS.SADNESS}Intensity`]: { value: 0. },
+                [`u${MOODS.ANGER}Intensity`]: { value: 0. },
+            }
+        })
+
+        // ;(async () => {
+        //     this.groundMaterial = new MeshStandardMaterial({
+        //         // color: 0x0000ff,
+        //         side: DoubleSide,
+        //         displacementMap: await textureLoader.loadAsync(displacementMap),
+        //         displacementScale: 0.05,
+        //     })
+        // })();
+
+
         this.raycaster = new Raycaster()
         this.mouse = mouse
         this.camera = camera
-        this.cursor = new Mesh( new BoxBufferGeometry(1, 1, 1), new MeshNormalMaterial() )
+        this.groundInstance = ground
+        this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), new MeshNormalMaterial() )
+        this.cursor.rotation.x = -Math.PI/2
+        // this.cursor.translateY(1)
         this.cursor.name = 'MoveCursor'
         this.euler = new Euler(0, 0, 0, 'YXZ')
         this.euler.setFromQuaternion( this.camera.container.quaternion )
         this.isLooking = false
+        this.isMoving = false
 
         this.setMoveCursor = this.setMoveCursor.bind(this)
+        this.setGroundDeformation = this.setGroundDeformation.bind(this)
         this.handleMove = this.handleMove.bind(this)
         this.handleLookAround = this.handleLookAround.bind(this)
         // this.setFakeGround = this.setFakeGround.bind(this)
@@ -58,29 +119,56 @@ export default class MoveManager {
 
             this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
             if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
+            this.cursor.position.y += 0.1
             // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
 
+            // update shader
+            this.cursorMaterial.uniforms.uTime.value += 0.01
+
             // rotate camera
-            this.camera.camera?.quaternion.setFromEuler( this.euler )
+            if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
         })
     }
 
+    // TODO: export to Ground class
+    setGroundDeformation() {
+        App.scene.getObjectByName('Plane').material = this.groundMaterial
+        ;(App.scene.getObjectByName('Plane').material as MeshStandardMaterial).needsUpdate = true
+        App.state.time.on('tick', () => {
+            // const shader = this.groundMaterial.userData.shader
+            // if (shader) shader.uniforms.uTime.value += 0.1
+            this.groundMaterial.uniforms.uTime.value += 0.1
+            for (const mood in moodPositions) {
+                const intensity = this.camera.container.position.distanceTo(moodPositions[mood]) / MAX_DISTANCE
+                this.groundMaterial.uniforms[`u${mood}Intensity`].value = intensity
+            }
+        })
+    }
+    
     handleMove() {
+        if (this.isMoving) return;
         this.mouse.on('click', () => {
+            if (this.camera.orbitControls.enabled) return;
+            if (this.lastIntersection === undefined) return;
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
                 const oldNeurons = neuronBuilder.spawnNeuron(this.cursor.position)
+                this.isMoving = true
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,
                     duration: this.lastIntersection.distance/5,
                     x: this.cursor.position.x,
                     y: this.cursor.position.y,
                     z: this.cursor.position.z - 5,
-                    onComplete: neuronBuilder.removeNeurons,
-                    onCompleteParams: [oldNeurons]
+                    onComplete: () => {
+                        this.isMoving = false
+                        neuronBuilder.removeNeurons(oldNeurons)
+                    }
                 })
 
+                neuronBuilder.spawnNeuron(this.cursor.position)
+                this.checkZoneStep(this.cursor.position)
             }
         })
     }
@@ -99,7 +187,35 @@ export default class MoveManager {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
     }
+    // a zone is a part of the map corresponding to an emotion, a step is a part is why you see more zone elements appearing
+    checkZoneStep(destination: Vector3){
+        const distanceFromCenter = destination.distanceTo(new Vector3(0, 0, 0))
+        
+        console.log("🚀 ~ file: MoveManager.ts ~ line 136 ~ MoveManager ~ checkZoneStep ~ distanceTo", distanceFromCenter)
 
+        for (const [limitIndex, limit] of Object.entries(ZONES_LIMITS)) {
+            if (distanceFromCenter > limit) {
+                this.handleAppearZone(parseInt(limitIndex))
+                break;
+            }
+            
+        }
+    }
+    handleAppearZone(stepIndex: number) {
+        // switch(stepIndex) {
+        //     case 0: // furthest
+        //         break;
+        //     case 1:
+        //         this.groundInstance.
+        //         break;
+        //     case 2:
+        //         break;
+        //     default:
+        //         break;
+        // }
+
+        if (stepIndex === 0) App.state.nextStep()
+    }
     setFakeGround() {
 
         const ground = this.ground.children[0]
@@ -122,16 +238,7 @@ export default class MoveManager {
                 ground.children[i].scale.z
             )
         })
-
-        console.log('original');
-
-        console.log('_____');
-        console.log(ground.children.map(mesh => mesh.geometry));
-        console.log('_____');
-        console.log('copied');
-        console.log(groundGeometries);
-
-
+          
         const groundGeometry = BufferGeometryUtils.mergeBufferGeometries(groundGeometries)
 
         // const fakesGroundMeshes = groundGeometries.map(geometry => new Mesh(geometry, new MeshBasicMaterial({ color: 0x00ff00 })))
@@ -144,6 +251,6 @@ export default class MoveManager {
         // fakeGround.rotation.copy(this.ground.children[0].rotation)
 
         // fakeGround.matrix.copy(this.ground.children[0].matrix)
-        App.scene.add(fakeGround)
+        // App.scene.add(fakeGround)
     }
 }

@@ -34,7 +34,7 @@ class NeuronBuilder {
             App.scene.add(this.container)
             this.setMovement()
             this.removeNeurons = this.removeNeurons.bind(this)
-        }, 50);
+        }, 100);
     }
 
     async setGeometry() {
