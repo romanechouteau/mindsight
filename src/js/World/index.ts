@@ -1,5 +1,4 @@
 import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
-import { isUndefined } from 'lodash'
 import { Mouse } from '../Tools/Mouse'
 
 // @ts-ignore
@@ -127,7 +126,7 @@ export default class World extends Component {
   }
 
   render() {
-    if (store.state.scene === 3 && isUndefined(this.brush)) {
+    if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
     }
   }
