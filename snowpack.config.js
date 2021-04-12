@@ -6,9 +6,9 @@ module.exports = {
     mount: {
 
         public: "/",
-    
+
         src: "/dist",
-    
+
       },
     alias: {
         '@': './src/',
@@ -26,6 +26,9 @@ module.exports = {
         '@snowpack/plugin-typescript',
         'snowpack-plugin-stylus',
         '@canarise/snowpack-eslint-plugin',
+        ["snowpack-plugin-raw-file-loader", {
+          exts: [".frag", ".vert", ".glsl"]
+        }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
         [
             "@marlonmarcello/snowpack-plugin-pug",

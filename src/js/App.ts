@@ -3,8 +3,8 @@ import * as dat from 'dat.gui'
 
 // @ts-ignore
 import Sizes from '@tools/Sizes'
-// @ts-ignore
-import Time from '@tools/Time'
+// // @ts-ignore
+// import Time from '@tools/Time'
 // @ts-ignore
 // import Assets from '@tools/Loader'
 
@@ -14,6 +14,9 @@ import Camera from './Camera'
 import World from '@world/index'
 
 import Stats from 'stats.js'
+import mouse, { Mouse } from './Tools/Mouse'
+import Time from './Tools/Time'
+import { createState, State } from './World/State'
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -29,6 +32,9 @@ export default class App {
   camera: any
   debug: any
   world: any
+  mouse: Mouse
+
+  state: { time: Time }
   constructor(options) {
     // Set options
     this.canvas = options.canvas
@@ -37,6 +43,10 @@ export default class App {
     this.time = new Time()
     this.sizes = new Sizes()
     // this.assets = new Assets()
+    this.mouse = mouse
+
+    // ! Only state shall be accessed on global App namespace
+    this.state = createState()
 
     this.setConfig()
     this.setRenderer()
@@ -103,6 +113,9 @@ export default class App {
     this.world = new World({
       time: this.time,
       debug: this.debug,
+      mouse: this.mouse,
+      camera: this.camera,
+      pixelRatio: this.renderer.getPixelRatio(),
     //   assets: this.assets,
     })
     // Add world to scene
@@ -114,3 +127,11 @@ export default class App {
     }
   }
 }
+
+// export interface App {
+
+// }
+
+// export declare namespace App {
+//   state: number
+// }
