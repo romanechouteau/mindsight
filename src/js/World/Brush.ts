@@ -51,6 +51,7 @@ export default class Brush extends Component {
   brush: Points
   camera: Camera
   canvas: HTMLElement
+  stopped: Boolean
   element: HTMLElement
   palette: ImageData
   painting: Points
@@ -62,10 +63,14 @@ export default class Brush extends Component {
   brushPreview: NodeListOf<SVGCircleElement>
   brushGeometry: BufferGeometry
   brushPositions: number[]
+  resizeListener: EventListener
   particlesOffset: number[]
+  mouseUpListener: Function
+  keyboardListener: EventListener
   paintingGeometry: BufferGeometry
   paintedMaterials: ShaderMaterial[]
   paintingPositions: number[]
+  mouseDownListener: Function
   params: {
     size: number
     count: number,
@@ -94,6 +99,7 @@ export default class Brush extends Component {
     }
     this.pixelRatio = pixelRatio
 
+    this.stopped = false
     this.interface = new dat.GUI({ autoPlace: false })
     this.raycaster = new Raycaster()
     this.paintingPositions = []
@@ -122,7 +128,9 @@ export default class Brush extends Component {
     this.listenMouseDown()
     this.listenMouseUp()
     this.listenKeyboard()
-    window.addEventListener('resize', debounce(() => this.render(), 150))
+
+    this.resizeListener = debounce(() => this.render(), 150)
+    window.addEventListener('resize', this.resizeListener)
   }
 
   setBrush() {
@@ -138,7 +146,7 @@ export default class Brush extends Component {
   }
 
   setMovement() {
-    this.time.on('tick', () => {
+    this.time.on('tick.brush', () => {
       this.material.uniforms.uTime.value += 0.01
       this.paintedMaterials.forEach(material => material.uniforms.uTime.value += 0.01)
 
@@ -208,7 +216,7 @@ export default class Brush extends Component {
   }
 
   listenMouseDown() {
-    this.mouse.on('down', () => {
+    this.mouseDownListener = () => {
       if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)) && isEqual(store.state.brush.canDraw, true)) {
         this.isPainting = true
         this.paintingGeometry = new BufferGeometry()
@@ -218,11 +226,12 @@ export default class Brush extends Component {
         this.painting.frustumCulled = false
         this.scene.add(this.painting)
       }
-    })
+    }
+    this.mouse.on('down', this.mouseDownListener)
   }
 
   listenMouseUp() {
-    this.mouse.on('up', () => {
+    this.mouseUpListener = () => {
       if (isEqual(this.isPainting, true) && isEqual(store.state.brush.canDraw, true)) {
         this.isPainting = false
         this.paintedMaterials.push(this.material)
@@ -240,18 +249,20 @@ export default class Brush extends Component {
         this.brush.material = this.material
         this.brush.frustumCulled = false
       }
-    })
+    }
+    this.mouse.on('up', this.mouseUpListener)
   }
 
   listenKeyboard() {
-    document.addEventListener('keyup', (event) => {
+    this.keyboardListener = (event) => {
       event.preventDefault()
       const key = event.key || event.keyCode
       if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
         const checkbox = <HTMLInputElement> this.element.querySelector('#canDraw')
         store.dispatch('updateBrushParams', { param: 'canDraw', value: !checkbox.checked })
       }
-    })
+    }
+    document.addEventListener('keyup', this.keyboardListener)
   }
 
   render() {
@@ -597,5 +608,18 @@ export default class Brush extends Component {
     const b = this.palette.data[pixel + 2]
 
     return new Color(r / 255, g / 255, b / 255)
+  }
+
+  stop() {
+    this.scene.remove(this.brush)
+
+    this.element.innerHTML = ''
+    this.mouse.off('up', this.mouseUpListener)
+    this.mouse.off('down', this.mouseDownListener)
+    window.removeEventListener('resize', this.resizeListener)
+    document.removeEventListener('keyup', this.keyboardListener)
+
+    this.render = () => {}
+    this.stopped = true
   }
 }

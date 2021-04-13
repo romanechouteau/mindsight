@@ -7,5 +7,5 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 3
+    scene: 2
   };

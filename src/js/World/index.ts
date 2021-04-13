@@ -1,5 +1,4 @@
 import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
-import { Mouse } from '../Tools/Mouse'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -14,6 +13,7 @@ import store from '@store/index'
 import Brush from './Brush'
 import Ground from './Ground'
 import Suzanne from './Suzanne'
+import SceneManager from "../Behavior/SceneManager"
 // @ts-ignore
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
@@ -37,6 +37,7 @@ export default class World extends Component {
   ground: Ground
   pixelRatio: number
   user: User
+  sceneManager: SceneManager
   constructor(options) {
     super({
       store
@@ -65,6 +66,7 @@ export default class World extends Component {
   init() {
     this.setAmbientLight()
     this.setPointLight()
+    this.setSceneManager()
     // this.setSuzanne()
     this.setGround()
     this.setUser()
@@ -125,9 +127,15 @@ export default class World extends Component {
     })
   }
 
+  setSceneManager() {
+    this.sceneManager = new SceneManager()
+  }
+
   render() {
     if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
+    } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
+      this.brush.stop()
     }
   }
 }
