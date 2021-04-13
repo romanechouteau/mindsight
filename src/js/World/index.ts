@@ -18,6 +18,8 @@ import Suzanne from './Suzanne'
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
+import { AUDIO_INPUT_MODES } from '../constants'
+import Spotify from './Sound/Spotify'
 
 export default class World extends Component {
   time: Time
@@ -37,6 +39,7 @@ export default class World extends Component {
   ground: Ground
   pixelRatio: number
   user: User
+  spotify: Spotify
   constructor(options) {
     super({
       store
@@ -125,9 +128,16 @@ export default class World extends Component {
     })
   }
 
+  setSpotify() {
+    this.spotify = new Spotify()
+  }
+
   render() {
     if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
+    }
+    if (store.state.scene === 4 && store.state.audioInputMode === AUDIO_INPUT_MODES.SPOTIFY) {
+      this.setSpotify()
     }
   }
 }

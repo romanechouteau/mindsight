@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending } from "three";
+import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending, Texture } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -12,12 +12,13 @@ import groundVertex from '../../shaders/groundVert.glsl'
 import groundFragment from '../../shaders/groundFrag.glsl'
 import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
 import Ground from "../World/Ground";
-import displacementMap from '../../images/map2.png'
+import displacementMapSrc from '../../images/map2.png'
 import { textureLoader } from "../Tools/utils";
 
 // @ts-ignore
 import store from '@store/index'
 
+// TODO: set cursor in separate class
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
@@ -34,6 +35,7 @@ export default class MoveManager {
     prevEuler: Euler
     isLooking: boolean
     isMoving: boolean
+    cursorDisplacementMap: Texture
     constructor({ camera, mouse, ground, canvas }) {
 
         this.cursorMaterial = new ShaderMaterial({
@@ -86,12 +88,25 @@ export default class MoveManager {
         this.canvas = canvas
         this.interfaceEmpty = document.querySelector('.brushInterface')
         this.groundInstance = ground
-        this.cursor = new Mesh( new PlaneBufferGeometry(2, 2), new MeshNormalMaterial() )
-        this.cursor.rotation.x = -Math.PI/2
-        this.cursor.frustumCulled = false
 
-        // this.cursor.translateY(1)
-        this.cursor.name = 'MoveCursor'
+
+        ;(async () => {
+            this.cursorDisplacementMap = (await textureLoader.loadAsync(displacementMapSrc))
+            this.cursor = new Mesh( new PlaneBufferGeometry(2, 2, 30, 30), new MeshNormalMaterial({
+                displacementMap: this.cursorDisplacementMap
+            }) )
+            this.cursor.rotation.x = -Math.PI/2
+            this.cursor.frustumCulled = false
+    
+            // this.cursor.translateY(1)
+            this.cursor.name = 'MoveCursor'
+
+            // TODO: wait for App mount
+            setTimeout(this.setMoveCursor, 50)
+            this.setCursorDiplacement()
+
+        })()
+
         this.euler = new Euler(0, 0, 0, 'YXZ')
         this.euler.setFromQuaternion( this.camera.container.quaternion )
         this.isLooking = false
@@ -101,16 +116,25 @@ export default class MoveManager {
         this.setGroundDeformation = this.setGroundDeformation.bind(this)
         this.handleMove = this.handleMove.bind(this)
         this.handleLookAround = this.handleLookAround.bind(this)
+        this.setCursorDiplacement = this.setCursorDiplacement.bind(this)
         // this.setFakeGround = this.setFakeGround.bind(this)
 
-        // TODO: wait for App mount
-        setTimeout(this.setMoveCursor, 50)
         this.handleMove()
         this.handleLookAround()
 
         // TODO: make this geometry merging work
         // setTimeout(this.setFakeGround, 500)
         // this.setMoveCursor()
+    }
+
+    async setCursorDiplacement() {
+        console.log('oui');
+
+        this.cursorDisplacementMap.offset = new Vector2(0.5, 0.5)
+        
+        // const displacementMap = (await textureLoader.loadAsync(displacementMapSrc))
+        
+        // this.cursor.material.displacementMap = displacementMap
     }
 
     setMoveCursor() {
@@ -132,6 +156,9 @@ export default class MoveManager {
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
                 if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
                 this.cursor.position.y += 0.1
+
+                // set displacement
+                // this.cursor.material.displacementMap
                 // this.cursor.geometry = new DecalGeometry( this.ground, position, orientation, size )
 
                 // update shader

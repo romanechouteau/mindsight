@@ -18,3 +18,8 @@ export const moodPositions = {
     [MOODS.SADNESS]: new Vector3(0, 0, -MAX_DISTANCE),
     [MOODS.ANGER]: new Vector3(-MAX_DISTANCE, 0, 0),
 }
+
+export enum AUDIO_INPUT_MODES {
+    SPOTIFY = 'spotify',
+    VOICE = 'voice',
+}

@@ -1,0 +1,5 @@
+<div class="spotify">
+    <input placeholder="Rechercher un titre" type="search"/>
+    <div class="results"></div>
+</div>
+<div class="player"></div>
