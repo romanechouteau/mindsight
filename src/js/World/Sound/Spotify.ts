@@ -14,13 +14,7 @@ export default class SpotifyManager {
 
     constructor() {
         this.setHUD()
-        console.log(template);
     }
-
-    // auth () {
-    //     fetch('https://accounts.spotify.com/login/password')
-    //     https://accounts.spotify.com/en/authorize?response_type=token&client_id=adaaf209fb064dfab873a71817029e0d&redirect_uri=https:%2F%2Fdeveloper.spotify.com%2Fdocumentation%2Fweb-playback-sdk%2Fquick-start%2F&scope=streaming%20user-read-email%20user-modify-playback-state%20user-read-private&show_dialog=true
-    // }
 
     setListeners (player) {
         // Error handling
@@ -57,11 +51,18 @@ export default class SpotifyManager {
         this.domElements = {player: document.querySelector('.player')}
     }
 
+    async getToken(): Promise<string> {
+        const res = await fetch('https://notion-api.splitbee.io/v1/page/6cf45e2e89b84034b7c8034863ea690d')
+        const json = await res.json();
+        const token = json[Object.keys(json)[1]].value.properties.title[0][0]
+        return token
+    }
+
     setHUD() {
         htmlUtils.addToDOM(template)
         this.registerDomNodes()
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = 'BQCi51p3g0pBQ9Wmw74-icp0oalSqIwvevbDUOBdzjVqa1eiWHgmDcrpguUjIJdUglFg5noRMNfqsyWmuOkMjbVFF_7tbImVFSbcpmPHecTLQ-1BQqgYRIAFyJa7nztNzzsVav2ftutxcivuiLxCgRWXmocrMlUtBYcT8OefJGONoudOTuyx8p4';
+        window.onSpotifyWebPlaybackSDKReady = async () => {
+            const token = await this.getToken()
             const player = new Spotify.Player({
                 name: 'Web Playback SDK Quick Start Player',
                 getOAuthToken: cb => { cb(token); }
@@ -75,25 +76,30 @@ export default class SpotifyManager {
                 }
 
             })
-            document.querySelector('input').addEventListener('keyup', el => {
-                fetch(`https://api.spotify.com/v1/search?q=${el.target.value}&type=track`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.accessToken}`
-                    },
-                })
-                    .then(res => res.json())
-                    .then(res => {
-                        console.log(res);
-                        this.searchTracks = []
-                        for (const track of res.tracks.items) {
-                            this.searchTracks.push(track)
-                        }
-                        this.renderTrackList()
-                    });
-            })
+            this.listenSearch()
         };
+    }
+
+    listenSearch() {
+        document.querySelector('input').addEventListener('keyup', el => {
+            if (!el.target.value.length) return this.resetSearch()
+            fetch(`https://api.spotify.com/v1/search?q=${el.target.value}&type=track`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+            })
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+                    this.searchTracks = []
+                    for (const track of res.tracks.items) {
+                        this.searchTracks.push(track)
+                    }
+                    this.renderTrackList()
+                });
+        })
     }
 
     resetSearch() {
