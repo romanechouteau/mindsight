@@ -612,6 +612,7 @@ export default class Brush extends Component {
 
   stop() {
     this.scene.remove(this.brush)
+    store.dispatch('updateBrushParams', { param: 'canDraw', value: false })
 
     this.element.innerHTML = ''
     this.mouse.off('up', this.mouseUpListener)
