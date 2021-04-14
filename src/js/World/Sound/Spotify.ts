@@ -52,6 +52,7 @@ export default class SpotifyManager {
     }
 
     async getToken(): Promise<string> {
+        // see https://www.notion.so/aymericarn/API-6cf45e2e89b84034b7c8034863ea690d
         const res = await fetch('https://notion-api.splitbee.io/v1/page/6cf45e2e89b84034b7c8034863ea690d')
         const json = await res.json();
         const token = json[Object.keys(json)[1]].value.properties.title[0][0]
@@ -137,7 +138,15 @@ export default class SpotifyManager {
                 },
             })
             .then(res => res.json().then(json => console.log(json)))
-
+            // repeat track
+            fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+            })
+            .then(res => res.json().then(json => console.log(json)))
         };
         play({
             spotify_uri: uri,
@@ -147,7 +156,7 @@ export default class SpotifyManager {
     registerMusicMood(track: Spotify.Track) {
         const [artistName, trackName] = [track.artists[0].name.replace(' ', '-'), track.name.replace(' ', '-')];
         const parser = new DOMParser()
-        fetch(`https://genius.com/${artistName}-${trackName}-lyrics`)
+        fetch(`https://mindsight-cors.herokuapp.com/https://genius.com/${artistName}-${trackName}-lyrics`, { headers: { 'X-Requested-With': 'XMLHTTPRequest' } })
             .then(res => res.text())
             .then(html => {
                 const doc = parser.parseFromString(html, 'text/html');
