@@ -12,7 +12,6 @@ import Camera from '@js/Camera'
 import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 import Component from '@lib/Component'
-
 // @ts-ignore
 import vertexShader from '@shaders/brushvert.glsl';
 // @ts-ignore
@@ -256,6 +255,7 @@ export default class Brush extends Component {
   listenKeyboard() {
     this.keyboardListener = (event) => {
       event.preventDefault()
+      // @ts-ignore
       const key = event.key || event.keyCode
       if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
         const checkbox = <HTMLInputElement> this.element.querySelector('#canDraw')
