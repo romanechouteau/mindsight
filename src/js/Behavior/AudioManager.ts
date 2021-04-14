@@ -35,12 +35,9 @@ class AudioManager extends Component {
         this.started = true
 
         this.listenKeyboard()
+
+        store.dispatch('chooseAudio', 'spotify')
         this.render()
-
-        store.dispatch('chooseAudio', 'voice')
-        VoiceManager.start()
-
-        this.drawSine()
     }
 
     stop() {
@@ -66,8 +63,10 @@ class AudioManager extends Component {
 
                 if (value === 'voice') {
                     VoiceManager.start()
+                    this.drawSine()
                 } else if (value === 'spotify') {
                     VoiceManager.stop()
+                    window.cancelAnimationFrame(this.rendering)
                 }
             }
         }
@@ -80,36 +79,35 @@ class AudioManager extends Component {
             return
         }
 
-        if (store.state.audioChoice === 'spotify') {
+        if (store.state.audioChoice === 'voice') {
             this.element.innerHTML = `
-                <div class="spotify">
-                    <div class="left"></div>
-                    <div class="center">
-                        <img src="${search}">
-                        <div class="inputWrapper">
-                            <div class="placeholder">Rechercher une musique</div>
-                            <input type="text" placeholder="Rechercher une musique"></input>
-                        </div>
-                    </div>
-                    <div class="right"></div>
+                <canvas id="sine">
+                </canvas>
+                <div class="center sine">
+                    <img src="${microphone}">
                 </div>
-
             `
+
+            this.canvas = this.element.querySelector('#sine')
+            this.canvas.width = window.innerWidth
+            this.canvas.height = window.innerHeight / 10
+            this.canvasCtx = this.canvas.getContext("2d")
             return
         }
 
         this.element.innerHTML = `
-            <canvas id="sine">
-            </canvas>
-            <div class="center sine">
-                <img src="${microphone}">
+            <div class="spotify">
+                <div class="left"></div>
+                <div class="center">
+                    <img src="${search}">
+                    <div class="inputWrapper">
+                        <div class="placeholder">Rechercher une musique</div>
+                        <input type="text" placeholder="Rechercher une musique"></input>
+                    </div>
+                </div>
+                <div class="right"></div>
             </div>
         `
-
-        this.canvas = this.element.querySelector('#sine')
-        this.canvas.width = window.innerWidth
-        this.canvas.height = window.innerHeight / 10
-        this.canvasCtx = this.canvas.getContext("2d")
     }
 
     drawSine() {
