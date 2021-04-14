@@ -55,6 +55,7 @@ class AudioManager extends Component {
     listenKeyboard() {
         this.keyboardListener = (event) => {
             event.preventDefault()
+            if ((<HTMLElement>event.target).tagName === 'INPUT') return
             // @ts-ignore
             const key = event.key || event.keyCode
             if (key === ' ' || key === 'Space' || key === 32) {
