@@ -6,6 +6,11 @@ import Component from '@lib/Component'
 
 import VoiceManager from './VoiceManager'
 
+// @ts-ignore
+import microphone from '../../images/microphone.svg'
+// @ts-ignore
+import search from '../../images/search.svg'
+
 class AudioManager extends Component {
     canvas: HTMLCanvasElement
     started: Boolean
@@ -75,9 +80,30 @@ class AudioManager extends Component {
             return
         }
 
+        if (store.state.audioChoice === 'spotify') {
+            this.element.innerHTML = `
+                <div class="spotify">
+                    <div class="left"></div>
+                    <div class="center">
+                        <img src="${search}">
+                        <div class="inputWrapper">
+                            <div class="placeholder">Rechercher une musique</div>
+                            <input type="text" placeholder="Rechercher une musique"></input>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                </div>
+
+            `
+            return
+        }
+
         this.element.innerHTML = `
-            <div>${store.state.audioChoice}</div>
-            <canvas id="sine"></canvas>
+            <canvas id="sine">
+            </canvas>
+            <div class="center sine">
+                <img src="${microphone}">
+            </div>
         `
 
         this.canvas = this.element.querySelector('#sine')
@@ -101,14 +127,28 @@ class AudioManager extends Component {
         const data = store.state.audioChoice === 'voice' ? VoiceManager.getAudioData() : [min]
         const size = store.state.audioChoice === 'voice' ? VoiceManager.bufferSize : 1
 
-        const sliceWidth = width / size;
+        const center = 96
+        const halfSize = size / 2
+        const sliceWidth = ((width - center) / 2) / halfSize
 
-        for (var i = 0; i < size; i++) {
+        for (var i = 0; i < halfSize; i++) {
             const value = data[i] / min
             const x = sliceWidth * i
             const y = value * height / 2
 
             if (i === 0) {
+                this.canvasCtx.moveTo(x, y)
+            } else {
+                this.canvasCtx.lineTo(x, y)
+            }
+        }
+
+        for (var i = Math.ceil(halfSize); i < size; i++) {
+            const value = data[i] / min
+            const x = sliceWidth * i + center
+            const y = value * height / 2
+
+            if (i === Math.ceil(size / 2)) {
                 this.canvasCtx.moveTo(x, y)
             } else {
                 this.canvasCtx.lineTo(x, y)

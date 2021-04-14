@@ -23,9 +23,62 @@ body, html
         position: fixed
         top: 0
         left: 0
+        height: 10vh
         width: 100%
-        margin-top: 48px
+        margin-top: 16px
         color: white
+        display: flex
+        justify-content: center
+        align-items: center
+
+        .center
+            padding: 0 48px
+
+            &.sine
+                position: absolute
+                top: 50%
+                left: 50%
+                transform: translate(-50%, -50%)
+
+            img
+                height: 16px
+                width: auto
+
+        .spotify
+            height: 100%
+            width: 100%
+            display: flex
+            justify-content: space-between
+            align-items: flex-end
+
+            .left, .right
+                height: 50%
+                flex-grow: 1
+                border-top: 1px solid white
+
+            .center
+                height: 100%
+                display: flex
+                justify-content: center
+                align-items: center
+
+                img
+                    margin-right: 16px
+
+                .inputWrapper
+                    .placeholder
+                        height: 0
+                        visibility: hidden
+
+                    input
+                        width: 100%
+                        background: none
+                        outline: none
+                        border: none
+                        color: white
+
+                        &::placeholder
+                            color: white
 
     .brushInterface
         position: absolute
