@@ -104,7 +104,7 @@ export default class World extends Component {
     this.container.add(this.ground.container)
   }
   setFog() {
-    const fog = new FogExp2(0x212121, 0.08)
+    const fog = new FogExp2(0xF4C5B5, 0.08)
     // const fog = new Fog(0x212121, 0, 10)
     App.scene.fog = fog
   }
