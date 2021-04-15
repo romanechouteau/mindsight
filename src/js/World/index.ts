@@ -1,5 +1,4 @@
 import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
-import { Mouse } from '../Tools/Mouse'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -9,13 +8,18 @@ import { Mouse } from '@tools/Mouse'
 import Camera from '@js/Camera'
 
 import User from './User'
+// @ts-ignore
+import store from '@store/index'
 import Brush from './Brush'
 import Ground from './Ground'
 import Suzanne from './Suzanne'
+import SceneManager from "../Behavior/SceneManager"
+// @ts-ignore
+import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 
-export default class World {
+export default class World extends Component {
   time: Time
   debug: any
   mouse: Mouse
@@ -33,7 +37,12 @@ export default class World {
   ground: Ground
   pixelRatio: number
   user: User
+  sceneManager: SceneManager
   constructor(options) {
+    super({
+      store
+    })
+
     // Set options
     this.time = options.time
     this.debug = options.debug
@@ -57,10 +66,11 @@ export default class World {
   init() {
     this.setAmbientLight()
     this.setPointLight()
+    this.setSceneManager()
     // this.setSuzanne()
-    this.setBrush()
     this.setGround()
     this.setUser()
+    this.render()
     setTimeout(() => {
       this.setFog()
     }, 50);
@@ -115,5 +125,17 @@ export default class World {
       canvas: this.canvas,
       pixelRatio: this.pixelRatio,
     })
+  }
+
+  setSceneManager() {
+    this.sceneManager = new SceneManager()
+  }
+
+  render() {
+    if (store.state.scene === 3 && this.brush === undefined) {
+      this.setBrush()
+    } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
+      this.brush.stop()
+    }
   }
 }

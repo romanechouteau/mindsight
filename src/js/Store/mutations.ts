@@ -6,4 +6,9 @@ export default {
 
         return state
     },
+    updateScene(state, payload) {
+        state.scene = payload
+
+        return state
+    },
 }

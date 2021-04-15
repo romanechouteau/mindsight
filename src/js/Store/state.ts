@@ -6,5 +6,6 @@ export default {
         color: [50, 50],
         canDraw: false,
     },
-    emotion: 'joy'
+    emotion: 'joy',
+    scene: 2
   };
