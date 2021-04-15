@@ -141,6 +141,7 @@ export default class World extends Component {
 
   setSpotify() {
     this.spotify = new Spotify()
+    AudioManager.setSpotify(this.spotify)
   }
 
   render() {
