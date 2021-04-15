@@ -1,5 +1,7 @@
 import { Vector3 } from "three"
 
+export const LAST_SCENE = 5
+
 export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]

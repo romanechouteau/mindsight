@@ -1,3 +1,5 @@
+import { AUDIO_INPUT_MODES } from "../constants";
+
 export default {
     brush: {
         size: 0.3,
@@ -7,5 +9,9 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 3
+    scene: 3,
+    audioInputMode: AUDIO_INPUT_MODES.SPOTIFY,
+    spotifyAudioData: {
+        sectionIndex: null
+    }
   };

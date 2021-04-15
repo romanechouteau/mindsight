@@ -1,6 +1,7 @@
 uniform float uSize;
 uniform float uTime;
 uniform float uParticleSize;
+uniform float uBeat;
 
 varying float randomized;
 
@@ -15,6 +16,12 @@ void main() {
   modelPosition.x += cos(uTime + offset * 10.) * (pow((0.1), 1. / (0.5 + uSize)));
   modelPosition.y += sin(uTime + offset * 15.) * (pow((0.1),1. / (0.5 + uSize)));
   modelPosition.z += sin(uTime + offset * 5.) * (pow((0.1), 1. / (0.5 + uSize)));
+
+  modelPosition.x += uBeat * offset;
+  modelPosition.y += uBeat * offset;
+  modelPosition.z += uBeat * offset;
+  // modelPosition.y += sin(uTime + offset * 15.) * (pow((0.1),1. / (0.5 + uSize)));
+  // modelPosition.z += sin(uTime + offset * 5.) * (pow((0.1), 1. / (0.5 + uSize)));
 
   vec4 viewPosition = viewMatrix * modelPosition;
   vec4 projectedPosition = projectionMatrix * viewPosition;

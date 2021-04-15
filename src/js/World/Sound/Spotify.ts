@@ -1,16 +1,18 @@
 // import { render } from 'pug';
 import { htmlUtils } from '../../Tools/utils'
 import template from '../../../templates/spotify.template'
+import store from '@store/index'
 
 export default class SpotifyManager {
 
-    searchTracks: {name: string; uri: string; artists: any[]}[]
+    searchTracks: {name: string; uri: string; id: string; artists: any[]}[]
     deviceId: string
-    player: string
+    player: Spotify.Player
     accessToken: string
     domElements: {
         player: HTMLElement
     }
+    playTracker: number
 
     constructor() {
         this.setHUD()
@@ -59,9 +61,16 @@ export default class SpotifyManager {
         return token
     }
 
+    addScript() {
+        const script = document.createElement('script');
+        script.setAttribute('src','https://sdk.scdn.co/spotify-player.js');
+        document.body.appendChild(script);
+    }
+
     setHUD() {
         htmlUtils.addToDOM(template)
         this.registerDomNodes()
+        this.addScript()
         window.onSpotifyWebPlaybackSDKReady = async () => {
             const token = await this.getToken()
             const player = new Spotify.Player({
@@ -71,18 +80,18 @@ export default class SpotifyManager {
             this.setListeners(player);
             // Connect to the player!
             player.connect().then(success => {
-
-                if (success) {
-                    console.log('The Web Playback SDK successfully connected to Spotify!');
-                }
-
+                if (success) console.log('The Web Playback SDK successfully connected to Spotify!');
             })
             this.listenSearch()
         };
     }
 
     listenSearch() {
-        document.querySelector('input').addEventListener('keyup', el => {
+        console.log('heyos');
+        
+        document.querySelector('.spotify__input').addEventListener('keyup', el => {
+            console.log('cherche');
+            
             if (!el.target.value.length) return this.resetSearch()
             fetch(`https://api.spotify.com/v1/search?q=${el.target.value}&type=track`, {
                 method: 'GET',
@@ -113,13 +122,17 @@ export default class SpotifyManager {
     renderTrackList() {
         document.querySelector('.results').innerHTML = ''
         this.searchTracks.forEach(track => {
+            console.log(track);
+            
             const $track = document.createElement('p')
             $track.textContent = track.name + ' - ' + track.artists[0].name
             $track.dataset.uri = track.uri
+            $track.dataset.id = track.id
             $track.addEventListener('click', ev => {
                 this.handleSetTrack(ev.target.dataset.uri)
                 this.resetSearch()
                 this.registerMusicMood(track)
+                this.setParticlesMovement(ev.target.dataset.id)
             })
             document.querySelector('.results').appendChild($track)
         })
@@ -162,5 +175,27 @@ export default class SpotifyManager {
                 const doc = parser.parseFromString(html, 'text/html');
                 const lyrics = (doc.querySelector('.lyrics p') as HTMLElement).innerText;
             })
+    }
+
+    async setParticlesMovement(trackId: string) {
+        const res = await fetch(`https://api.spotify.com/v1/audio-analysis/${trackId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.accessToken}`
+            },
+        })
+        const meta = await res.json()
+        this.playTracker = window.setInterval(async() => {
+            if (this.player.paused) return
+            const { position } = await this.player.getCurrentState()
+            let iterator = 0            
+            while (position/1000 > meta.sections[iterator].start) {
+                iterator++                
+            }
+            if (store.state.spotifyAudioData.sectionIndex === iterator) return
+            const { tempo, loudness } = meta.sections[iterator]
+            const offset = meta.beats[0].start
+            store.dispatch('setSpotifyAudioData', { tempo, loudness, iterator, sectionIndex: iterator, offset })
+        }, 1000)
     }
 }

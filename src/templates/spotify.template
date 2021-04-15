@@ -1,5 +1,6 @@
 <div class="spotify">
-    <input placeholder="Rechercher un titre" type="search"/>
+    <input class="spotify__input" placeholder="Rechercher un titre" type="search"/>
     <div class="results"></div>
 </div>
 <div class="player"></div>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>

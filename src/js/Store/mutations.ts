@@ -6,4 +6,14 @@ export default {
 
         return state
     },
+    updateScene(state, payload) {
+        state.scene = payload
+
+        return state
+    },
+    setSpotifyAudioData(state, payload) {
+        state.spotifyAudioData = payload
+
+        return state
+    }
 }

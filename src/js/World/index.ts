@@ -20,6 +20,7 @@ import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import { AUDIO_INPUT_MODES } from '../constants'
 import Spotify from './Sound/Spotify'
+import SceneManager from "../Behavior/SceneManager"
 
 export default class World extends Component {
   time: Time
@@ -40,6 +41,7 @@ export default class World extends Component {
   pixelRatio: number
   user: User
   spotify: Spotify
+  sceneManager: SceneManager
   constructor(options) {
     super({
       store
@@ -71,6 +73,7 @@ export default class World extends Component {
     // this.setSuzanne()
     this.setGround()
     this.setUser()
+    this.setSceneManager()
     this.render()
     setTimeout(() => {
       this.setFog()
@@ -126,6 +129,10 @@ export default class World extends Component {
       canvas: this.canvas,
       pixelRatio: this.pixelRatio,
     })
+    store.events.subscribe('setSpotifyAudioData', this.brush.setSpotifyMovement)
+  }
+  setSceneManager() {
+    this.sceneManager = new SceneManager()
   }
 
   setSpotify() {
@@ -136,7 +143,7 @@ export default class World extends Component {
     if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
     }
-    if (store.state.scene === 4 && store.state.audioInputMode === AUDIO_INPUT_MODES.SPOTIFY) {
+    if (store.state.scene === 4 && store.state.audioInputMode === AUDIO_INPUT_MODES.SPOTIFY && this.spotify === undefined) {
       this.setSpotify()
     }
   }

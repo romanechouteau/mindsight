@@ -1,4 +1,4 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide, Group, Mesh } from 'three'
 import * as dat from 'dat.gui'
 import { isEqual, nth, first, debounce } from 'lodash'
 
@@ -66,20 +66,27 @@ export default class Brush extends Component {
   paintingGeometry: BufferGeometry
   paintedMaterials: ShaderMaterial[]
   paintingPositions: number[]
+  container: Group
   params: {
     size: number
     count: number,
     particleSize: number,
     color: number[],
   }
+  audioData: {
+    intensity: number
+    moving: boolean
+    waitForNextBeat: boolean
+  }
 
   constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, canvas: HTMLElement, pixelRatio: number }) {
-    const { scene, mouse, camera, time, canvas, pixelRatio } = options
-
+    
     super({
       store,
       element: document.querySelector('.brushInterface')
     })
+
+    const { scene, mouse, camera, time, canvas, pixelRatio } = options
 
     this.time = time
     this.scene = scene
@@ -102,6 +109,8 @@ export default class Brush extends Component {
     this.particlesOffset = []
     this.paintedMaterials = []
     this.paintingGeometry = new BufferGeometry()
+    this.container = new Group()
+    this.scene.add(this.container)
 
     this.render()
 
@@ -113,9 +122,12 @@ export default class Brush extends Component {
         uSize: { value: store.state.brush.size },
         uTime: { value: 0. },
         uColor: { value: this.getColorInGradient() },
-        uOpacity: { value: 1. }
+        uOpacity: { value: 1. },
+        uBeat: { value: 0. }
       },
     })
+
+    this.audioData = { moving: false, intensity: 0, waitForNextBeat: false }
 
     this.setBrush()
     this.setMovement()
@@ -216,7 +228,7 @@ export default class Brush extends Component {
 
         this.painting = new Points(this.paintingGeometry, this.material)
         this.painting.frustumCulled = false
-        this.scene.add(this.painting)
+        this.container.add(this.painting)
       }
     })
   }
@@ -234,7 +246,8 @@ export default class Brush extends Component {
             uSize: { value: store.state.brush.size },
             uTime: { value: 0. },
             uColor: { value: this.getColorInGradient() },
-            uOpacity: { value: 1. }
+            uOpacity: { value: 1. },
+            uBeat: { value: 0. }
           },
         })
         this.brush.material = this.material
@@ -384,7 +397,7 @@ export default class Brush extends Component {
       })
     })
 
-    this.element.querySelectorAll('input').forEach((input) => {
+    this.element.querySelectorAll('.paramsGroup input').forEach((input) => {
       const param = input.getAttribute('name')
       const type = input.getAttribute('type')
 
@@ -401,7 +414,7 @@ export default class Brush extends Component {
         })
       } else if (isEqual(type, 'checkbox')) {
         input.addEventListener('change', () => {
-          const value = input.checked
+          const value = input.checked          
           store.dispatch('updateBrushParams', { param, value })
         })
       }
@@ -597,5 +610,54 @@ export default class Brush extends Component {
     const b = this.palette.data[pixel + 2]
 
     return new Color(r / 255, g / 255, b / 255)
+  }
+  
+  setSpotifyMovement = () => {
+    if (this.audioData.moving) return
+    this.audioData.intensity = 0
+    this.audioData.moving = true
+    const start = this.time.current
+    let position = 0
+    const { tempo, loudness, offset } = store.state.spotifyAudioData
+    this.audioData.intensity = 0.5 * (loudness+40)
+
+    
+    this.time.on('tick', () => {
+      // const { tempo, loudness, offset } = store.state.spotifyAudioData
+      // const bps = 1/(tempo / 60)
+       
+      // // position = Math.round(this.time.current - start + offset *1000)
+      // position += this.time.delta
+      // console.log(position/1000, bps);
+      
+      // if (position/1000 > bps*2) {
+      //   position = 0
+      //   this.audioData.intensity = 0.5 * (loudness+40)
+      // }
+      if (this.audioData.intensity > 0) this.audioData.intensity -= 0.2
+      // debugger
+      
+      // // if (position % bpms < 50 && !this.audioData.waitForNextBeat) {
+      // //   this.audioData.intensity = 0.5 * (loudness+40)
+      // //   this.audioData.waitForNextBeat = true
+      // // }
+      // // else {
+      // //   this.audioData.waitForNextBeat = false
+      // //   if (this.audioData.intensity > 0) this.audioData.intensity -= 0.2
+      // // }
+      // // console.log(this.audioData.intensity);
+      this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/20.)
+    })
+
+    setInterval(() => {
+      // const { tempo, loudness, offset } = store.state.spotifyAudioData
+      this.audioData.intensity = 0.5 * (loudness+40)
+      // this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/20.)
+    }, 1/ (tempo / 60) *1000)
+
+    // for (const [index, painting] of Object.entries(this.container.children)) {
+    //   ;(painting as Mesh).geometry.
+    // }
+
   }
 }
