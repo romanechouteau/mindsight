@@ -19,7 +19,7 @@ import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import { AUDIO_INPUT_MODES } from '../constants'
-import Spotify from './Sound/Spotify'
+import Spotify from '../Behavior/Sound/Spotify'
 import SceneManager from "../Behavior/SceneManager"
 
 export default class World extends Component {
