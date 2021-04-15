@@ -14,7 +14,7 @@ void main() {
   vec4 modelPosition = modelMatrix * vec4(position, 1.0);
 
   float displacementStep = step(0.1, audioData);
-  float displacement = mix(0.1, (audioData * 0.002 - 0.15), displacementStep);
+  float displacement = mix(0.1, (audioData * 0.003 - 0.28), displacementStep);
 
   float offset = rand(vec2(gl_VertexID, gl_VertexID));
   modelPosition.x += cos(uTime + offset * 10.) * (pow((displacement), 1. / (0.5 + uSize)));
