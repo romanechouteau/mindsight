@@ -82,10 +82,12 @@ class AudioManager extends Component {
 
         if (store.state.audioChoice === 'voice') {
             this.element.innerHTML = `
-                <canvas id="sine">
-                </canvas>
-                <div class="center sine">
-                    <img src="${microphone}">
+                <div class="audioWrapper">
+                    <canvas id="sine">
+                    </canvas>
+                    <div class="center sine">
+                        <img src="${microphone}">
+                    </div>
                 </div>
             `
 
@@ -97,7 +99,7 @@ class AudioManager extends Component {
         }
 
         this.element.innerHTML = `
-            <div class="spotify">
+            <div class="audioWrapper spotify">
                 <div class="left"></div>
                 <div class="center">
                     <img src="${search}">
