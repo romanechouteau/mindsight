@@ -17,9 +17,9 @@ void main() {
   modelPosition.y += sin(uTime + offset * 15.) * (pow((0.1),1. / (0.5 + uSize)));
   modelPosition.z += sin(uTime + offset * 5.) * (pow((0.1), 1. / (0.5 + uSize)));
 
-  modelPosition.x += uBeat * offset;
-  modelPosition.y += uBeat * offset;
-  modelPosition.z += uBeat * offset;
+  modelPosition.x += (uBeat * (offset - .5));
+  modelPosition.y += (uBeat * (offset - .5));
+  modelPosition.z += (uBeat * (offset - .5));
   // modelPosition.y += sin(uTime + offset * 15.) * (pow((0.1),1. / (0.5 + uSize)));
   // modelPosition.z += sin(uTime + offset * 5.) * (pow((0.1), 1. / (0.5 + uSize)));
 

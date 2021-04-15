@@ -77,7 +77,9 @@ export default class Brush extends Component {
     intensity: number
     moving: boolean
     waitForNextBeat: boolean
+    peak: boolean
   }
+  debug: any
 
   constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, canvas: HTMLElement, pixelRatio: number }) {
     
@@ -86,7 +88,7 @@ export default class Brush extends Component {
       element: document.querySelector('.brushInterface')
     })
 
-    const { scene, mouse, camera, time, canvas, pixelRatio } = options
+    const { scene, mouse, camera, time, canvas, pixelRatio, debug } = options
 
     this.time = time
     this.scene = scene
@@ -111,6 +113,7 @@ export default class Brush extends Component {
     this.paintingGeometry = new BufferGeometry()
     this.container = new Group()
     this.scene.add(this.container)
+    this.debug = debug
 
     this.render()
 
@@ -127,7 +130,7 @@ export default class Brush extends Component {
       },
     })
 
-    this.audioData = { moving: false, intensity: 0, waitForNextBeat: false }
+    this.audioData = { moving: false, intensity: 0, waitForNextBeat: false, peak: false }
 
     this.setBrush()
     this.setMovement()
@@ -619,45 +622,35 @@ export default class Brush extends Component {
     const start = this.time.current
     let position = 0
     const { tempo, loudness, offset } = store.state.spotifyAudioData
-    this.audioData.intensity = 0.5 * (loudness+40)
 
+    const PARAMS = {
+      peakSpeed: 4,
+      comebackSpeed: 0.4
+    }
     
     this.time.on('tick', () => {
-      // const { tempo, loudness, offset } = store.state.spotifyAudioData
-      // const bps = 1/(tempo / 60)
-       
-      // // position = Math.round(this.time.current - start + offset *1000)
-      // position += this.time.delta
-      // console.log(position/1000, bps);
+      if (this.audioData.peak) console.log(0.05 * (loudness+40));
       
-      // if (position/1000 > bps*2) {
-      //   position = 0
-      //   this.audioData.intensity = 0.5 * (loudness+40)
-      // }
-      if (this.audioData.intensity > 0) this.audioData.intensity -= 0.2
-      // debugger
-      
-      // // if (position % bpms < 50 && !this.audioData.waitForNextBeat) {
-      // //   this.audioData.intensity = 0.5 * (loudness+40)
-      // //   this.audioData.waitForNextBeat = true
-      // // }
-      // // else {
-      // //   this.audioData.waitForNextBeat = false
-      // //   if (this.audioData.intensity > 0) this.audioData.intensity -= 0.2
-      // // }
-      // // console.log(this.audioData.intensity);
-      this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/20.)
+      if (this.audioData.peak) this.audioData.intensity += 0.05 * (loudness+40)
+      if (this.audioData.intensity > 0) this.audioData.intensity -= PARAMS.comebackSpeed
+      this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/10.)
     })
 
-    setInterval(() => {
-      // const { tempo, loudness, offset } = store.state.spotifyAudioData
-      this.audioData.intensity = 0.5 * (loudness+40)
-      // this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/20.)
-    }, 1/ (tempo / 60) *1000)
+    const bps = 1/ (tempo / 60) *1000
+    setTimeout(() => {
+      setInterval(() => {
+        this.audioData.peak = true
+        setTimeout(() => {
+          this.audioData.peak = false
+        }, this.time.delta * PARAMS.peakSpeed)
+      }, bps)
+    }, 1000)
 
-    // for (const [index, painting] of Object.entries(this.container.children)) {
-    //   ;(painting as Mesh).geometry.
-    // }
+    if (this.debug) {
+      this.debug.addFolder('Beat deformation')
+      folder.add(PARAMS.peakSpeed)
+      folder.add(PARAMS.comebackSpeed)
+    }
 
   }
 }

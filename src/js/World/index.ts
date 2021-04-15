@@ -128,6 +128,7 @@ export default class World extends Component {
       camera: this.camera,
       canvas: this.canvas,
       pixelRatio: this.pixelRatio,
+      debug: this.debugFolder
     })
     store.events.subscribe('setSpotifyAudioData', this.brush.setSpotifyMovement)
   }
