@@ -12,7 +12,7 @@ export default {
         return state
     },
     chooseAudio(state, payload) {
-        state.audioChoice = payload
+        state.audioInputMode = payload
 
         return state
     },

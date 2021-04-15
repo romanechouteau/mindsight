@@ -11,6 +11,11 @@ import microphone from '../../images/microphone.svg'
 // @ts-ignore
 import search from '../../images/search.svg'
 
+import { AUDIO_INPUT_MODES } from '../constants'
+import { htmlUtils } from '../Tools/utils'
+// @ts-ignore
+import template from '../../templates/spotify.template'
+
 class AudioManager extends Component {
     canvas: HTMLCanvasElement
     started: Boolean
@@ -36,7 +41,7 @@ class AudioManager extends Component {
 
         this.listenKeyboard()
 
-        store.dispatch('chooseAudio', 'spotify')
+        store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
         this.render()
     }
 
@@ -59,13 +64,13 @@ class AudioManager extends Component {
             // @ts-ignore
             const key = event.key || event.keyCode
             if (key === ' ' || key === 'Space' || key === 32) {
-                const value = store.state.audioChoice === 'voice' ? 'spotify' : 'voice'
+                const value = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE  ? AUDIO_INPUT_MODES.SPOTIFY : AUDIO_INPUT_MODES.VOICE
                 store.dispatch('chooseAudio', value)
 
-                if (value === 'voice') {
+                if (value === AUDIO_INPUT_MODES.VOICE) {
                     VoiceManager.start()
                     this.drawSine()
-                } else if (value === 'spotify') {
+                } else if (value === AUDIO_INPUT_MODES.SPOTIFY) {
                     VoiceManager.stop()
                     window.cancelAnimationFrame(this.rendering)
                 }
@@ -80,7 +85,7 @@ class AudioManager extends Component {
             return
         }
 
-        if (store.state.audioChoice === 'voice') {
+        if (store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE) {
             this.element.innerHTML = `
                 <div class="audioWrapper">
                     <canvas id="sine">
@@ -98,19 +103,7 @@ class AudioManager extends Component {
             return
         }
 
-        this.element.innerHTML = `
-            <div class="audioWrapper spotify">
-                <div class="left"></div>
-                <div class="center">
-                    <img src="${search}">
-                    <div class="inputWrapper">
-                        <div class="placeholder">Rechercher une musique</div>
-                        <input type="text" placeholder="Rechercher une musique"></input>
-                    </div>
-                </div>
-                <div class="right"></div>
-            </div>
-        `
+        htmlUtils.renderToDOM(this.element, template, { search })
     }
 
     drawSine() {
@@ -125,8 +118,8 @@ class AudioManager extends Component {
         this.canvasCtx.beginPath()
 
         const min = 128
-        const data = store.state.audioChoice === 'voice' ? VoiceManager.getAudioData() : [min]
-        const size = store.state.audioChoice === 'voice' ? VoiceManager.bufferSize : 1
+        const data = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE ? VoiceManager.getAudioData() : [min]
+        const size = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE ? VoiceManager.bufferSize : 1
 
         const center = 96
         const halfSize = size / 2

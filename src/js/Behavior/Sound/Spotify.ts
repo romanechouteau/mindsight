@@ -2,6 +2,8 @@
 import { htmlUtils } from '../../Tools/utils'
 import template from '../../../templates/spotify.template'
 import store from '@store/index'
+// @ts-ignore
+import search from '../../../images/search.svg'
 
 export default class SpotifyManager {
 
@@ -25,15 +27,12 @@ export default class SpotifyManager {
         player.addListener('account_error', ({ message }) => { console.error(message); });
         player.addListener('playback_error', ({ message }) => { console.error(message); });
         // Playback status updates
-        player.addListener('player_state_changed', state => { 
-            // console.log(state.paused);
-            // console.log(state.paused);
+        player.addListener('player_state_changed', state => {
             if (state.paused === false && state.track_window?.current_track) {
                 this.domElements.player.innerText = `Currently Playing : ${state.track_window.current_track.name} - ${state.track_window.current_track.artists[0].name}`
             } else {
                 this.domElements.player.innerText = ''
             }
-            console.log(state);
          });
         // Ready
         player.addListener('ready', ({ device_id }) => {
@@ -68,7 +67,6 @@ export default class SpotifyManager {
     }
 
     setHUD() {
-        htmlUtils.addToDOM(template)
         this.registerDomNodes()
         this.addScript()
         window.onSpotifyWebPlaybackSDKReady = async () => {
@@ -87,11 +85,8 @@ export default class SpotifyManager {
     }
 
     listenSearch() {
-        console.log('heyos');
-        
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
-            console.log('cherche');
-            
+
             if (!el.target.value.length) return this.resetSearch()
             fetch(`https://api.spotify.com/v1/search?q=${el.target.value}&type=track`, {
                 method: 'GET',
@@ -102,7 +97,6 @@ export default class SpotifyManager {
             })
                 .then(res => res.json())
                 .then(res => {
-                    console.log(res);
                     this.searchTracks = []
                     for (const track of res.tracks.items) {
                         this.searchTracks.push(track)
@@ -122,8 +116,6 @@ export default class SpotifyManager {
     renderTrackList() {
         document.querySelector('.results').innerHTML = ''
         this.searchTracks.forEach(track => {
-            console.log(track);
-            
             const $track = document.createElement('p')
             $track.textContent = track.name + ' - ' + track.artists[0].name
             $track.dataset.uri = track.uri
@@ -188,9 +180,9 @@ export default class SpotifyManager {
         this.playTracker = window.setInterval(async() => {
             if (this.player.paused) return
             const { position } = await this.player.getCurrentState()
-            let iterator = 0            
+            let iterator = 0
             while (position/1000 > meta.sections[iterator].start) {
-                iterator++                
+                iterator++
             }
             if (store.state.spotifyAudioData.sectionIndex === iterator) return
             const { tempo, loudness } = meta.sections[iterator]

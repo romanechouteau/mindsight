@@ -17,6 +17,8 @@ import vertexShader from '@shaders/brushvert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/brushfrag.glsl'
 
+import { AUDIO_INPUT_MODES } from '../constants'
+
 import VoiceManager from '../Behavior/VoiceManager'
 
 const configShaderMaterial = {
@@ -168,7 +170,7 @@ export default class Brush extends Component {
       this.material.uniforms.uTime.value += 0.01
       this.paintedMaterials.forEach(material => material.uniforms.uTime.value += 0.01)
 
-      if (store.state.audioChoice === 'voice') {
+      if (store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE) {
         const data = VoiceManager.getAudioData()
         this.paintedGeometries.forEach(geometry => {
           const values = []
@@ -679,8 +681,6 @@ export default class Brush extends Component {
     }
 
     this.time.on('tick', () => {
-      if (this.audioData.peak) console.log(0.05 * (loudness+40));
-
       if (this.audioData.peak) this.audioData.intensity += 0.05 * (loudness+40)
       if (this.audioData.intensity > 0) this.audioData.intensity -= PARAMS.comebackSpeed
       this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/10.)
