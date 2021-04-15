@@ -5,6 +5,7 @@ import store from '@store/index'
 import Component from '@lib/Component'
 
 import VoiceManager from './VoiceManager'
+import Spotify from './Sound/Spotify'
 
 // @ts-ignore
 import microphone from '../../images/microphone.svg'
@@ -18,6 +19,7 @@ import template from '../../templates/spotify.template'
 
 class AudioManager extends Component {
     canvas: HTMLCanvasElement
+    spotify: Spotify
     started: Boolean
     element: HTMLElement
     rendering: number
@@ -104,6 +106,9 @@ class AudioManager extends Component {
         }
 
         htmlUtils.renderToDOM(this.element, template, { search })
+        document.querySelector('.spotify__input').addEventListener('keyup', el => {
+            this.spotify.handleSearch((<HTMLInputElement>el.target).value)
+        })
     }
 
     drawSine() {
@@ -151,6 +156,10 @@ class AudioManager extends Component {
 
         this.canvasCtx.lineTo(width, height / 2)
         this.canvasCtx.stroke()
+    }
+
+    setSpotify(spotify) {
+        this.spotify = spotify
     }
 }
 

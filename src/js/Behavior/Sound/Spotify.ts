@@ -80,30 +80,26 @@ export default class SpotifyManager {
             player.connect().then(success => {
                 if (success) console.log('The Web Playback SDK successfully connected to Spotify!');
             })
-            this.listenSearch()
         };
     }
 
-    listenSearch() {
-        document.querySelector('.spotify__input').addEventListener('keyup', el => {
-
-            if (!el.target.value.length) return this.resetSearch()
-            fetch(`https://api.spotify.com/v1/search?q=${el.target.value}&type=track`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.accessToken}`
-                },
-            })
-                .then(res => res.json())
-                .then(res => {
-                    this.searchTracks = []
-                    for (const track of res.tracks.items) {
-                        this.searchTracks.push(track)
-                    }
-                    this.renderTrackList()
-                });
+    handleSearch(value) {
+        if (!value.length) return this.resetSearch()
+        fetch(`https://api.spotify.com/v1/search?q=${value}&type=track`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.accessToken}`
+            },
         })
+            .then(res => res.json())
+            .then(res => {
+                this.searchTracks = []
+                for (const track of res.tracks.items) {
+                    this.searchTracks.push(track)
+                }
+                this.renderTrackList()
+            });
     }
 
     resetSearch() {
