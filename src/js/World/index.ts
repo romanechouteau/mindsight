@@ -1,4 +1,4 @@
-import { AxesHelper, Camera, FogExp2, Fog, Object3D } from 'three'
+import { AxesHelper, FogExp2, Fog, Object3D } from 'three'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -14,6 +14,7 @@ import Brush from './Brush'
 import Ground from './Ground'
 import Suzanne from './Suzanne'
 import SceneManager from "../Behavior/SceneManager"
+import AudioManager from "../Behavior/AudioManager"
 // @ts-ignore
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
@@ -136,6 +137,12 @@ export default class World extends Component {
       this.setBrush()
     } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()
+    }
+
+    if (store.state.scene === 4 && AudioManager.started === false) {
+      AudioManager.start()
+    } else if (store.state.scene !== 4 && AudioManager.started === true) {
+      AudioManager.stop()
     }
   }
 }

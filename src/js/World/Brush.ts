@@ -12,11 +12,12 @@ import Camera from '@js/Camera'
 import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 import Component from '@lib/Component'
+// @ts-ignore
+import vertexShader from '@shaders/brushvert.glsl'
+// @ts-ignore
+import fragmentShader from '@shaders/brushfrag.glsl'
 
-// @ts-ignore
-import vertexShader from '@shaders/brushvert.glsl';
-// @ts-ignore
-import fragmentShader from '@shaders/brushfrag.glsl';
+import VoiceManager from '../Behavior/VoiceManager'
 
 const configShaderMaterial = {
   depthWrite: false,
@@ -69,6 +70,7 @@ export default class Brush extends Component {
   keyboardListener: EventListener
   paintingGeometry: BufferGeometry
   paintedMaterials: ShaderMaterial[]
+  paintedGeometries: BufferGeometry[]
   paintingPositions: number[]
   mouseDownListener: Function
   params: {
@@ -107,6 +109,7 @@ export default class Brush extends Component {
     this.brushPositions = []
     this.particlesOffset = []
     this.paintedMaterials = []
+    this.paintedGeometries = []
     this.paintingGeometry = new BufferGeometry()
 
     this.render()
@@ -149,6 +152,27 @@ export default class Brush extends Component {
     this.time.on('tick.brush', () => {
       this.material.uniforms.uTime.value += 0.01
       this.paintedMaterials.forEach(material => material.uniforms.uTime.value += 0.01)
+
+      if (store.state.audioChoice === 'voice') {
+        const data = VoiceManager.getAudioData()
+        this.paintedGeometries.forEach(geometry => {
+          const values = []
+          for (let i = 0; i < geometry.attributes.position.count; i++) {
+            values.push(data[i % VoiceManager.bufferSize])
+          }
+          geometry.setAttribute(
+            'audioData',
+            new BufferAttribute(new Float32Array(values), 1)
+          )
+        })
+      } else {
+        this.paintedGeometries.forEach(geometry => {
+          geometry.setAttribute(
+            'audioData',
+            new BufferAttribute(new Float32Array(Array(geometry.attributes.position.count).fill(0)), 1)
+          )
+        })
+      }
 
       if (isEqual(store.state.brush.canDraw, true)) {
         const onCanvas = isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)
@@ -235,6 +259,7 @@ export default class Brush extends Component {
       if (isEqual(this.isPainting, true) && isEqual(store.state.brush.canDraw, true)) {
         this.isPainting = false
         this.paintedMaterials.push(this.material)
+        this.paintedGeometries.push(this.paintingGeometry)
         this.material = new ShaderMaterial({
           ...configShaderMaterial,
           uniforms:
@@ -256,6 +281,7 @@ export default class Brush extends Component {
   listenKeyboard() {
     this.keyboardListener = (event) => {
       event.preventDefault()
+      // @ts-ignore
       const key = event.key || event.keyCode
       if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
         const checkbox = <HTMLInputElement> this.element.querySelector('#canDraw')

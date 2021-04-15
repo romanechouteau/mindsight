@@ -7,5 +7,6 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 2
+    scene: 2,
+    audioChoice: 'none'
   };

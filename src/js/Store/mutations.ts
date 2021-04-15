@@ -11,4 +11,9 @@ export default {
 
         return state
     },
+    chooseAudio(state, payload) {
+        state.audioChoice = payload
+
+        return state
+    },
 }

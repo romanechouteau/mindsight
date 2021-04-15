@@ -5,4 +5,7 @@ export default {
     updateScene(context, payload) {
         context.commit('updateScene', payload)
     },
+    chooseAudio(context, payload) {
+        context.commit('chooseAudio', payload)
+    },
 }
