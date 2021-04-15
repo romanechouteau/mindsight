@@ -8,4 +8,8 @@ export default {
     chooseAudio(context, payload) {
         context.commit('chooseAudio', payload)
     },
+    setSpotifyAudioData(context, payload) {
+        context.commit('setSpotifyAudioData', payload)
+        context.events.publish('setSpotifyAudioData')
+    }
 }

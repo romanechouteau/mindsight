@@ -1,4 +1,4 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide, Group, Mesh } from 'three'
 import * as dat from 'dat.gui'
 import { isEqual, nth, first, debounce } from 'lodash'
 
@@ -59,6 +59,7 @@ export default class Brush extends Component {
   material: ShaderMaterial
   interface: dat.GUI
   raycaster: Raycaster
+  container: Group
   pixelRatio: number
   isPainting: Boolean
   brushPreview: NodeListOf<SVGCircleElement>
@@ -79,14 +80,22 @@ export default class Brush extends Component {
     particleSize: number,
     color: number[],
   }
+  audioData: {
+    intensity: number
+    moving: boolean
+    waitForNextBeat: boolean
+    peak: boolean
+  }
+  debug: any
 
-  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, canvas: HTMLElement, pixelRatio: number }) {
-    const { scene, mouse, camera, time, canvas, pixelRatio } = options
+  constructor(options: { scene: Object3D, mouse: Mouse, camera: Camera, time: Time, canvas: HTMLElement, pixelRatio: number, debug: any }) {
 
     super({
       store,
       element: document.querySelector('.brushInterface')
     })
+
+    const { scene, mouse, camera, time, canvas, pixelRatio, debug } = options
 
     this.time = time
     this.scene = scene
@@ -111,6 +120,9 @@ export default class Brush extends Component {
     this.paintedMaterials = []
     this.paintedGeometries = []
     this.paintingGeometry = new BufferGeometry()
+    this.container = new Group()
+    this.scene.add(this.container)
+    this.debug = debug
 
     this.render()
 
@@ -122,9 +134,12 @@ export default class Brush extends Component {
         uSize: { value: store.state.brush.size },
         uTime: { value: 0. },
         uColor: { value: this.getColorInGradient() },
-        uOpacity: { value: 1. }
+        uOpacity: { value: 1. },
+        uBeat: { value: 0. }
       },
     })
+
+    this.audioData = { moving: false, intensity: 0, waitForNextBeat: false, peak: false }
 
     this.setBrush()
     this.setMovement()
@@ -248,7 +263,7 @@ export default class Brush extends Component {
 
         this.painting = new Points(this.paintingGeometry, this.material)
         this.painting.frustumCulled = false
-        this.scene.add(this.painting)
+        this.container.add(this.painting)
       }
     }
     this.mouse.on('down', this.mouseDownListener)
@@ -268,7 +283,8 @@ export default class Brush extends Component {
             uSize: { value: store.state.brush.size },
             uTime: { value: 0. },
             uColor: { value: this.getColorInGradient() },
-            uOpacity: { value: 1. }
+            uOpacity: { value: 1. },
+            uBeat: { value: 0. }
           },
         })
         this.brush.material = this.material
@@ -421,7 +437,7 @@ export default class Brush extends Component {
       })
     })
 
-    this.element.querySelectorAll('input').forEach((input) => {
+    this.element.querySelectorAll('.paramsGroup input').forEach((input) => {
       const param = input.getAttribute('name')
       const type = input.getAttribute('type')
 
@@ -649,5 +665,42 @@ export default class Brush extends Component {
     this.stopped = true
 
     store.dispatch('updateBrushParams', { param: 'canDraw', value: false })
+  }
+
+  setSpotifyMovement = () => {
+    if (this.audioData.moving) return
+    this.audioData.intensity = 0
+    this.audioData.moving = true
+    const { tempo, loudness } = store.state.spotifyAudioData
+
+    const PARAMS = {
+      peakSpeed: 4,
+      comebackSpeed: 0.4
+    }
+
+    this.time.on('tick', () => {
+      if (this.audioData.peak) console.log(0.05 * (loudness+40));
+
+      if (this.audioData.peak) this.audioData.intensity += 0.05 * (loudness+40)
+      if (this.audioData.intensity > 0) this.audioData.intensity -= PARAMS.comebackSpeed
+      this.paintedMaterials.forEach(material => material.uniforms.uBeat.value = this.audioData.intensity/10.)
+    })
+
+    const bps = 1/ (tempo / 60) *1000
+    setTimeout(() => {
+      setInterval(() => {
+        this.audioData.peak = true
+        setTimeout(() => {
+          this.audioData.peak = false
+        }, this.time.delta * PARAMS.peakSpeed)
+      }, bps)
+    }, 1000)
+
+    if (this.debug) {
+      const folder = this.debug.addFolder('Beat deformation')
+      folder.add(PARAMS.peakSpeed)
+      folder.add(PARAMS.comebackSpeed)
+    }
+
   }
 }

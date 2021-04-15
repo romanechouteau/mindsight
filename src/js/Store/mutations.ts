@@ -16,4 +16,9 @@ export default {
 
         return state
     },
+    setSpotifyAudioData(state, payload) {
+        state.spotifyAudioData = payload
+
+        return state
+    }
 }
