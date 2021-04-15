@@ -97,7 +97,7 @@ export default class MoveManager {
             }) )
             this.cursor.rotation.x = -Math.PI/2
             this.cursor.frustumCulled = false
-    
+
             // this.cursor.translateY(1)
             this.cursor.name = 'MoveCursor'
 
@@ -128,12 +128,10 @@ export default class MoveManager {
     }
 
     async setCursorDiplacement() {
-        console.log('oui');
-
         this.cursorDisplacementMap.offset = new Vector2(0.5, 0.5)
-        
+
         // const displacementMap = (await textureLoader.loadAsync(displacementMapSrc))
-        
+
         // this.cursor.material.displacementMap = displacementMap
     }
 

@@ -21,9 +21,6 @@ export default class PubSub {
           return []
         }
 
-        console.log('event');
-        
-
         return map(this.events[event], callback => callback(data))
       }
   }
