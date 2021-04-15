@@ -302,8 +302,7 @@ export default class Brush extends Component {
       // @ts-ignore
       const key = event.key || event.keyCode
       if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
-        const checkbox = <HTMLInputElement> this.element.querySelector('#canDraw')
-        store.dispatch('updateBrushParams', { param: 'canDraw', value: !checkbox.checked })
+        store.dispatch('updateBrushParams', { param: 'canDraw', value: !store.state.brush.canDraw })
       }
     }
     document.addEventListener('keyup', this.keyboardListener)
@@ -316,7 +315,6 @@ export default class Brush extends Component {
     this.element.innerHTML = `
       <div class="paramsGroup bigAndSmallCircles">
         <div class="inputGroup circleRangeGroup">
-          <div class="label">Brush size</div>
           <div
               class="circleRange"
               id="size"
@@ -345,19 +343,6 @@ export default class Brush extends Component {
         </div>
       </div>
       <div class="paramsGroup">
-        <div class="inputGroup checkbox">
-          <div class="checkboxWrapper">
-            <div class="toggle">
-              <input
-                type="checkbox"
-                name="canDraw"
-                id="canDraw"
-                ${store.state.brush.canDraw && 'checked'} />
-              <div class="slider"></div>
-            </div>
-          </div>
-          <label for="canDraw">Draw</label>
-        </div>
         <div class="inputGroup">
         <input
         type="range"
@@ -367,7 +352,6 @@ export default class Brush extends Component {
         name="particleSize"
         id="particleSize"
         value="${store.state.brush.particleSize}" />
-        <label for="particleSize">Particle size</label>
         </div>
         <div class="inputGroup">
           <input
@@ -378,7 +362,6 @@ export default class Brush extends Component {
             name="count"
             id="count"
             value="${store.state.brush.count}" />
-          <label for="count">Density</label>
         </div>
       </div>
     `
@@ -452,11 +435,6 @@ export default class Brush extends Component {
 
         input.addEventListener('change', () => {
           const value = parseFloat(input.value)
-          store.dispatch('updateBrushParams', { param, value })
-        })
-      } else if (isEqual(type, 'checkbox')) {
-        input.addEventListener('change', () => {
-          const value = input.checked
           store.dispatch('updateBrushParams', { param, value })
         })
       }
