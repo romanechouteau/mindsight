@@ -93,7 +93,7 @@ export default class MoveManager {
         ;(async () => {
             this.cursorDisplacementMap = (await textureLoader.loadAsync(displacementMapSrc))
             this.cursor = new Mesh( new PlaneBufferGeometry(2, 2, 30, 30), new MeshNormalMaterial({
-                displacementMap: this.cursorDisplacementMap
+                // displacementMap: this.cursorDisplacementMap
             }) )
             this.cursor.rotation.x = -Math.PI/2
             this.cursor.frustumCulled = false
@@ -152,8 +152,10 @@ export default class MoveManager {
                 this.raycaster.setFromCamera(cursor, this.camera.camera)
 
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
-                if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
-                this.cursor.position.y += 0.1
+                if (this.lastIntersection) {
+                    this.cursor.position.copy(this.lastIntersection.point)
+                    this.cursor.position.y += 0.1
+                }
 
                 // set displacement
                 // this.cursor.material.displacementMap
