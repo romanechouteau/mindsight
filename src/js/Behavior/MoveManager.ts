@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending, Texture, Color, MeshLambertMaterial, Group } from "three";
+import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending, Texture, Color, MeshLambertMaterial, Group, BufferGeometry, Points, MeshBasicMaterial, BufferAttribute, PointsMaterial } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -37,6 +37,9 @@ export default class MoveManager {
     isLooking: boolean
     isMoving: boolean
     cursorDisplacementMap: Texture
+    cursorParticlesPositions: number[];
+    cursorParticlesGeometry: BufferGeometry;
+    cursorParticles: Points;
     constructor({ camera, mouse, ground, canvas }) {
 
         this.cursorMaterial = new ShaderMaterial({
@@ -95,14 +98,27 @@ export default class MoveManager {
 
         ;(async () => {
             this.cursorDisplacementMap = (await textureLoader.loadAsync(displacementMapSrc))
-            this.cursor = new Mesh( new PlaneBufferGeometry(2, 2, 600, 600), this.cursorMaterial)
+            this.cursorBase = new Mesh( new PlaneBufferGeometry(2, 2, 600, 600), this.cursorMaterial)
             // new MeshNormalMaterial({
             //     displacementMap: this.cursorDisplacementMap,
             //     displacementScale: 1,
             //     side: DoubleSide
             // }) )
-            this.cursor.rotation.x = -Math.PI/2
-            this.cursor.frustumCulled = false
+            this.cursorBase.rotation.x = -Math.PI/2
+            this.cursorBase.frustumCulled = false
+
+            this.cursorParticlesPositions = Array.from(Array(12), val => val = 0.5)
+            this.cursorParticlesGeometry = new BufferGeometry()
+            this.cursorParticles = new Points(this.cursorParticlesGeometry, new PointsMaterial({ color: 0xffffff, size: 0.05 }))
+            this.cursorParticlesGeometry.setAttribute(
+                'position',
+                new BufferAttribute(new Float32Array(this.cursorParticlesPositions), 3)
+            )
+
+
+            this.cursor = new Group()
+            this.cursor.add(this.cursorBase)
+            this.cursor.add(this.cursorParticles)
 
             // this.cursor.translateY(1)
             this.cursor.name = 'MoveCursor'
