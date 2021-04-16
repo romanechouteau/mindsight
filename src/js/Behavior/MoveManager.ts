@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending, Texture } from "three";
+import { BoxBufferGeometry, DoubleSide, Euler, Intersection, Mesh, MeshStandardMaterial, MeshNormalMaterial, Object3D, Raycaster, Vector2, PlaneBufferGeometry, ShaderMaterial, Vector3, Vector, AdditiveBlending, Texture, Color, MeshLambertMaterial, Group } from "three";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Camera from '../Camera'
@@ -12,7 +12,7 @@ import groundVertex from '../../shaders/groundVert.glsl'
 import groundFragment from '../../shaders/groundFrag.glsl'
 import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
 import Ground from "../World/Ground";
-import displacementMapSrc from '../../images/map2.png'
+import displacementMapSrc from '../../images/mapTest-displacement.png'
 import { textureLoader } from "../Tools/utils";
 
 // @ts-ignore
@@ -28,7 +28,8 @@ export default class MoveManager {
     groundInstance: Ground
     groundMaterial: ShaderMaterial
     cursorMaterial: ShaderMaterial
-    cursor: Mesh
+    cursor: Group
+    cursorBase: Mesh
     interfaceEmpty: HTMLElement
     lastIntersection: Intersection
     euler: Euler
@@ -41,9 +42,11 @@ export default class MoveManager {
         this.cursorMaterial = new ShaderMaterial({
             vertexShader: moveCursorVertex,
             fragmentShader: moveCursorFragment,
+            transparent: true,
             uniforms: {
                 uTime: { value: 0. },
-            }
+            },
+            side: DoubleSide
         })
 
         this.groundMaterial =
@@ -92,9 +95,12 @@ export default class MoveManager {
 
         ;(async () => {
             this.cursorDisplacementMap = (await textureLoader.loadAsync(displacementMapSrc))
-            this.cursor = new Mesh( new PlaneBufferGeometry(2, 2, 30, 30), new MeshNormalMaterial({
-                displacementMap: this.cursorDisplacementMap
-            }) )
+            this.cursor = new Mesh( new PlaneBufferGeometry(2, 2, 600, 600), this.cursorMaterial)
+            // new MeshNormalMaterial({
+            //     displacementMap: this.cursorDisplacementMap,
+            //     displacementScale: 1,
+            //     side: DoubleSide
+            // }) )
             this.cursor.rotation.x = -Math.PI/2
             this.cursor.frustumCulled = false
 
@@ -128,7 +134,8 @@ export default class MoveManager {
     }
 
     async setCursorDiplacement() {
-        this.cursorDisplacementMap.offset = new Vector2(0.5, 0.5)
+        // this.cursorDisplacementMap.offset = new Vector2(0.5, 0.5)
+        // this.cursorDisplacementMap.repeat = new Vector2(25, 25)
 
         // const displacementMap = (await textureLoader.loadAsync(displacementMapSrc))
 
@@ -154,6 +161,8 @@ export default class MoveManager {
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
                 if (this.lastIntersection) this.cursor.position.copy(this.lastIntersection.point)
                 this.cursor.position.y += 0.1
+                
+                // this.cursorDisplacementMap.offset = new Vector2(- this.cursor.position.x * 25, - this.cursor.position.z *25)
 
                 // set displacement
                 // this.cursor.material.displacementMap
@@ -208,8 +217,6 @@ export default class MoveManager {
                         neuronBuilder.removeNeurons(oldNeurons)
                     }
                 })
-
-                this.checkZoneStep(this.cursor.position)
             }
         })
     }
@@ -228,71 +235,5 @@ export default class MoveManager {
     toggleLooking(isLooking: boolean) {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
-    }
-    // a zone is a part of the map corresponding to an emotion, a step is a part is why you see more zone elements appearing
-    checkZoneStep(destination: Vector3){
-        const distanceFromCenter = destination.distanceTo(new Vector3(0, 0, 0))
-
-        console.log("🚀 ~ file: MoveManager.ts ~ line 136 ~ MoveManager ~ checkZoneStep ~ distanceTo", distanceFromCenter)
-
-        for (const [limitIndex, limit] of Object.entries(ZONES_LIMITS)) {
-            if (distanceFromCenter > limit) {
-                this.handleAppearZone(parseInt(limitIndex))
-                break;
-            }
-
-        }
-    }
-    handleAppearZone(stepIndex: number) {
-        // switch(stepIndex) {
-        //     case 0: // furthest
-        //         break;
-        //     case 1:
-        //         this.groundInstance.
-        //         break;
-        //     case 2:
-        //         break;
-        //     default:
-        //         break;
-        // }
-
-        if (stepIndex === 0) App.state.nextStep()
-    }
-    setFakeGround() {
-
-        const ground = this.ground.children[0]
-
-        const groundGeometries = (ground.children as Mesh[]).map(mesh => mesh.geometry.clone())
-
-        groundGeometries.forEach((geometry, i) => {
-            geometry.translate(
-                ground.children[i].position.x,
-                ground.children[i].position.y,
-                ground.children[i].position.z
-            )
-            geometry.rotateX(ground.children[i].rotation.x)
-            geometry.rotateY(ground.children[i].rotation.y)
-            geometry.rotateZ(ground.children[i].rotation.z)
-
-            geometry.scale(
-                ground.children[i].scale.x,
-                ground.children[i].scale.y,
-                ground.children[i].scale.z
-            )
-        })
-
-        const groundGeometry = BufferGeometryUtils.mergeBufferGeometries(groundGeometries)
-
-        // const fakesGroundMeshes = groundGeometries.map(geometry => new Mesh(geometry, new MeshBasicMaterial({ color: 0x00ff00 })))
-        // fakesGroundMeshes.forEach(mesh => App.scene.add(mesh))
-
-        // TODO: test if it works with visible set to false on the mesh
-        const fakeGround = new Mesh(groundGeometry, new MeshStandardMaterial({ color: 0xff0000, side: DoubleSide }))
-        // fakeGround.position.copy(this.ground.children[0].position)
-        // fakeGround.scale.copy(this.ground.children[0].scale)
-        // fakeGround.rotation.copy(this.ground.children[0].rotation)
-
-        // fakeGround.matrix.copy(this.ground.children[0].matrix)
-        // App.scene.add(fakeGround)
     }
 }
