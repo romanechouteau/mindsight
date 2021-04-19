@@ -44,6 +44,7 @@ class AudioManager extends Component {
         this.listenKeyboard()
 
         store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
+        this.spotify = new Spotify()
         this.render()
     }
 
@@ -53,6 +54,7 @@ class AudioManager extends Component {
         window.removeEventListener('resize', this.resizeListener)
         document.removeEventListener('keyup', this.keyboardListener)
 
+        VoiceManager.stop()
         window.cancelAnimationFrame(this.rendering)
 
         this.render = () => {}
@@ -75,6 +77,10 @@ class AudioManager extends Component {
                 } else if (value === AUDIO_INPUT_MODES.SPOTIFY) {
                     VoiceManager.stop()
                     window.cancelAnimationFrame(this.rendering)
+
+                    if (this.spotify === undefined) {
+                        this.spotify = new Spotify()
+                    }
                 }
             }
         }
@@ -156,10 +162,6 @@ class AudioManager extends Component {
 
         this.canvasCtx.lineTo(width, height / 2)
         this.canvasCtx.stroke()
-    }
-
-    setSpotify(spotify) {
-        this.spotify = spotify
     }
 }
 
