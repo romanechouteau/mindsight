@@ -77,9 +77,9 @@ export default class World extends Component {
     this.setUser()
     this.setSceneManager()
     this.render()
-    setTimeout(() => {
-      this.setFog()
-    }, 50);
+    // setTimeout(() => {
+    //   this.setFog()
+    // }, 50);
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
