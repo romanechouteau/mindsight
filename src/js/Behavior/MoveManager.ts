@@ -14,6 +14,7 @@ import { MAX_DISTANCE, moodPositions, MOODS, ZONES_LIMITS } from '../constants'
 import Ground from "../World/Ground";
 import displacementMapSrc from '../../images/mapTest-displacement.png'
 import { textureLoader } from "../Tools/utils";
+import { throttle } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -107,7 +108,7 @@ export default class MoveManager {
             this.cursorBase.rotation.x = -Math.PI/2
             this.cursorBase.frustumCulled = false
 
-            this.cursorParticlesPositions = Array.from(Array(12), val => val = 0.5)
+            this.cursorParticlesPositions = Array.from(Array(12), val => val = (Math.random() - 0.5) * 0.1)
             this.cursorParticlesGeometry = new BufferGeometry()
             this.cursorParticles = new Points(this.cursorParticlesGeometry, new PointsMaterial({ color: 0xffffff, size: 0.05 }))
             this.cursorParticlesGeometry.setAttribute(
@@ -168,6 +169,15 @@ export default class MoveManager {
 
         // @ts-ignore
         App.state.time.on('tick', () => {
+
+            // throttle(() => {
+            //     this.cursorParticlesPositions.push(
+            //         (Math.random() - 0.5) * 0.1, 
+            //         (Math.random() - 0.5) * 0.1, 
+            //         (Math.random() - 0.5) * 0.1
+            //     )
+            // }, 64)
+
             if (store.state.brush.canDraw === false) {
                 this.cursorMaterial.opacity = 1
 
