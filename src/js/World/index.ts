@@ -19,9 +19,7 @@ import AudioManager from "../Behavior/AudioManager"
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
-import { AUDIO_INPUT_MODES } from '../constants'
 import Spotify from '../Behavior/Sound/Spotify'
-import SceneManager from "../Behavior/SceneManager"
 
 export default class World extends Component {
   time: Time
@@ -110,7 +108,7 @@ export default class World extends Component {
     this.container.add(this.ground.container)
   }
   setFog() {
-    const fog = new FogExp2(0xF4C5B5, 0.08)
+    const fog = new FogExp2(0xF4C5B5, 0.03)
     // const fog = new Fog(0x212121, 0, 10)
     App.scene.fog = fog
   }
@@ -139,10 +137,6 @@ export default class World extends Component {
     this.sceneManager = new SceneManager()
   }
 
-  setSpotify() {
-    this.spotify = new Spotify()
-  }
-
   render() {
     if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
@@ -154,9 +148,6 @@ export default class World extends Component {
       AudioManager.start()
     } else if (store.state.scene !== 4 && AudioManager.started === true) {
       AudioManager.stop()
-    }
-    if (store.state.scene === 4 && store.state.audioInputMode === AUDIO_INPUT_MODES.SPOTIFY && this.spotify === undefined) {
-      this.setSpotify()
     }
   }
 }
