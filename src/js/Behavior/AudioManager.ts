@@ -64,7 +64,7 @@ class AudioManager extends Component {
     listenKeyboard() {
         this.keyboardListener = (event) => {
             event.preventDefault()
-            if ((<HTMLElement>event.target).tagName === 'INPUT') return
+            if ((event.target as HTMLElement).tagName === 'INPUT') return
             // @ts-ignore
             const key = event.key || event.keyCode
             if (key === ' ' || key === 'Space' || key === 32) {
@@ -113,7 +113,7 @@ class AudioManager extends Component {
 
         htmlUtils.renderToDOM(this.element, template, { search })
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
-            this.spotify.handleSearch((<HTMLInputElement>el.target).value)
+            this.spotify.handleSearch((el.target as HTMLInputElement).value)
         })
     }
 
