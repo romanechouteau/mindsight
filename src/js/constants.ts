@@ -34,3 +34,5 @@ export enum WORLDBUILDER_STEPS {
 }
 
 export const WORLDBUILDER_PRECISION = 3
+
+export const SHAPE_NUMBER = 4
