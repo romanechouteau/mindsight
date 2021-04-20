@@ -26,3 +26,11 @@ export enum AUDIO_INPUT_MODES {
     VOICE = 'voice',
     NONE = 'none'
 }
+
+export enum WORLDBUILDER_STEPS {
+    GROUND = 'ground',
+    SHAPE = 'shape',
+    SKY = 'sky',
+}
+
+export const WORLDBUILDER_PRECISION = 3
