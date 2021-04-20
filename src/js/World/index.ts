@@ -13,6 +13,7 @@ import store from '@store/index'
 import Brush from './Brush'
 import Ground from './Ground'
 import Suzanne from './Suzanne'
+import Environments from './Environments'
 import SceneManager from "../Behavior/SceneManager"
 import AudioManager from "../Behavior/AudioManager"
 // @ts-ignore
@@ -41,6 +42,7 @@ export default class World extends Component {
   user: User
   spotify: Spotify
   sceneManager: SceneManager
+  environments: Environments
   constructor(options) {
     super({
       store
@@ -71,8 +73,6 @@ export default class World extends Component {
     this.setPointLight()
     this.setSceneManager()
     // this.setSuzanne()
-    this.setGround()
-    this.setUser()
     this.setSceneManager()
     this.render()
     setTimeout(() => {
@@ -133,14 +133,36 @@ export default class World extends Component {
     store.events.subscribe('setSpotifyAudioData', this.brush.setSpotifyMovement)
   }
 
+  setEnvironments() {
+    this.environments = new Environments({
+      mouse: this.mouse,
+      camera: this.camera
+    })
+    this.container.add(this.environments.container)
+  }
+
   setSceneManager() {
     this.sceneManager = new SceneManager()
   }
 
   render() {
-    if (store.state.scene === 3 && this.brush === undefined) {
-      this.setBrush()
-    } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
+    if (store.state.scene === 2 && this.environments === undefined) {
+      this.setEnvironments()
+    } else if (store.state.scene !== 2 && this.environments !== undefined && this.environments.stopped === false) {
+      this.environments.stop()
+    }
+
+    if (store.state.scene === 3) {
+      if (this.brush === undefined) {
+        this.setBrush()
+      }
+      if (this.user === undefined) {
+        this.setUser()
+      }
+      if (this.ground === undefined) {
+        this.setGround()
+      }
+     } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()
     }
 

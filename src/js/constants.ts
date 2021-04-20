@@ -6,6 +6,8 @@ export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]
 
+export const ENV_DISTANCE = 50
+
 export enum MOODS {
     JOY = "joy",
     FEAR = "fear",

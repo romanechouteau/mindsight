@@ -20,5 +20,10 @@ export default {
         state.spotifyAudioData = payload
 
         return state
+    },
+    updateEnvironment(state, payload) {
+        state.environment = payload
+
+        return state
     }
 }
