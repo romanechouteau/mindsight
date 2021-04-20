@@ -14,7 +14,6 @@ const loader = new GLTFLoader()
 
 class NeuronBuilder {
     time: Time
-    ground: Object3D
     container: Group
     pixelRatio: number
     neuronGeometry: BufferGeometry
@@ -22,7 +21,6 @@ class NeuronBuilder {
     constructor() {
         // TODO: wait for app mount
         setTimeout(() => {
-            this.ground = App.scene.getObjectByName('Ground')
             this.container = new Group()
             this.container.name = 'NeuronContainer'
 

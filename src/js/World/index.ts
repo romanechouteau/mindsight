@@ -11,7 +11,6 @@ import User from './User'
 // @ts-ignore
 import store from '@store/index'
 import Brush from './Brush'
-import Ground from './Ground'
 import Suzanne from './Suzanne'
 import Environments from './Environments'
 import SceneManager from "../Behavior/SceneManager"
@@ -37,7 +36,6 @@ export default class World extends Component {
   light: PointLightSource
   suzanne: Suzanne
   brush: Brush
-  ground: Ground
   pixelRatio: number
   user: User
   spotify: Spotify
@@ -100,13 +98,6 @@ export default class World extends Component {
     })
     this.container.add(this.light.container)
   }
-  setGround() {
-    this.ground = new Ground({
-      time: this.time,
-      mouse: this.mouse
-    })
-    this.container.add(this.ground.container)
-  }
   setFog() {
     const fog = new FogExp2(0xF4C5B5, 0.04)
     // const fog = new Fog(0x212121, 0, 10)
@@ -116,7 +107,7 @@ export default class World extends Component {
     this.user = new User({
       camera: this.camera,
       mouse: this.mouse,
-      ground: this.ground,
+      ground: this.environments,
       canvas: this.canvas
     })
   }
@@ -158,9 +149,6 @@ export default class World extends Component {
       }
       if (this.user === undefined) {
         this.setUser()
-      }
-      if (this.ground === undefined) {
-        this.setGround()
       }
      } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()

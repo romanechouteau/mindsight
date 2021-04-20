@@ -139,7 +139,7 @@ export default class MoveManager {
 
         // TODO: refacto
         // @ts-ignore
-        this.ground = App.scene.getObjectByName('Ground')
+        this.ground = this.groundInstance.container
         // @ts-ignore
         App.scene.add(this.cursor)
 
