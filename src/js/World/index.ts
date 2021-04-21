@@ -19,7 +19,6 @@ import AudioManager from "../Behavior/AudioManager"
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
-import Spotify from '../Behavior/Sound/Spotify'
 import WorldBuilder from "../Behavior/WorldBuilder"
 
 export default class World extends Component {
@@ -40,7 +39,6 @@ export default class World extends Component {
   ground: Ground
   pixelRatio: number
   user: User
-  spotify: Spotify
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
   constructor(options) {
@@ -140,11 +138,7 @@ export default class World extends Component {
   }
 
   setWorldBuilder() {
-    this.worldBuilder = new WorldBuilder()
-  }
-
-  setSpotify() {
-    this.spotify = new Spotify()
+    this.worldBuilder = new WorldBuilder({ scene: this.container })
   }
 
   render() {
