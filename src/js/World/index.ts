@@ -140,7 +140,7 @@ export default class World extends Component {
   }
 
   setWorldBuilder() {
-    this.worldBuilder = new WorldBuilder({ scene: this.container })
+    this.worldBuilder = new WorldBuilder({ scene: this.container, time: this.time })
   }
 
   setSpotify() {
