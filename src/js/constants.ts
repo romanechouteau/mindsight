@@ -34,5 +34,6 @@ export enum WORLDBUILDER_STEPS {
 }
 
 export const WORLDBUILDER_PRECISION = 3
+export const WORLDBUILDER_RANGE_MAX = 12
 
 export const SHAPE_NUMBER = 4

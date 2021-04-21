@@ -1,8 +1,8 @@
 import { Float32BufferAttribute, Group, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from "three"
-import shape1Src from '@models/testShape1.glb'
-import shape2Src from '@models/testShape2.glb'
-import shape3Src from '@models/Rond.gltf'
-import shape4Src from '@models/Triangle.gltf'
+import shape3Src from '@models/testShape1.glb'
+import shape4Src from '@models/testShape2.glb'
+import shape1Src from '@models/Rond.gltf'
+import shape2Src from '@models/Triangle.gltf'
 import { modelLoader } from '../../Tools/utils';
 import { SHAPE_NUMBER, WORLDBUILDER_PRECISION } from "../../constants";
 
@@ -51,15 +51,18 @@ export default class ShapeCreator {
     }
 
     prepareMorph(mesh?: Mesh) {
-        const shapeMesh = mesh ?? (this.container.getObjectByName('Cube') as Mesh)
-        shapeMesh.geometry.morphAttributes.position = []
-        ;(shapeMesh.material as MeshStandardMaterial).morphTargets = true;
-        // attach each geometry to morph targets
-        for (const [index, shape] of Object.entries(this.shapes)) {
-            const geometry = (shape.children as Mesh[]).find(child => child.isMesh).geometry
-            shapeMesh.geometry.morphAttributes.position[ parseInt(index) ] = geometry.attributes.position.clone()
-        }
-        shapeMesh.updateMorphTargets()
+        const shapeMesh = mesh ?? (this.container.getObjectByName('Cube002') as Mesh)
+        delete shapeMesh.geometry.morphAttributes.normal
+        // shapeMesh.geometry.morphAttributes.position = []
+        // ;(shapeMesh.material as MeshStandardMaterial).morphTargets = true;
+        // // attach each geometry to morph targets
+        // for (const [index, shape] of Object.entries(this.shapes)) {
+        //     const geometry = (shape.children as Mesh[]).find(child => child.isMesh).geometry
+        //     shapeMesh.geometry.morphAttributes.position[ parseInt(index) ] = geometry.attributes.position.clone()
+        // }
+        // debugger
+        // shapeMesh.morphTargetInfluences[0] = 0
+        // shapeMesh.updateMorphTargets()
     }
 
     prepareClonesMorph() {
@@ -68,19 +71,22 @@ export default class ShapeCreator {
         })
     }
 
-    handleChange(e) {
-        const value = parseInt(e.target.value)
-        const shapeMesh = (this.container.getObjectByName('Cube') as Mesh)
+    handleChange(value) {
+        console.log(value);
+        
+        console.log('change morph');
+        // const value = parseInt(e.target.value)
+        const shapeMesh = (this.container.getObjectByName('Cube002') as Mesh)
         const [ firstShapeIndex, secondShapeIndex ] = [ Math.floor(value/WORLDBUILDER_PRECISION) % this.shapes.length, (Math.floor(value/WORLDBUILDER_PRECISION) + 1) % this.shapes.length ]
         shapeMesh.morphTargetInfluences[firstShapeIndex] = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
-        shapeMesh.morphTargetInfluences[secondShapeIndex] = (value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION
+        // shapeMesh.morphTargetInfluences[secondShapeIndex] = (value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION
         // apply to clones
-        this.container.traverse(_child => {
-            const child = _child as Mesh
-            if (child.isMesh) {
-                child.morphTargetInfluences[firstShapeIndex] = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
-                child.morphTargetInfluences[secondShapeIndex] = (value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION
-            }
-        })
+        // this.container.traverse(_child => {
+        //     const child = _child as Mesh
+        //     if (child.isMesh) {
+        //         child.morphTargetInfluences[firstShapeIndex] = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
+        //         child.morphTargetInfluences[secondShapeIndex] = (value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION
+        //     }
+        // })
     }
 }
