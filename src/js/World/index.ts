@@ -24,7 +24,7 @@ import WorldBuilder from "../Behavior/WorldBuilder"
 
 export default class World extends Component {
   time: Time
-  debug: any
+  debug: dat.GUI
   mouse: Mouse
   canvas: HTMLElement
   camera: Camera
@@ -140,7 +140,11 @@ export default class World extends Component {
   }
 
   setWorldBuilder() {
-    this.worldBuilder = new WorldBuilder({ scene: this.container, time: this.time })
+    this.worldBuilder = new WorldBuilder({ 
+      scene: this.container, 
+      time: this.time, 
+      debug: this.debug
+    })
   }
 
   setSpotify() {
