@@ -117,7 +117,8 @@ export default class App {
       mouse: this.mouse,
       camera: this.camera,
       pixelRatio: this.renderer.getPixelRatio(),
-      canvas: this.canvas
+      canvas: this.canvas,
+      globalScene: this.scene
       //   assets: this.assets,
     })
     // Add world to scene

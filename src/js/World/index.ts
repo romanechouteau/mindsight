@@ -1,4 +1,4 @@
-import { AxesHelper, FogExp2, Fog, Object3D } from 'three'
+import { AxesHelper, FogExp2, Object3D, Scene } from 'three'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -19,7 +19,6 @@ import AudioManager from "../Behavior/AudioManager"
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
-import Spotify from '../Behavior/Sound/Spotify'
 import WorldBuilder from "../Behavior/WorldBuilder"
 
 export default class World extends Component {
@@ -33,6 +32,7 @@ export default class World extends Component {
   loadDiv: any
   loadModels: any
   progress: any
+  globalScene: Scene
   ambientlight: AmbientLightSource
   light: PointLightSource
   suzanne: Suzanne
@@ -40,7 +40,6 @@ export default class World extends Component {
   ground: Ground
   pixelRatio: number
   user: User
-  spotify: Spotify
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
   constructor(options) {
@@ -55,6 +54,7 @@ export default class World extends Component {
     this.camera = options.camera
     this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
+    this.globalScene = options.globalScene
 
     // Set up
     this.container = new Object3D()
@@ -76,10 +76,8 @@ export default class World extends Component {
     this.setGround()
     this.setUser()
     this.setSceneManager()
+    this.setFog()
     this.render()
-    setTimeout(() => {
-      this.setFog()
-    }, 50);
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -110,10 +108,9 @@ export default class World extends Component {
     this.container.add(this.ground.container)
   }
   setFog() {
-    const fog = new FogExp2(0xF4C5B5, 0.03)
-    // const fog = new Fog(0x212121, 0, 10)
-    App.scene.fog = fog
+    this.globalScene.fog = new FogExp2(0xF4C5B5, 0.03)
   }
+
   setUser() {
     this.user = new User({
       camera: this.camera,
@@ -140,11 +137,11 @@ export default class World extends Component {
   }
 
   setWorldBuilder() {
-    this.worldBuilder = new WorldBuilder({ scene: this.container })
-  }
-
-  setSpotify() {
-    this.spotify = new Spotify()
+    this.worldBuilder = new WorldBuilder({
+      scene: this.container,
+      globalScene: this.globalScene,
+      time: this.time
+    })
   }
 
   render() {

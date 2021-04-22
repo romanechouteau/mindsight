@@ -34,3 +34,14 @@ export enum WORLDBUILDER_STEPS {
 }
 
 export const WORLDBUILDER_PRECISION = 3
+
+export const SKY_COLORS = {
+    [MOODS.JOY]: [0xFFD160, 0xFFF7DC],
+    [MOODS.FEAR]: [0x0A1012, 0x343434],
+    [MOODS.SADNESS]: [0x596E72, 0xC6C6C7],
+    [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
+}
+
+export const LIST_MOODS = Object.values(MOODS)
+
+export const WORLDBUILDER_MAX_VALUE = LIST_MOODS.length * WORLDBUILDER_PRECISION
