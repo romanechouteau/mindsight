@@ -20,6 +20,7 @@ import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import Spotify from '../Behavior/Sound/Spotify'
+import WorldBuilder from "../Behavior/WorldBuilder"
 
 export default class World extends Component {
   time: Time
@@ -41,6 +42,7 @@ export default class World extends Component {
   user: User
   spotify: Spotify
   sceneManager: SceneManager
+  worldBuilder: WorldBuilder
   constructor(options) {
     super({
       store
@@ -137,7 +139,18 @@ export default class World extends Component {
     this.sceneManager = new SceneManager()
   }
 
+  setWorldBuilder() {
+    this.worldBuilder = new WorldBuilder()
+  }
+
+  setSpotify() {
+    this.spotify = new Spotify()
+  }
+
   render() {
+    if (store.state.scene === 2 && this.worldBuilder === undefined) {
+      this.setWorldBuilder()
+    }
     if (store.state.scene === 3 && this.brush === undefined) {
       this.setBrush()
     } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
