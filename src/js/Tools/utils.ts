@@ -1,6 +1,8 @@
 import { TextureLoader } from "three"
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export const textureLoader = new TextureLoader()
+export const modelLoader = new GLTFLoader()
 
 export const htmlUtils = {
     scrapeTagText: (html: string, selector: string) => {

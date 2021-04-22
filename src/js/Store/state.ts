@@ -1,4 +1,4 @@
-import { AUDIO_INPUT_MODES } from "../constants";
+import { AUDIO_INPUT_MODES, WORLDBUILDER_STEPS } from "../constants";
 
 export default {
     brush: {
@@ -9,9 +9,12 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 3,
+    scene: 2,
     audioInputMode: AUDIO_INPUT_MODES.NONE,
     spotifyAudioData: {
         sectionIndex: null
+    },
+    worldBuilder: {
+        step: WORLDBUILDER_STEPS.SHAPE
     }
   };
