@@ -49,12 +49,12 @@ export default class SkyCreator {
         this.setMovement()
     }
 
-    handleChange(event) {
-        this.changeGradient(event.target.value)
+    handleChange(value) {
+        this.changeGradient(value)
     }
 
     changeGradient(input) {
-        const value = parseFloat(input) % WORLDBUILDER_MAX_VALUE
+        const value = input % WORLDBUILDER_MAX_VALUE
         const step = Math.floor(value / WORLDBUILDER_PRECISION)
         const firstSky = step % LIST_MOODS.length
         const secondSky = (step + 1) % LIST_MOODS.length

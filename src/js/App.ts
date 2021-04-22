@@ -18,6 +18,7 @@ import World from '@world/index'
 import Stats from 'stats.js'
 import Time from './Tools/Time'
 import { createState, State } from './World/State'
+import PointerCursor from './Tools/PointerCursor'
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -31,10 +32,11 @@ export default class App {
   renderer: WebGLRenderer
   renderOnBlur: any
   camera: any
-  debug: any
+  debug: dat.GUI
   world: any
   mouse: Mouse
   state: { time: Time }
+  pointerCursor: PointerCursor
   constructor(options) {
     // Set options
     this.canvas = options.canvas
@@ -52,7 +54,11 @@ export default class App {
     this.setRenderer()
     this.setCamera()
     this.setWorld()
+    this.setPointerCursor()
 
+  }
+  setPointerCursor() {
+    this.pointerCursor = PointerCursor
   }
   setRenderer() {
     // Set scene

@@ -23,7 +23,7 @@ import WorldBuilder from "../Behavior/WorldBuilder"
 
 export default class World extends Component {
   time: Time
-  debug: any
+  debug: dat.GUI
   mouse: Mouse
   canvas: HTMLElement
   camera: Camera
@@ -140,7 +140,8 @@ export default class World extends Component {
     this.worldBuilder = new WorldBuilder({
       scene: this.container,
       globalScene: this.globalScene,
-      time: this.time
+      time: this.time,
+      debug: this.debug
     })
   }
 

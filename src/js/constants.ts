@@ -45,3 +45,5 @@ export const SKY_COLORS = {
 export const LIST_MOODS = Object.values(MOODS)
 
 export const WORLDBUILDER_MAX_VALUE = LIST_MOODS.length * WORLDBUILDER_PRECISION
+
+export const SHAPE_NUMBER = 4
