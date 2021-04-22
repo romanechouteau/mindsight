@@ -15,6 +15,6 @@ export default {
         sectionIndex: null
     },
     worldBuilder: {
-        step: WORLDBUILDER_STEPS.SHAPE
+        step: WORLDBUILDER_STEPS.SKY
     }
   };
