@@ -122,7 +122,6 @@ export default class WorldBuilder extends Component {
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
             this.skyCreator = new SkyCreator({
                 scene: this.scene,
-                range: this.range,
                 globalScene: this.globalScene,
                 time: this.time
             })

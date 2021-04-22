@@ -11,15 +11,13 @@ import Time from '@tools/Time'
 export default class SkyCreator {
     time: Time
     scene: Object3D
-    range: HTMLInputElement
     globalScene: Scene
     skyMaterial: ShaderMaterial
-    constructor(options: { scene: Object3D, range: HTMLInputElement, globalScene: Scene, time: Time }) {
-        const { scene, range, globalScene, time } = options
+    constructor(options: { scene: Object3D, globalScene: Scene, time: Time }) {
+        const { scene, globalScene, time } = options
 
         this.time = time
         this.scene = scene
-        this.range = range
         this.globalScene = globalScene
         this.handleChange = this.handleChange.bind(this)
 
@@ -45,7 +43,7 @@ export default class SkyCreator {
 
         this.scene.add(sky)
 
-        this.changeGradient(this.range.value)
+        this.changeGradient(0)
         this.setMovement()
     }
 
