@@ -137,7 +137,11 @@ export default class World extends Component {
   }
 
   setWorldBuilder() {
-    this.worldBuilder = new WorldBuilder({ scene: this.container, globalScene: this.globalScene })
+    this.worldBuilder = new WorldBuilder({
+      scene: this.container,
+      globalScene: this.globalScene,
+      time: this.time
+    })
   }
 
   render() {

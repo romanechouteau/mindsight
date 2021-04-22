@@ -5,19 +5,24 @@ import Component from '../../../js/Lib/Component';
 import template from '../../../templates/worldBuilder.template';
 import SkyCreator from './SkyCreator'
 import { WORLDBUILDER_STEPS } from '../../../js/constants';
+// @ts-ignore
+import Time from '@tools/Time'
 
 interface WorldBuilderParams {
+    time: Time,
     scene: Object3D,
     globalScene: Scene
 }
 
 export default class WorldBuilder extends Component {
+    time: Time
     scene: Object3D
     range: HTMLInputElement
     skyCreator: SkyCreator
     globalScene: Scene
-    constructor({ scene, globalScene }: WorldBuilderParams) {
+    constructor({ scene, globalScene, time }: WorldBuilderParams) {
         super({ store })
+        this.time = time
         this.scene = scene
         this.globalScene = globalScene
         this.init()
@@ -35,7 +40,11 @@ export default class WorldBuilder extends Component {
 
     render = () => {
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
-            this.skyCreator = new SkyCreator({ scene: this.scene, range: this.range, globalScene: this.globalScene })
+            this.skyCreator = new SkyCreator({
+                scene: this.scene,
+                range: this.range,
+                globalScene: this.globalScene,
+                time: this.time })
             this.range.onchange = this.skyCreator.handleChange
         }
     }
