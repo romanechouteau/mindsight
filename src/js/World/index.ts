@@ -11,8 +11,8 @@ import User from './User'
 // @ts-ignore
 import store from '@store/index'
 import Brush from './Brush'
-import Ground from './Ground'
 import Suzanne from './Suzanne'
+import Environments from './Environments'
 import SceneManager from "../Behavior/SceneManager"
 import AudioManager from "../Behavior/AudioManager"
 // @ts-ignore
@@ -20,6 +20,7 @@ import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
+import { SCENES } from '../constants'
 
 export default class World extends Component {
   time: Time
@@ -37,11 +38,11 @@ export default class World extends Component {
   light: PointLightSource
   suzanne: Suzanne
   brush: Brush
-  ground: Ground
   pixelRatio: number
   user: User
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
+  environments: Environments
   constructor(options) {
     super({
       store
@@ -73,8 +74,6 @@ export default class World extends Component {
     this.setPointLight()
     this.setSceneManager()
     // this.setSuzanne()
-    this.setGround()
-    this.setUser()
     this.setSceneManager()
     this.setFog()
     this.render()
@@ -100,13 +99,6 @@ export default class World extends Component {
     })
     this.container.add(this.light.container)
   }
-  setGround() {
-    this.ground = new Ground({
-      time: this.time,
-      mouse: this.mouse
-    })
-    this.container.add(this.ground.container)
-  }
   setFog() {
     this.globalScene.fog = new FogExp2(0xF4C5B5, 0.03)
   }
@@ -115,7 +107,7 @@ export default class World extends Component {
     this.user = new User({
       camera: this.camera,
       mouse: this.mouse,
-      ground: this.ground,
+      ground: this.environments,
       canvas: this.canvas
     })
   }
@@ -132,6 +124,14 @@ export default class World extends Component {
     store.events.subscribe('setSpotifyAudioData', this.brush.setSpotifyMovement)
   }
 
+  setEnvironments() {
+    this.environments = new Environments({
+      mouse: this.mouse,
+      camera: this.camera
+    })
+    this.container.add(this.environments.container)
+  }
+
   setSceneManager() {
     this.sceneManager = new SceneManager()
   }
@@ -146,18 +146,30 @@ export default class World extends Component {
   }
 
   render() {
-    if (store.state.scene === 2 && this.worldBuilder === undefined) {
+    if (store.state.scene === SCENES.ENIVRONMENT && this.environments === undefined) {
+      this.setEnvironments()
+    } else if (store.state.scene !== SCENES.ENIVRONMENT && this.environments !== undefined && this.environments.stopped === false) {
+      this.environments.stop()
+    }
+
+    if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.setWorldBuilder()
     }
-    if (store.state.scene === 3 && this.brush === undefined) {
-      this.setBrush()
-    } else if (store.state.scene !== 3 && this.brush !== undefined && this.brush.stopped === false) {
+
+    if (store.state.scene === SCENES.BRUSH) {
+      if (this.brush === undefined) {
+        this.setBrush()
+      }
+      if (this.user === undefined) {
+        this.setUser()
+      }
+     } else if (store.state.scene !== SCENES.BRUSH && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()
     }
 
-    if (store.state.scene === 4 && AudioManager.started === false) {
+    if (store.state.scene === SCENES.AUDIO && AudioManager.started === false) {
       AudioManager.start()
-    } else if (store.state.scene !== 4 && AudioManager.started === true) {
+    } else if (store.state.scene !== SCENES.AUDIO && AudioManager.started === true) {
       AudioManager.stop()
     }
   }

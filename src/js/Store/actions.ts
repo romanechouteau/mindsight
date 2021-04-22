@@ -11,5 +11,9 @@ export default {
     setSpotifyAudioData(context, payload) {
         context.commit('setSpotifyAudioData', payload)
         context.events.publish('setSpotifyAudioData')
+    },
+    updateEnvironment(context, payload) {
+        context.commit('updateEnvironment', payload)
+        context.events.publish('updateEnvironment')
     }
 }

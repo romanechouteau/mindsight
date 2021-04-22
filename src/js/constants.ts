@@ -6,6 +6,8 @@ export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]
 
+export const ENV_DISTANCE = 40
+
 export enum MOODS {
     JOY = "joy",
     FEAR = "fear",
@@ -47,3 +49,12 @@ export const LIST_MOODS = Object.values(MOODS)
 export const WORLDBUILDER_MAX_VALUE = LIST_MOODS.length * WORLDBUILDER_PRECISION
 
 export const SHAPE_NUMBER = 4
+
+export enum SCENES {
+    EYETRACKING = 1,
+    ENIVRONMENT = 2,
+    PARAMETERS = 3,
+    BRUSH = 4,
+    AUDIO = 5,
+    SUMUP = 6
+}

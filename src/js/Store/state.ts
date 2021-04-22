@@ -16,5 +16,6 @@ export default {
     },
     worldBuilder: {
         step: WORLDBUILDER_STEPS.SHAPE
-    }
+    },
+    environment: 0
   };
