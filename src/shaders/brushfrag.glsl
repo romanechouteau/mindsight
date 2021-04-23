@@ -11,8 +11,8 @@ float rand(vec2 co){
 void main()
 {
     float strength = distance(gl_PointCoord, vec2(0.5));
-    float step = step(0.5, strength);
-    vec4 finalColor = mix(vec4(uColor, clamp(uOpacity - (randomized * 0.8), 0., 1.)), vec4(uColor, 0.), step);
+    float colorStep = smoothstep(0.3, 0.5, strength);
+    vec4 finalColor = mix(vec4(uColor, 1.), vec4(uColor, 0.), colorStep);
 
     gl_FragColor = finalColor;
 }

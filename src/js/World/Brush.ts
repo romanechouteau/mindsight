@@ -1,4 +1,4 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide, Group, Mesh } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide, Group, Mesh, AdditiveBlending } from 'three'
 import * as dat from 'dat.gui'
 import { isEqual, nth, first, debounce } from 'lodash'
 
@@ -17,7 +17,7 @@ import vertexShader from '@shaders/brushvert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/brushfrag.glsl'
 
-import { AUDIO_INPUT_MODES } from '../constants'
+import { AUDIO_INPUT_MODES, BLOOM_LAYER } from '../constants'
 
 import VoiceManager from '../Behavior/VoiceManager'
 
@@ -156,6 +156,7 @@ export default class Brush extends Component {
   setBrush() {
     this.brushGeometry = new BufferGeometry()
     this.brush = new Points(this.brushGeometry, this.material)
+    this.brush.layers.enable(BLOOM_LAYER)
     for (let i = 0; i < store.state.brush.count; i++) {
       this.particlesOffset.push(
         Math.random() - 0.5,
@@ -265,6 +266,7 @@ export default class Brush extends Component {
 
         this.painting = new Points(this.paintingGeometry, this.material)
         this.painting.frustumCulled = false
+        this.painting.layers.enable(BLOOM_LAYER)
         this.container.add(this.painting)
       }
     }

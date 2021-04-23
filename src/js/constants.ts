@@ -58,3 +58,5 @@ export enum SCENES {
     AUDIO = 5,
     SUMUP = 6
 }
+
+export const BLOOM_LAYER = 1
