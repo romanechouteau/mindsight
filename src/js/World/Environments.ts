@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import { Mouse } from '../Tools/Mouse'
 // @ts-ignore
-import envSrc1 from '@models/mapTest.glb'
+import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
 
@@ -51,7 +51,7 @@ export default class Environments {
       this.environments[i].scale.set(0.01, 0.01, 0.01)
       this.environments[i].rotation.y = Math.PI
       this.environments[i].position.z = - i * ENV_DISTANCE
-      this.environments[i].children[0].material = new MeshStandardMaterial({
+      this.environments[i].children[4].material = new MeshStandardMaterial({
         color: new Color(`hsl(${255 / 4 * i}, 100%, 50%)`)
       })
     }

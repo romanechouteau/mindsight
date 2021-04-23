@@ -141,7 +141,8 @@ export default class World extends Component {
       scene: this.container,
       globalScene: this.globalScene,
       time: this.time,
-      debug: this.debug
+      debug: this.debug,
+      ground: this.environments
     })
   }
 
