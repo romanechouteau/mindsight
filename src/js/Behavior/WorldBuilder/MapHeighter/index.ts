@@ -1,4 +1,4 @@
-import { Texture } from "three"
+import { CanvasTexture, Group, Mesh, MeshNormalMaterial, MeshStandardMaterial, PlaneBufferGeometry, Texture } from "three"
 import collineSrc from '@textures/plage_colline_displacement.png'
 import montagneSrc from '@textures/plage_montages_displacement.png'
 import plaineSrc from '@textures/plage_plaine_displacement.png'
@@ -7,13 +7,15 @@ import { textureLoader } from '../../../Tools/utils'
 import { WORLDBUILDER_PRECISION } from "@/js/constants"
 import Environments from "../../../World/Environments"
 import { throttle } from 'lodash'
+import store from '../../../Store'
 
 interface MapHeighterParams {
     ground: Environments
 }
 
 export default class MapHeighter {
-    ground: Environments
+    ground: Mesh
+    // ground: Environments
     displacementMaps: HTMLImageElement[]
     blendingCanvas: HTMLCanvasElement
     ctx: CanvasRenderingContext2D
@@ -21,7 +23,8 @@ export default class MapHeighter {
     throttledBlend: Function
     blendParams: { firstMapIndex, firstMapInfluence, secondMapIndex, secondMapInfluence }
     constructor({ ground }: MapHeighterParams) {
-        this.ground = ground
+        this.ground = ground.container.children[store.state.environment] as Mesh
+        // .environments[store.state.environment]
         this.handleChange = this.handleChange.bind(this)
         this.init()
         this.throttledBlend = throttle(
@@ -56,11 +59,23 @@ export default class MapHeighter {
         // this.blendingCanvas.style.zIndex = `50p`
         this.blendingCanvas.style.top = `25px`
         this.blendingCanvas.style.transform = `scale(0.2)`
+        this.blendingCanvas.style.opacity = `0`
         this.blendingCanvas.style.transformOrigin = `top left`
         this.blendingCanvas.style.left = `200px`
         this.blendingCanvas.style.pointerEvents = `none`
         this.blendingCanvas.classList.add('debug-blender')
         document.body.appendChild(this.blendingCanvas)
+
+        this.worker.addEventListener('message', message => {
+            
+            if (message.data.event === 'update') {
+                if (!(this.ground.material.displacementMap instanceof CanvasTexture)) this.ground.material.displacementMap = new CanvasTexture(this.blendingCanvas)
+                else this.ground.material.displacementMap.needsUpdate = true
+            }
+        })
+
+        this.saveBlendParams(0, 1, 1, 0)
+        this.blend()
     }
 
     saveBlendParams(firstMapIndex: number, secondMapIndex: number, firstMapInfluence: number, secondMapInfluence: number) {
@@ -77,6 +92,5 @@ export default class MapHeighter {
         const secondMapInfluence = ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
         this.saveBlendParams(firstMapIndex, secondMapIndex, firstMapInfluence, secondMapInfluence)
         this.throttledBlend()
-
     }
 }

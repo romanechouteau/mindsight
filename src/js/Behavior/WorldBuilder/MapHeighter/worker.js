@@ -30,6 +30,7 @@ function blend(options) {
     }
     image1.data.set(imageData1)
     ctx.putImageData(image1, 0, 0)
+    self.postMessage({ event: 'update' })
 }
 
 self.addEventListener('message', message => {
