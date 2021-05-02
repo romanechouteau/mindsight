@@ -93,6 +93,7 @@ export default class WorldBuilder extends Component {
             this.drawWave(ctx, width, height, configs[1])
             this.drawWave(ctx, width, height, configs[2])
         })
+        // add params for waves
         if (this.debug) {
             const mainFolder = this.debug.addFolder('worldbuilder waves')
             configs.forEach((conf, id) => {
@@ -134,7 +135,7 @@ export default class WorldBuilder extends Component {
             })
             this.onChange = this.skyCreator.handleChange
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
-            this.mapHeighter = new MapHeighter({ ground: this.ground })
+            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time })
             this.onChange = this.mapHeighter.handleChange
         }
     }
