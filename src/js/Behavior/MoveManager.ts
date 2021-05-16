@@ -1,4 +1,4 @@
-import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, Vector2, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, Vector2, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color, Vector2 } from "three";
 import gsap from "gsap/all";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 
@@ -83,6 +83,7 @@ export default class MoveManager {
                     uTime: { value: 0. },
                     uColor: { value: new Color(0xFFFFFF) },
                     uOpacity: { value: 1. },
+                    uDirection: { value: new Vector2(0, 0) }
                 }
             })
             this.cursor = new Points(this.cursorGeometry, this.cursorParticlesMaterial)
@@ -120,6 +121,8 @@ export default class MoveManager {
 
                 const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
                 this.raycaster.setFromCamera(cursor, this.camera.camera)
+
+                const lastPoint = this.lastIntersection
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
 
                 if (this.lastIntersection) {
@@ -139,6 +142,13 @@ export default class MoveManager {
                 // update shader
                 this.cursorMaterial.uniforms.uTime.value += 0.01
                 this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
+                if (lastPoint && this.lastIntersection) {
+                    const oldDirection = this.cursorParticlesMaterial.uniforms.uDirection.value
+                    const difference = new Vector2(this.lastIntersection.point.x - lastPoint.point.x, this.lastIntersection.point.z - lastPoint.point.z)
+                    this.cursorParticlesMaterial.uniforms.uDirection.value = oldDirection.lerp(difference, 0.05)
+                } else {
+                    this.cursorParticlesMaterial.uniforms.uDirection.value = new Vector2(0, 0)
+                }
 
                 // rotate camera
                 if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
