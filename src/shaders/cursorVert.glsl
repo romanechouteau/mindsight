@@ -201,12 +201,12 @@ void main() {
     modelPosition.x += noise;
     modelPosition.z += noise;
 
-    float ease = 10. + displacement * 4.;
+    float ease = (3. + log(displacement)) * 5.;
     modelPosition.x -= uDirection.x * ease;
     modelPosition.z -= uDirection.y * ease;
 
-    float maxDistance = max(abs(uDirection.x), abs(uDirection.y)) * 8.;
-    modelPosition.y -= min(displacement, maxDistance);
+    float maxDistance = max(abs(uDirection.x), abs(uDirection.y)) * (displacement * 5.);
+    modelPosition.y -= min(modelPosition.y + 2., maxDistance);
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
