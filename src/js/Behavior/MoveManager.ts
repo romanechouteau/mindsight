@@ -172,8 +172,8 @@ export default class MoveManager {
 
             // throttle(() => {
             //     this.cursorParticlesPositions.push(
-            //         (Math.random() - 0.5) * 0.1, 
-            //         (Math.random() - 0.5) * 0.1, 
+            //         (Math.random() - 0.5) * 0.1,
+            //         (Math.random() - 0.5) * 0.1,
             //         (Math.random() - 0.5) * 0.1
             //     )
             // }, 64)
