@@ -205,9 +205,6 @@ void main() {
     modelPosition.x -= uDirection.x * ease;
     modelPosition.z -= uDirection.y * ease;
 
-    float maxDistance = max(abs(uDirection.x), abs(uDirection.y)) * (displacement * 5.);
-    modelPosition.y -= min(modelPosition.y + 2., maxDistance);
-
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
     gl_Position = projectedPosition;
