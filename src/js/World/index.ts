@@ -108,7 +108,9 @@ export default class World extends Component {
       camera: this.camera,
       mouse: this.mouse,
       ground: this.environments,
-      canvas: this.canvas
+      canvas: this.canvas,
+      scene: this.container,
+      pixelRatio: this.pixelRatio
     })
   }
   setBrush() {

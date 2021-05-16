@@ -58,3 +58,5 @@ export enum SCENES {
     AUDIO = 5,
     SUMUP = 6
 }
+
+export const CURSOR_SIZE = new Vector3(2, 2, 1)
