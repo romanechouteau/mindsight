@@ -162,6 +162,7 @@ export default class Brush extends Component {
         Math.random() - 0.5,
         Math.random() - 0.5)
     }
+    this.brush.frustumCulled = false
     this.scene.add(this.brush)
   }
 
@@ -194,10 +195,10 @@ export default class Brush extends Component {
       if (isEqual(store.state.brush.canDraw, true)) {
         const onCanvas = isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)
         if (onCanvas && this.material.uniforms.uOpacity.value < 1) {
-          const value = this.material.uniforms.uOpacity.value += 0.06
+          const value = this.material.uniforms.uOpacity.value + 0.06
           this.material.uniforms.uOpacity.value = Math.min(value, 1)
         } else if (!onCanvas && this.material.uniforms.uOpacity.value > 0) {
-          const value = this.material.uniforms.uOpacity.value -= 0.03
+          const value = this.material.uniforms.uOpacity.value - 0.03
           this.material.uniforms.uOpacity.value = Math.max(value, 0)
         }
 
@@ -247,11 +248,16 @@ export default class Brush extends Component {
           }
         }
       } else {
-        this.brushPositions = []
-        this.brushGeometry.setAttribute(
-          'position',
-          new BufferAttribute(new Float32Array(), 3)
-        )
+        if (this.material.uniforms.uOpacity.value > 0) {
+          const value = this.material.uniforms.uOpacity.value - 0.03
+          this.material.uniforms.uOpacity.value = Math.max(value, 0)
+        } else {
+          this.brushPositions = []
+          this.brushGeometry.setAttribute(
+            'position',
+            new BufferAttribute(new Float32Array(), 3)
+          )
+        }
       }
     })
   }
@@ -290,7 +296,6 @@ export default class Brush extends Component {
           },
         })
         this.brush.material = this.material
-        this.brush.frustumCulled = false
       }
     }
     this.mouse.on('up', this.mouseUpListener)

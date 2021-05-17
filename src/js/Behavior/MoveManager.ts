@@ -60,6 +60,7 @@ export default class MoveManager {
             transparent: true,
             uniforms: {
                 uTime: { value: 0. },
+                uOpacity: { value: 1. }
             },
             side: DoubleSide
         })
@@ -119,7 +120,9 @@ export default class MoveManager {
         // @ts-ignore
         App.state.time.on('tick', () => {
             if (store.state.brush.canDraw === false) {
-                this.cursorMaterial.opacity = 1
+                const value = this.cursorMaterial.uniforms.uOpacity.value + 0.06
+                this.cursorMaterial.uniforms.uOpacity.value = Math.min(value, 1)
+                this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.min(value, 1)
 
                 const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
                 this.raycaster.setFromCamera(cursor, this.camera.camera)
@@ -156,7 +159,9 @@ export default class MoveManager {
                 if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
                 this.camera.raycasterPlane.quaternion.setFromEuler( this.euler )
             } else {
-                this.cursorMaterial.opacity = 0
+                const value = this.cursorMaterial.uniforms.uOpacity.value - 0.06
+                this.cursorMaterial.uniforms.uOpacity.value = Math.max(value, 0)
+                this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.max(value, 0)
             }
         })
     }
