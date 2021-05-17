@@ -226,7 +226,7 @@ export default class App {
   }
 
   darkenNonBloomed(obj) {
-    if (obj.isMesh && this.bloomLayer.test(obj.layers) === false) {
+    if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {
       obj.material.colorWrite = false
     }
   }
