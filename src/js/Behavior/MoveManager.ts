@@ -5,7 +5,7 @@ import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtil
 import Camera from '../Camera'
 // TODO: add app in global namespace
 import { Mouse } from '../Tools/Mouse'
-import neuronBuilder from './NeuronBuilder'
+// import neuronBuilder from './NeuronBuilder'
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 import moveCursorFragment from '../../shaders/moveCursorFrag.glsl'
 import groundVertex from '../../shaders/groundVert.glsl'
@@ -197,7 +197,7 @@ export default class MoveManager {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
-                const oldNeurons = store.state.scene === 2 ? neuronBuilder.spawnNeuron(this.cursor.position) : []
+                // const oldNeurons = store.state.scene === 2 ? neuronBuilder.spawnNeuron(this.cursor.position) : []
                 this.isMoving = true
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,
@@ -207,7 +207,7 @@ export default class MoveManager {
                     z: this.cursor.position.z - 5,
                     onComplete: () => {
                         this.isMoving = false
-                        neuronBuilder.removeNeurons(oldNeurons)
+                        // neuronBuilder.removeNeurons(oldNeurons)
                     }
                 })
 

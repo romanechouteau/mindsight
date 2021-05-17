@@ -90,5 +90,5 @@ class NeuronBuilder {
     }
 }
 
-const instance = new NeuronBuilder()
-export default instance
+// const instance = new NeuronBuilder()
+// export default instance

@@ -1,0 +1,8 @@
+<div class="intro">
+    <div class="bg"></div>
+    <canvas id="full" width="%width-full%" height="%height-full%"></canvas>
+    <canvas id="left" width="%width-left%" height="%height-left%"></canvas>
+    <canvas id="right" width="%width-right%" height="%height-right%"></canvas>
+    <div class="title">Mindsight</div>
+    <img class="headphone" src="%hpSrc%" alt="headphone required">
+</div>
