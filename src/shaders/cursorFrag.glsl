@@ -14,8 +14,8 @@ void main()
     float strength = distance(gl_PointCoord, vec2(0.5));
     float stepColor = step(0.5, strength);
 
-    float opacityEndStep = smoothstep(0.9, 1., opacityLevel);
-    float opacityEnd = mix(clamp(uOpacity - (randomized * 0.8), 0., 1.), 0., opacityEndStep);
+    float opacityEndStep = smoothstep(0.1, 1., opacityLevel);
+    float opacityEnd = mix(clamp(uOpacity - (randomized * 0.8), 0., 1.), 0., opacityLevel);
     float opacityStartStep = smoothstep(0., 0.1, opacityLevel);
     float opacity = mix(0., opacityEnd, opacityStartStep);
 

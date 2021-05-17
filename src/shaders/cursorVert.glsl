@@ -209,6 +209,6 @@ void main() {
     vec4 projectedPosition = projectionMatrix * viewPosition;
     gl_Position = projectedPosition;
 
-    gl_PointSize = uParticleSize + (sin(offset) - 0.5) * 40.;
+    gl_PointSize = (uParticleSize + (sin(offset) - 0.5) * 40.) * (1.5 - opacityLevel);
     gl_PointSize *= (1.0 / - viewPosition.z);
 }
