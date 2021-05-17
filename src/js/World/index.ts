@@ -13,6 +13,7 @@ import store from '@store/index'
 import Brush from './Brush'
 import Suzanne from './Suzanne'
 import Environments from './Environments'
+import EyeTracking from '../Behavior/EyeTracking'
 import SceneManager from "../Behavior/SceneManager"
 import AudioManager from "../Behavior/AudioManager"
 // @ts-ignore
@@ -43,6 +44,9 @@ export default class World extends Component {
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
   environments: Environments
+  eyeTracking: EyeTracking
+  windowWidth: number
+  windowHeight: number
   constructor(options) {
     super({
       store
@@ -56,7 +60,8 @@ export default class World extends Component {
     this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
     this.globalScene = options.globalScene
-
+    this.windowWidth = options.windowWidth
+    this.windowHeight = options.windowHeight
     // Set up
     this.container = new Object3D()
     this.container.name = 'World'
@@ -74,9 +79,9 @@ export default class World extends Component {
     this.setPointLight()
     this.setSceneManager()
     // this.setSuzanne()
-    this.setSceneManager()
     this.setFog()
     this.render()
+    this.setEyeTracking()
   }
   setLoader() {
     this.loadDiv = document.querySelector('.loadScreen')
@@ -172,5 +177,14 @@ export default class World extends Component {
     } else if (store.state.scene !== SCENES.AUDIO && AudioManager.started === true) {
       AudioManager.stop()
     }
+  }
+  setEyeTracking() {
+    this.eyeTracking = new EyeTracking({
+      windowWidth: this.windowWidth,
+      windowHeight: this.windowHeight,
+      mouse: this.mouse,
+      camera: this.camera,
+    })
+    this.container.add(this.eyeTracking.container)
   }
 }
