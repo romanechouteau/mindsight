@@ -1,4 +1,4 @@
-import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, DoubleSide, Group, Mesh } from 'three'
+import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, Group } from 'three'
 import * as dat from 'dat.gui'
 import { isEqual, nth, first, debounce } from 'lodash'
 

@@ -60,3 +60,5 @@ export enum SCENES {
 }
 
 export const CURSOR_SIZE = new Vector3(2, 2, 1)
+
+export const BLOOM_LAYER = 1
