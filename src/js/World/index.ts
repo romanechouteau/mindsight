@@ -146,9 +146,9 @@ export default class World extends Component {
   }
 
   render() {
-    if (store.state.scene === SCENES.ENIVRONMENT && this.environments === undefined) {
+    if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
       this.setEnvironments()
-    } else if (store.state.scene !== SCENES.ENIVRONMENT && this.environments !== undefined && this.environments.stopped === false) {
+    } else if (store.state.scene !== SCENES.ENVIRONMENT && this.environments !== undefined && this.environments.stopped === false) {
       this.environments.stop()
     }
 
