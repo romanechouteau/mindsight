@@ -150,8 +150,8 @@ export default class App {
 
     this.bloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
     this.bloomPass.threshold = 0
-    this.bloomPass.strength = 1.1
-    this.bloomPass.radius = 0.5
+    this.bloomPass.strength = 1.5
+    this.bloomPass.radius = 0.1
 
     const gammaCorrection = new ShaderPass(GammaCorrectionShader)
 

@@ -6,7 +6,7 @@ import Camera from '../Camera'
 // TODO: add app in global namespace
 import Ground from "../World/Ground"
 import { Mouse } from '../Tools/Mouse'
-import { CURSOR_SIZE } from '../constants'
+import { BLOOM_LAYER, CURSOR_SIZE } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 // @ts-ignore
@@ -79,7 +79,7 @@ export default class MoveManager {
                 fragmentShader,
                 transparent: true,
                 uniforms: {
-                    uParticleSize: { value: 40 * this.pixelRatio },
+                    uParticleSize: { value: 50 * this.pixelRatio },
                     uTime: { value: 0. },
                     uColor: { value: new Color(0xFFFFFF) },
                     uOpacity: { value: 1. },
@@ -87,10 +87,12 @@ export default class MoveManager {
                 }
             })
             this.cursor = new Points(this.cursorGeometry, this.cursorParticlesMaterial)
+            this.cursor.layers.enable(BLOOM_LAYER)
 
             const geometry = new DecalGeometry(this.ground, this.cursor.position, new Euler(0, 0, 0, 'YXZ'), CURSOR_SIZE)
             this.cursorBase = new Mesh(geometry, this.cursorMaterial)
             this.cursorBase.position.y = 0.05
+            this.cursorBase.layers.enable(BLOOM_LAYER)
 
             this.scene.add(this.cursor)
             this.scene.add(this.cursorBase)
