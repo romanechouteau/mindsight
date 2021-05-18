@@ -1,0 +1,56 @@
+#eyetrackingManager
+    width: 100%
+    height: 100%
+    position: fixed
+    top: 0
+    left: 0
+    background-color: rgba(255, 255, 255, 0.5)
+
+    svg
+        position: relative
+        & > g
+            transform: translateY(25vh)
+
+        circle, ellipse
+            filter: drop-shadow( 0 0 3px white)
+
+        defs
+            .pupilWhite
+                fill: white
+                stroke: white
+                stroke-width: 3px
+            .pupilBlack
+                filter: none
+                fill: black
+                stroke: black
+            .pupilStroke
+                fill: white
+                stroke: black
+                stroke-width: 3px
+
+        .eyeCircles
+            fill: none
+            stroke: white
+            stroke-width: 3px
+
+        .pupilCenter
+            position: absolute
+            width: 0
+            height: 0
+
+        .pointCircle
+            fill: white
+            cursor: pointer
+
+            &.invisible
+                display: none
+
+    .center
+        width: 48px
+        height: 48px
+        background-color: blue
+        cursor: pointer
+        position: absolute
+        top: 50%
+        left: 50%
+        transform: translate(-50%, -50%)

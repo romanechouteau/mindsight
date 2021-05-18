@@ -124,12 +124,11 @@ export default class App {
       time: this.time,
       debug: this.debug,
       mouse: this.mouse,
+      sizes: this.sizes,
       camera: this.camera,
-      pixelRatio: this.renderer.getPixelRatio(),
       canvas: this.canvas,
       globalScene: this.scene,
-      windowWidth: this.sizes.viewport.width,
-      windowHeight: this.sizes.viewport.height,
+      pixelRatio: this.renderer.getPixelRatio()
     //   assets: this.assets,
     })
     // Add world to scene

@@ -58,3 +58,15 @@ export enum SCENES {
     AUDIO = 5,
     SUMUP = 6
 }
+
+export const EYETRACKING_RADIUS = 0.5
+
+export const EYETRACKING_DURATION = 100
+
+export const EYETRACKING_SUCCESS = 0.8
+
+export const OUTER_EYE_MOVEMENT = 1
+
+export const INNER_EYE_MOVEMENT = 10
+
+export const PUPIL_MOVEMENT = 50
