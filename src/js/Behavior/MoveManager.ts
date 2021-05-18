@@ -1,4 +1,4 @@
-import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, Vector2, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color, Vector2 } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color, Vector2 } from "three";
 import gsap from "gsap/all";
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 
@@ -88,6 +88,7 @@ export default class MoveManager {
                 }
             })
             this.cursor = new Points(this.cursorGeometry, this.cursorParticlesMaterial)
+            this.cursor.frustumCulled = true
             this.cursor.layers.enable(BLOOM_LAYER)
 
             const geometry = new DecalGeometry(this.ground, this.cursor.position, new Euler(0, 0, 0, 'YXZ'), CURSOR_SIZE)
