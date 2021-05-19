@@ -1,4 +1,5 @@
 import gsap from "gsap/all"
+import * as dat from 'dat.gui'
 import { debounce } from 'lodash'
 
 // @ts-ignore
@@ -13,37 +14,62 @@ import Component from '@lib/Component'
 import pointTemplate from '../../templates/eyetrackingPoint.template'
 // @ts-ignore
 import { htmlUtils } from '@tools/utils'
-import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_CENTER_MOVEMENT, EYE_TRACKING_DEBOUNCE } from '../constants'
+import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE } from '../constants'
 
 export default class EyeTrackingManager extends Component {
     sizes: any
+    debug: dat.GUI
     points: NodeListOf<Element>
     inZone: boolean[]
+    params: {
+        radius: number,
+        duration: number,
+        success: number,
+        outerEyeMovement: number,
+        innerEyeMovement: number,
+        pupilMovement: number,
+        pupilShineMovement: number,
+    }
     pupilR: number
     centerX: number
     centerY: number
     element: HTMLElement
     calibrated: boolean
+    debugFolder: any
     eyeMovement: any
     pointsClicks: number[]
     currentPoint: number
     currentTranslate: number
 
-    constructor(options: { sizes: any }) {
+    constructor(options: { sizes: any, debug: dat.GUI }) {
         super({
             store,
             element: document.querySelector('#eyetrackingManager')
         })
 
-        const { sizes } = options
+        const { sizes, debug } = options
 
         this.sizes = sizes
+        this.debug = debug
 
         this.inZone = []
         this.calibrated = false
         this.currentPoint = 0
         this.pointsClicks = [0, 0, 0, 0, 0, 0, 0]
         this.currentTranslate = 25
+        this.params = {
+            radius: EYETRACKING_RADIUS,
+            duration: EYETRACKING_DURATION,
+            success: EYETRACKING_SUCCESS,
+            outerEyeMovement: OUTER_EYE_MOVEMENT,
+            innerEyeMovement: INNER_EYE_MOVEMENT,
+            pupilMovement: PUPIL_MOVEMENT,
+            pupilShineMovement: PUPIL_SHINE_MOVEMENT,
+        }
+
+        if (this.debug) {
+            this.setDebug()
+        }
 
         this.setWebGazer()
         this.render()
@@ -81,61 +107,61 @@ export default class EyeTrackingManager extends Component {
         const outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelector('.outerEye'), {
             duration,
-            translateX: `${moveX * OUTER_EYE_MOVEMENT}%`,
-            translateY: `${currentVH + moveY * OUTER_EYE_MOVEMENT * outerEyeBox.height * 0.01}px`,
+            translateX: `${moveX * this.params.outerEyeMovement}%`,
+            translateY: `${currentVH + moveY * this.params.outerEyeMovement * outerEyeBox.height * 0.01}px`,
         })
 
         const innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelector('.innerEye'), {
             duration,
-            translateX: `${moveX * INNER_EYE_MOVEMENT}%`,
-            translateY: `${currentVH + moveY * INNER_EYE_MOVEMENT * innerEyeBox.height * 0.01}px`,
+            translateX: `${moveX * this.params.innerEyeMovement}%`,
+            translateY: `${currentVH + moveY * this.params.innerEyeMovement * innerEyeBox.height * 0.01}px`,
         })
 
         const pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelectorAll('.pupil, .maskWrapper .pupilWhite'), {
             duration,
-            translateX: `${moveX * PUPIL_MOVEMENT}%`,
-            translateY: `${currentVH + moveY * PUPIL_MOVEMENT * pupilBox.height * 0.01}px`,
+            translateX: `${moveX * this.params.pupilMovement}%`,
+            translateY: `${currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01}px`,
         })
         gsap.to(this.element.querySelectorAll('#maskPupil .maskWrapper'), {
             duration,
-            translateX: `${-(moveX * PUPIL_MOVEMENT * pupilBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * PUPIL_MOVEMENT * pupilBox.height * 0.01)}px`,
+            translateX: `${-(moveX * this.params.pupilMovement * pupilBox.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01)}px`,
         })
 
         const pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelectorAll('#maskShine .maskWrapper'), {
             duration,
-            translateX: `${-(moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01)}px`,
+            translateX: `${-(moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01)}px`,
         })
         gsap.to(this.element.querySelector('.pupilCenterMask'), {
             duration,
-            translateX: `${moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01}px`
+            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
         })
 
         gsap.to(this.element.querySelector('.pupilCenter'), {
             duration,
-            translateX: `${moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01}px`
+            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
         })
     }
 
     checkInZone(x, y) {
-        const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(EYETRACKING_RADIUS, 2)
+        const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(this.params.radius, 2)
 
-        if (this.inZone.length < EYETRACKING_DURATION) {
+        if (this.inZone.length < this.params.duration) {
             return this.inZone.push(isInZone)
         }
 
         this.inZone.shift()
         this.inZone.push(isInZone)
 
-        const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / EYETRACKING_DURATION
+        const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
 
-        if (percentage > EYETRACKING_SUCCESS) {
+        if (percentage > this.params.success) {
             this.stop()
         }
     }
@@ -239,5 +265,52 @@ export default class EyeTrackingManager extends Component {
         this.render = () => {}
 
         store.dispatch('updateScene', store.state.scene + 1)
+    }
+
+    setDebug() {
+        this.debugFolder = this.debug.addFolder('Eyetracking')
+        this.debugFolder.open()
+        this.debugFolder
+            .add(this.params, 'radius')
+            .step(0.01)
+            .min(0)
+            .max(1)
+            .name('Success radius')
+        this.debugFolder
+            .add(this.params, 'duration')
+            .step(10)
+            .min(0)
+            .max(500)
+            .name('Focus duration')
+        this.debugFolder
+            .add(this.params, 'success')
+            .step(0.05)
+            .min(0)
+            .max(1)
+            .name('Success percentage')
+        this.debugFolder
+            .add(this.params, 'outerEyeMovement')
+            .step(0.1)
+            .min(0)
+            .max(5)
+            .name('Outer eye movement')
+        this.debugFolder
+            .add(this.params, 'innerEyeMovement')
+            .step(1)
+            .min(0)
+            .max(50)
+            .name('Inner eye movement')
+        this.debugFolder
+            .add(this.params, 'pupilMovement')
+            .step(10)
+            .min(0)
+            .max(100)
+            .name('Pupil movement')
+        this.debugFolder
+            .add(this.params, 'pupilShineMovement')
+            .step(10)
+            .min(0)
+            .max(100)
+            .name('Pupil shine movement')
     }
 }

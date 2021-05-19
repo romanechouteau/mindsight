@@ -71,6 +71,6 @@ export const INNER_EYE_MOVEMENT = 10
 
 export const PUPIL_MOVEMENT = 50
 
-export const PUPIL_CENTER_MOVEMENT = 60
+export const PUPIL_SHINE_MOVEMENT = 60
 
 export const EYE_TRACKING_DEBOUNCE = 20

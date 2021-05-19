@@ -181,7 +181,8 @@ export default class World extends Component {
   }
   setEyeTrackingManager() {
     this.eyeTrackingManager = new EyeTrackingManager({
-      sizes: this.sizes
+      sizes: this.sizes,
+      debug: this.debug
     })
   }
 }
