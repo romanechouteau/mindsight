@@ -17,7 +17,8 @@
     "@types/node": "^14.14.31",
     "@types/spotify-web-playback-sdk": "^0.1.8",
     "rollup-plugin-node-polyfills": "^0.2.1",
-    "snowpack": "^3.0.11"
+    "snowpack": "^3.0.11",
+    "snowpack-plugin-relative-css-urls": "^1.2.0"
   },
   "dependencies": {
     "@canarise/snowpack-eslint-plugin": "^0.1.0",

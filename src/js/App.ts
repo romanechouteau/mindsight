@@ -31,7 +31,7 @@ document.body.appendChild(stats.dom)
 
 export default class App extends Component {
   canvas: any
-  time: any
+  time: Time
   sizes: any
   scene: Scene
   renderer: WebGLRenderer
@@ -149,7 +149,7 @@ export default class App extends Component {
   render = () => {
     
     if (store.state.isIntro) {
-      this.intro = new IntroController()
+      this.intro = new IntroController({time: this.time})
     } else if (document.querySelector('#intro')) {
       this.intro.dispose()
     }

@@ -1,9 +1,26 @@
-#intro
+#intro, .intro
     height: 100vh
     width: 100vw
     position: absolute
     top: 0
     left: 0
+    display: flex
+    justify-content: center
+    align-items: center
+
+    .title
+        z-index: 200
+        height: min-content
+        color: white
+        font-family: 'Displace'
+        font-size: 5.938rem
+        text-transform: uppercase
+        transition: opacity 0.5s ease
+
+    .headphone
+        transition: opacity 0.5s ease
+        display: none
+        z-index: 200
 
     .bg
         display: flex
@@ -14,6 +31,23 @@
         left: -20vh
         background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
         animation: spinning 6s linear infinite
+
+    canvas
+        position: absolute
+        top: 0
+        left: 0
+        height: 100vh
+
+        &#full
+            width: 100vw
+
+        &#right
+            right: 0
+            left: initial
+
+        &:not(#full)
+            width: 50vw
+            transition: width 0.5s ease
 
 @keyframes spinning {
     0% {

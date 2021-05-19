@@ -11,6 +11,7 @@ import PointerCursor from '../../Tools/PointerCursor'
 import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE } from '../../../js/constants';
 // @ts-ignore
 import Time from '@tools/Time'
+import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
 
 interface WorldBuilderParams {
     time: Time,
@@ -78,9 +79,8 @@ export default class WorldBuilder extends Component {
         const canvas: HTMLCanvasElement = document.querySelector('#worldBuilder canvas')
         const ctx = canvas.getContext('2d')
         const {width, height} = canvas
-        const config = { steps: 200, opacity: 1, waveLength: 50, speed: 250, offset: 0, height: 50, widthReductor: 3 }
         ctx.imageSmoothingEnabled = true;
-        const configs = [ {...config, opacity: 1}, {...config, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...config, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
+        const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
         this.time.on('tick', () => {
             ctx.clearRect(0, 0, width, height)
             this.drawWave(ctx, width, height, configs[0])
