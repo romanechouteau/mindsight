@@ -9,6 +9,7 @@ export interface drawWaveConfig {
     offset: number;
     height: number;
     widthReductor: number;
+    inflexionPoint?: number;
 }
 
 export const waveBaseConfig = { 
@@ -18,11 +19,12 @@ export const waveBaseConfig = {
     speed: 250, 
     offset: 0, 
     height: 50, 
-    widthReductor: 3 
+    widthReductor: 3,
+    inflexionPoint: 0.5
 }
 
 // TODO: refactor params
-export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: number, config: drawWaveConfig, inflexionPoint = 0.5, _time?: Time) {
+export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: number, config: drawWaveConfig, _time?: Time) {
     const time = this?.time ?? _time
     ctx.save()
     ctx.translate(0.5, height/2)
@@ -37,7 +39,8 @@ export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: n
     // const sineLimits = [ Math.max(inflexionPoint - 0.5, 0), Math.min(inflexionPoint + 0.5, 1) ]
     const sineLimits = [ 0, 1 ]
     for (let x = 0; x < config.steps; x++) {
-        const inflexionPointDistance = Math.abs(inflexionPoint - (x/config.steps));
+        const ip = config.inflexionPoint
+        const inflexionPointDistance = Math.abs(ip - (x/config.steps));
         // debugger;
         let y = 0
         if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))

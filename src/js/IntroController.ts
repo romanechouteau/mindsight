@@ -15,10 +15,14 @@ export default class IntroController {
     title: HTMLDivElement
     headPhoneImage: HTMLImageElement
     fullLineConfigs: drawWaveConfig[]
+    leftLineConfigs: drawWaveConfig[]
+    rightLineConfigs: drawWaveConfig[]
     waveHeight: number
+    debug?: dat.GUI
 
-    constructor({time}) {
+    constructor({time, debug}) {
         this.time = time
+        this.debug = debug
         this.createHtml()
         this.bindHtml()
         this.waveHeight = 200
@@ -27,7 +31,30 @@ export default class IntroController {
             { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }, 
             { ...waveBaseConfig, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }
         ]
-        this.addWave(this.fullCanvas, 'tick.introFullCanvas', 0.5)
+
+        this.leftLineConfigs = [
+            { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }, 
+            { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 , inflexionPoint: 0}, 
+            { ...waveBaseConfig, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }
+        ]
+        this.rightLineConfigs = [
+            { ...waveBaseConfig, offset: 3, widthReductor: 1.8, height: this.waveHeight, speed: 450, steps: 400, inflexionPoint: 1 }, 
+            { ...waveBaseConfig, offset: 4, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 1 }, 
+            { ...waveBaseConfig, widthReductor: 2.2, height: this.waveHeight, speed: 550, steps: 400, inflexionPoint: 1 }
+        ]
+
+        if (this.debug) {
+            const mainFolder = this.debug.addFolder('intro wavesets')
+            ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach((configs, wasetId) => {
+                const subfolder = mainFolder.addFolder(`waveset ${wasetId}`)
+                configs.forEach((conf, waveId) => {
+                    const subsubfolder = subfolder.addFolder(`wave ${waveId}`)
+                    Object.keys(conf).forEach(key => subsubfolder.add(conf, key))
+                })
+            })
+        }
+
+        this.addWave(this.fullCanvas, 'tick.introFullCanvas', this.fullLineConfigs)
         this.initTicker()
     }
 
@@ -51,38 +78,40 @@ export default class IntroController {
         this.headPhoneImage = document.querySelector('.headphone')
     }
 
-    addWave(canvas: HTMLCanvasElement, evtNameSpace: string , inflexionPoint: number) {
+    addWave(canvas: HTMLCanvasElement, evtNameSpace: string , configs: drawWaveConfig[]) {
         const ctx = canvas.getContext('2d')
         const {width, height} = canvas
         this.time.on(evtNameSpace, () => {
             ctx.clearRect(0, 0, width, height)
-            drawWave(ctx, width, height, this.fullLineConfigs[0], inflexionPoint, this.time)
-            drawWave(ctx, width, height, this.fullLineConfigs[1], inflexionPoint, this.time)
-            drawWave(ctx, width, height, this.fullLineConfigs[2], inflexionPoint, this.time)
+            drawWave(ctx, width, height, configs[0], this.time)
+            drawWave(ctx, width, height, configs[1], this.time)
+            drawWave(ctx, width, height, configs[2], this.time)
         })
     }
 
     toggleLineMovement() {
         
         let height = 0
-        if (this.fullLineConfigs[0].height === 0) height = this.waveHeight
-        gsap.to(this.fullLineConfigs[0], {
-            height: height,
-            widthReductor: 1.5,
-            ease: 'power1.inOut',
-            duration: 2
-        })
-        gsap.to(this.fullLineConfigs[1], {
-            height: height,
-            widthReductor: 1.5,
-            ease: 'power1.inOut',
-            duration: 2
-        })
-        gsap.to(this.fullLineConfigs[2], {
-            height: height,
-            widthReductor: 1.5,
-            ease: 'power1.inOut',
-            duration: 2
+        if (this.fullLineConfigs[0].height === 0) height = this.waveHeight        
+        ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
+            gsap.to(configs[0], {
+                height: height,
+                widthReductor: 1.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
+            gsap.to(configs[1], {
+                height: height,
+                widthReductor: 1.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
+            gsap.to(configs[2], {
+                height: height,
+                widthReductor: 1.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
         })
     }
 
@@ -93,8 +122,8 @@ export default class IntroController {
     }
 
     enableSideLines() {
-        this.addWave(this.leftCanvas, 'tick.introLeftCanvas', 0)
-        this.addWave(this.rightCanvas, 'tick.introRightCanvas', 1)
+        this.addWave(this.leftCanvas, 'tick.introLeftCanvas', this.leftLineConfigs)
+        this.addWave(this.rightCanvas, 'tick.introRightCanvas', this.rightLineConfigs)
         // @ts-ignore
         this.leftCanvas.attributeStyleMap.set('width', CSS.vw(40))
         // @ts-ignore
@@ -112,7 +141,7 @@ export default class IntroController {
             setTimeout(() => {
                 this.killFullLine()
                 this.enableSideLines()
-            }, 2000)
+            }, 2100)
             // @ts-ignore
             this.headPhoneImage.attributeStyleMap.set('display', 'inline-block')
             // @ts-ignore
@@ -122,25 +151,20 @@ export default class IntroController {
 
     flyLines() {
         gsap.to(this.fullLineConfigs[0], {
-            // height: height,
-            // widthReductor: 1,
+            widthReductor: 1,
             ease: 'power1.inOut',
             duration: 2
         })
         gsap.to(this.fullLineConfigs[1], {
-            // height: height,
-            // widthReductor: 1,
+            widthReductor: 1,
             ease: 'power1.inOut',
             duration: 2
         })
         gsap.to(this.fullLineConfigs[2], {
-            // height: height,
-            // widthReductor: 1,
+            widthReductor: 1,
             ease: 'power1.inOut',
             duration: 2
         })
-
-        
     }
 
     async initTicker() {

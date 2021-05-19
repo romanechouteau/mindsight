@@ -149,7 +149,7 @@ export default class App extends Component {
   render = () => {
     
     if (store.state.isIntro) {
-      this.intro = new IntroController({time: this.time})
+      this.intro = new IntroController({time: this.time, debug: this.debug})
     } else if (document.querySelector('#intro')) {
       this.intro.dispose()
     }
