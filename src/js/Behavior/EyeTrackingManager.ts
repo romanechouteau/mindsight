@@ -302,7 +302,7 @@ export default class EyeTrackingManager extends Component {
             .name('Inner eye movement')
         this.debugFolder
             .add(this.params, 'pupilMovement')
-            .step(10)
+            .step(5)
             .min(0)
             .max(100)
             .name('Pupil movement')

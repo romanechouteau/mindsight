@@ -61,16 +61,16 @@ export enum SCENES {
 
 export const EYETRACKING_RADIUS = 0.5
 
-export const EYETRACKING_DURATION = 100
+export const EYETRACKING_DURATION = 50
 
 export const EYETRACKING_SUCCESS = 0.8
 
-export const OUTER_EYE_MOVEMENT = 1
+export const OUTER_EYE_MOVEMENT = 0.3
 
-export const INNER_EYE_MOVEMENT = 10
+export const INNER_EYE_MOVEMENT = 3
 
-export const PUPIL_MOVEMENT = 50
+export const PUPIL_MOVEMENT = 25
 
-export const PUPIL_SHINE_MOVEMENT = 60
+export const PUPIL_SHINE_MOVEMENT = 30
 
 export const EYE_TRACKING_DEBOUNCE = 20
