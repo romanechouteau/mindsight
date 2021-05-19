@@ -1,4 +1,5 @@
 import gsap from "gsap/all"
+import { debounce } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
@@ -12,7 +13,7 @@ import Component from '@lib/Component'
 import pointTemplate from '../../templates/eyetrackingPoint.template'
 // @ts-ignore
 import { htmlUtils } from '@tools/utils'
-import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT } from '../constants'
+import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_CENTER_MOVEMENT, EYE_TRACKING_DEBOUNCE } from '../constants'
 
 export default class EyeTrackingManager extends Component {
     sizes: any
@@ -23,6 +24,7 @@ export default class EyeTrackingManager extends Component {
     centerY: number
     element: HTMLElement
     calibrated: boolean
+    eyeMovement: any
     pointsClicks: number[]
     currentPoint: number
     currentTranslate: number
@@ -46,6 +48,7 @@ export default class EyeTrackingManager extends Component {
         this.setWebGazer()
         this.render()
         this.listenMouseDown()
+        this.eyeMovement = debounce(this.moveEye, EYE_TRACKING_DEBOUNCE, { leading: true })
     }
 
     setWebGazer() {
@@ -64,7 +67,7 @@ export default class EyeTrackingManager extends Component {
         const x = (data.x / this.sizes.viewport.width - 0.5) * 2
         const y = - (data.y / this.sizes.viewport.height - 0.5) * 2
 
-        this.moveEye(x, -y)
+        this.eyeMovement(x, -y)
 
         if (this.calibrated) {
             this.checkInZone(x, y)
@@ -73,48 +76,50 @@ export default class EyeTrackingManager extends Component {
 
     moveEye(moveX, moveY) {
         const currentVH = this.currentTranslate * 0.01 * this.sizes.height
+        const duration = 0.5
 
         const outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelector('.outerEye'), {
-            duration: 0.2,
+            duration,
             translateX: `${moveX * OUTER_EYE_MOVEMENT}%`,
             translateY: `${currentVH + moveY * OUTER_EYE_MOVEMENT * outerEyeBox.height * 0.01}px`,
         })
 
         const innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelector('.innerEye'), {
-            duration: 0.2,
+            duration,
             translateX: `${moveX * INNER_EYE_MOVEMENT}%`,
             translateY: `${currentVH + moveY * INNER_EYE_MOVEMENT * innerEyeBox.height * 0.01}px`,
         })
 
         const pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelector('.pupil'), {
-            duration: 0.2,
+        gsap.to(this.element.querySelectorAll('.pupil, .maskWrapper .pupilWhite'), {
+            duration,
             translateX: `${moveX * PUPIL_MOVEMENT}%`,
             translateY: `${currentVH + moveY * PUPIL_MOVEMENT * pupilBox.height * 0.01}px`,
         })
+        gsap.to(this.element.querySelectorAll('#maskPupil .maskWrapper'), {
+            duration,
+            translateX: `${-(moveX * PUPIL_MOVEMENT * pupilBox.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * PUPIL_MOVEMENT * pupilBox.height * 0.01)}px`,
+        })
 
-        const angle = Math.atan2(moveX, moveY)
-        const inCircle = moveX > - EYETRACKING_RADIUS && moveX < EYETRACKING_RADIUS
-        && moveY > - EYETRACKING_RADIUS && moveY < EYETRACKING_RADIUS
-        const pupilCenterX = inCircle ? this.centerX + moveX * this.pupilR : Math.sin(angle) * this.pupilR + this.centerX
-        const pupilCenterY = inCircle ? this.centerY + moveY * this.pupilR : Math.cos(angle) * this.pupilR + this.centerY
-        gsap.to(this.element.querySelector('.pupilCenter circle'), {
-            duration: 0.2,
-            cx: pupilCenterX,
-            cy: pupilCenterY,
+        const pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
+        gsap.to(this.element.querySelectorAll('#maskShine .maskWrapper'), {
+            duration,
+            translateX: `${-(moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01)}px`,
         })
         gsap.to(this.element.querySelector('.pupilCenterMask'), {
-            duration: 0.2,
-            cx: pupilCenterX,
-            cy: pupilCenterY,
+            duration,
+            translateX: `${moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01}px`,
+            translateY: `${currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01}px`
         })
 
         gsap.to(this.element.querySelector('.pupilCenter'), {
-            duration: 0.2,
-            translateX: `${moveX * PUPIL_MOVEMENT * pupilBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * PUPIL_MOVEMENT * pupilBox.height * 0.01}px`,
+            duration,
+            translateX: `${moveX * PUPIL_CENTER_MOVEMENT * pupilCenterBox.width * 0.01}px`,
+            translateY: `${currentVH + moveY * PUPIL_CENTER_MOVEMENT * pupilCenterBox.height * 0.01}px`
         })
     }
 
@@ -174,16 +179,16 @@ export default class EyeTrackingManager extends Component {
     render() {
         const width = this.sizes.viewport.width
         const height = this.sizes.viewport.height
-        this.centerX = width * 0.5
-        this.centerY = height * 0.5
+        const centerX = width * 0.5
+        const centerY = height * 0.5
         const outerAdd = height > width * 0.7 ? height * 0.5 : height * 0.2
         const outerRX = width * 0.5 + outerAdd
         const outerRY = height * 0.7
-        this.pupilR = height * 0.3
-        const pupilCenterX = Math.cos(-Math.PI / 6) * this.pupilR + this.centerX
-        const pupilCenterY = Math.sin(-Math.PI / 6) * this.pupilR + this.centerY
+        const pupilR = height * 0.3
+        const pupilCenterX = Math.cos(-Math.PI / 6) * (pupilR * 1.3) + centerX
+        const pupilCenterY = Math.sin(-Math.PI / 6) * (pupilR * 1.3) + centerY
 
-        const getPointY = (x, direction) => this.getPointYEllipse(x, [this.centerX, this.centerY], outerRX, outerRY, direction)
+        const getPointY = (x, direction) => this.getPointYEllipse(x, [centerX, centerY], outerRX, outerRY, direction)
 
         const pointsHTML = this.pointsClicks.reduce((acc, val, i) => {
             const r = 10 + 2 * val
@@ -201,16 +206,16 @@ export default class EyeTrackingManager extends Component {
                 return acc + htmlUtils.createHTMLFromTemplate(pointTemplate, { x, y, r, order: i, invisible })
             }
 
-            return acc + htmlUtils.createHTMLFromTemplate(pointTemplate, { x: this.centerX, y: this.centerY, r, order: i, invisible })
+            return acc + htmlUtils.createHTMLFromTemplate(pointTemplate, { x: centerX, y: centerY, r, order: i, invisible })
         }, '')
         const eyetrackingTemplate = htmlUtils.insertHTMLInTemplate(template, pointsHTML, 'points')
 
         htmlUtils.renderToDOM(this.element, eyetrackingTemplate, {
             width,
             height,
-            pupilR: this.pupilR,
-            centerX: this.centerX,
-            centerY: this.centerY,
+            pupilR,
+            centerX,
+            centerY,
             outerRX,
             outerRY,
             innerEyeR: height * 0.6,
@@ -227,6 +232,8 @@ export default class EyeTrackingManager extends Component {
     stop() {
         webgazer.pause()
         document.getElementById('webgazerVideoContainer').remove()
+
+        this.eyeMovement.cancel()
 
         htmlUtils.renderToDOM(this.element, '', {})
         this.render = () => {}

@@ -1,11 +1,15 @@
 <svg viewBox="0 0 {{width}} {{height}}" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <mask id="maskPupil">
-            <circle vector-effect="non-scaling-stroke" class="pupilWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
-            <circle cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" class="pupilBlack pupilCenterMask"></circle>
+            <g class="maskWrapper">
+                <circle vector-effect="non-scaling-stroke" class="pupilWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+                <circle cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" class="pupilBlack pupilCenterMask"></circle>
+            </g>
         </mask>
         <mask id="maskShine">
-            <circle vector-effect="non-scaling-stroke" class="pupilWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+            <g class="maskWrapper">
+                <circle vector-effect="non-scaling-stroke" class="pupilWhite noDrop" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+            </g>
         </mask>
     </defs>
     <g class="innerEye">
