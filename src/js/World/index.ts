@@ -108,7 +108,9 @@ export default class World extends Component {
       camera: this.camera,
       mouse: this.mouse,
       ground: this.environments,
-      canvas: this.canvas
+      canvas: this.canvas,
+      scene: this.container,
+      pixelRatio: this.pixelRatio
     })
   }
   setBrush() {
@@ -141,14 +143,15 @@ export default class World extends Component {
       scene: this.container,
       globalScene: this.globalScene,
       time: this.time,
-      debug: this.debug
+      debug: this.debug,
+      ground: this.environments
     })
   }
 
   render() {
-    if (store.state.scene === SCENES.ENIVRONMENT && this.environments === undefined) {
+    if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
       this.setEnvironments()
-    } else if (store.state.scene !== SCENES.ENIVRONMENT && this.environments !== undefined && this.environments.stopped === false) {
+    } else if (store.state.scene !== SCENES.ENVIRONMENT && this.environments !== undefined && this.environments.stopped === false) {
       this.environments.stop()
     }
 

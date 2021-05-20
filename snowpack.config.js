@@ -17,7 +17,7 @@ module.exports = {
         '@models': './src/models/',
         '@shaders': './src/shaders/',
         '@sounds': './src/sounds/',
-        '@textures': './src/textures/',
+        '@textures': './src/images/textures/',
         '@js': './src/js/',
         '@tools': './src/js/Tools/',
         '@world': './src/js/World/',

@@ -12,12 +12,15 @@ import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE } from '../../../js/constant
 // @ts-ignore
 import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
+import MapHeighter from './MapHeighter';
+import Environments from '../../World/Environments';
 
 interface WorldBuilderParams {
     time: Time,
     scene: Object3D,
     globalScene: Scene
     debug?: dat.GUI
+    ground: Environments
 }
 
 export default class WorldBuilder extends Component {
@@ -31,10 +34,13 @@ export default class WorldBuilder extends Component {
     globalScene: Scene
     shapeCreator: ShapeCreator
     cursorAnimation?: any
-    constructor({ scene, globalScene, time, debug }: WorldBuilderParams) {
+    mapHeighter: MapHeighter
+    ground: Environments
+    constructor({ scene, globalScene, time, debug, ground }: WorldBuilderParams) {
         super({ store })
         this.time = time
         this.scene = scene
+        this.ground = ground
         this.debug = debug
         this.onChange = () => null
         this.rangeValue = { value: 0 } // init
@@ -79,6 +85,8 @@ export default class WorldBuilder extends Component {
         const canvas: HTMLCanvasElement = document.querySelector('#worldBuilder canvas')
         const ctx = canvas.getContext('2d')
         const {width, height} = canvas
+
+        const config = { steps: 200, opacity: 1, waveLength: 50, speed: 250, offset: 0, height: 50, width: 0.2 }
         ctx.imageSmoothingEnabled = true;
         const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
         this.time.on('tick', () => {
@@ -87,6 +95,7 @@ export default class WorldBuilder extends Component {
             this.drawWave(ctx, width, height, configs[1])
             this.drawWave(ctx, width, height, configs[2])
         })
+        // add params for waves
         if (this.debug) {
             const mainFolder = this.debug.addFolder('worldbuilder waves')
             configs.forEach((conf, id) => {
@@ -113,6 +122,7 @@ export default class WorldBuilder extends Component {
             const inflexionPointDistance = Math.abs(inflexionPoint - (x/config.steps));
             // debugger;
             let y = 0
+            // const smoother = x > (sineLimits[1] - config.width/2 ) ? sineLimits[1] - x - sineLimits[0] : x - sineLimits[0]
             if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
                 y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
             ctx.lineTo( x/config.steps * width, y * config.height )
@@ -133,6 +143,9 @@ export default class WorldBuilder extends Component {
                 time: this.time
             })
             this.onChange = this.skyCreator.handleChange
+        } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
+            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time })
+            this.onChange = this.mapHeighter.handleChange
         }
     }
 }

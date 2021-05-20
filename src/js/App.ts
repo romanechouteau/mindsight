@@ -1,4 +1,9 @@
-import { Scene, sRGBEncoding, WebGLRenderer } from 'three'
+import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, MeshBasicMaterial, FogExp2 } from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import * as dat from 'dat.gui'
 
 // @ts-ignore
@@ -25,6 +30,12 @@ import { createState, State } from './World/State'
 import PointerCursor from './Tools/PointerCursor'
 import Component from './Lib/Component'
 
+// @ts-ignore
+import bloomVertShader from '@shaders/bloomVert.glsl'
+// @ts-ignore
+import bloomFragShader from '@shaders/bloomFrag.glsl'
+import { BLOOM_LAYER } from './constants'
+
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
@@ -41,8 +52,12 @@ export default class App extends Component {
   world: any
   mouse: Mouse
   state: { time: Time }
+  bloomLayer: Layers
   pointerCursor: PointerCursor
   intro: IntroController
+  bloomPass: UnrealBloomPass
+  bloomComposer: EffectComposer
+  finalComposer: EffectComposer
   constructor(options) {
     super({
       store
@@ -62,6 +77,7 @@ export default class App extends Component {
     this.setConfig()
     this.setRenderer()
     this.setCamera()
+    this.setPostprocessing()
     this.setWorld()
     this.setPointerCursor()
     this.render()
@@ -73,6 +89,11 @@ export default class App extends Component {
   setRenderer() {
     // Set scene
     this.scene = new Scene()
+
+    // Bloom layers
+    this.bloomLayer = new Layers()
+    this.bloomLayer.set(BLOOM_LAYER)
+
     // Set renderer
     this.renderer = new WebGLRenderer({
       canvas: this.canvas,
@@ -101,7 +122,12 @@ export default class App extends Component {
       // which might cause some performance or batteries issues when testing on multiple browsers
       if (!(this.renderOnBlur?.activated && !document.hasFocus())) {
         stats.begin()
-        this.renderer.render(this.scene, this.camera.camera)
+        this.scene.traverse(this.darkenNonBloomed.bind(this))
+        this.renderer.setClearColor(0x000000, 1.)
+        this.bloomComposer.render()
+        this.renderer.setClearColor(0xF4C5B5, 1.)
+        this.scene.traverse(this.restoreMaterial.bind(this))
+        this.finalComposer.render()
         stats.end()
       }
     })
@@ -125,6 +151,69 @@ export default class App extends Component {
     // Add camera to scene
     this.scene.add(this.camera.container)
   }
+
+  setPostprocessing() {
+    const renderScene = new RenderPass(this.scene, this.camera.camera)
+
+    // BLOOM COMPOSER
+    this.bloomComposer = new EffectComposer(this.renderer)
+
+    this.bloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
+    this.bloomPass.threshold = 0
+    this.bloomPass.strength = 1.5
+    this.bloomPass.radius = 0.1
+
+    const gammaCorrection = new ShaderPass(GammaCorrectionShader)
+
+    this.bloomComposer.addPass(renderScene)
+    this.bloomComposer.addPass(this.bloomPass)
+    this.bloomComposer.addPass(gammaCorrection)
+
+    // FINAL COMPOSER
+    const finalPass = new ShaderPass(
+      new ShaderMaterial({
+        uniforms: {
+          baseTexture: {
+            value: null
+          },
+          bloomTexture: {
+            value: this.bloomComposer.renderTarget2.texture
+          }
+        },
+        vertexShader: bloomVertShader,
+        fragmentShader: bloomFragShader,
+        defines: {}
+      }), "baseTexture"
+    )
+    finalPass.needsSwap = true
+
+    this.finalComposer = new EffectComposer(this.renderer)
+    this.finalComposer.addPass(renderScene)
+    this.finalComposer.addPass(finalPass)
+
+    // debug
+    if (this.debug) {
+      const folder = this.debug.addFolder('Bloom')
+      folder.open()
+      folder
+        .add(this.bloomPass, 'threshold')
+        .step(0.1)
+        .min(0)
+        .max(1)
+        .name('Threshold')
+      folder.add(this.bloomPass, 'strength')
+        .step(0.01)
+        .min(0)
+        .max(3)
+        .name('Strength')
+      folder.add(this.bloomPass, 'radius')
+        .step(0.01)
+        .min(0)
+        .max(1)
+        .name('Radius')
+    }
+  }
+
   setWorld() {
     // Create world instance
     this.world = new World({
@@ -147,11 +236,22 @@ export default class App extends Component {
   }
 
   render = () => {
-    
     if (store.state.isIntro) {
       this.intro = new IntroController({time: this.time, debug: this.debug})
     } else if (document.querySelector('#intro')) {
       this.intro.dispose()
+    }
+  }
+  
+  darkenNonBloomed(obj) {
+    if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {
+      obj.material.colorWrite = false
+    }
+  }
+
+  restoreMaterial(obj) {
+    if (obj.material) {
+      obj.material.colorWrite = true
     }
   }
 }
