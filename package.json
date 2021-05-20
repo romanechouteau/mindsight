@@ -29,6 +29,7 @@
     "event-emitter": "^0.3.5",
     "gl-matrix": "^3.3.0",
     "gsap": "^3.6.0",
+    "lottie-web": "^5.7.8",
     "snowpack-plugin-raw-file-loader": "^1.0.9",
     "snowpack-plugin-stylus": "^1.0.6",
     "stats.js": "^0.17.0",

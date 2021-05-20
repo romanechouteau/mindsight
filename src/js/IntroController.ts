@@ -4,6 +4,8 @@ import hpSrc from '../images/casque.svg'
 import { drawWave, waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
 import Time from './Tools/Time'
 import { queue } from './Tools/asyncUtils'
+import lottie from 'lottie-web'
+import logoAnimation from '../images/mindisight_logo_animation.json'
 
 // TODO: replace all magical numbers
 export default class IntroController {
@@ -19,6 +21,7 @@ export default class IntroController {
     rightLineConfigs: drawWaveConfig[]
     waveHeight: number
     debug?: dat.GUI
+    timeouts: any
 
     constructor({time, debug}) {
         this.time = time
@@ -33,9 +36,9 @@ export default class IntroController {
         ]
 
         this.leftLineConfigs = [
-            { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }, 
-            { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 , inflexionPoint: 0}, 
-            { ...waveBaseConfig, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }
+            { ...waveBaseConfig, offset: 5, widthReductor: 2, height: this.waveHeight, speed: 490, steps: 400, inflexionPoint: 0 }, 
+            { ...waveBaseConfig, offset: 2, widthReductor: 1.9, height: this.waveHeight, speed: 540, steps: 400 , inflexionPoint: 0}, 
+            { ...waveBaseConfig, widthReductor: 2.3, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }
         ]
         this.rightLineConfigs = [
             { ...waveBaseConfig, offset: 3, widthReductor: 1.8, height: this.waveHeight, speed: 450, steps: 400, inflexionPoint: 1 }, 
@@ -43,19 +46,39 @@ export default class IntroController {
             { ...waveBaseConfig, widthReductor: 2.2, height: this.waveHeight, speed: 550, steps: 400, inflexionPoint: 1 }
         ]
 
+        this.timeouts = {
+            fadeTitle: 2000,
+            lineSplit: 2000,
+            linesGoesAway: 5000,
+            linesMoveAfterDisassemble: 1000
+        }
+
         if (this.debug) {
-            const mainFolder = this.debug.addFolder('intro wavesets')
+            const wavesFolder = this.debug.addFolder('intro wavesets')
             ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach((configs, wasetId) => {
-                const subfolder = mainFolder.addFolder(`waveset ${wasetId}`)
+                const subfolder = wavesFolder.addFolder(`waveset ${wasetId}`)
                 configs.forEach((conf, waveId) => {
                     const subsubfolder = subfolder.addFolder(`wave ${waveId}`)
                     Object.keys(conf).forEach(key => subsubfolder.add(conf, key))
                 })
             })
+            const timeoutsFolder = this.debug.addFolder('intro timeouts')
+            Object.keys(this.timeouts).forEach(key => timeoutsFolder.add(this.timeouts, key))
         }
 
         this.addWave(this.fullCanvas, 'tick.introFullCanvas', this.fullLineConfigs)
         this.initTicker()
+        this.initLogoAnimation()
+    }
+
+    initLogoAnimation() {
+        lottie.loadAnimation({
+            container: this.title,
+            renderer: 'svg',
+            loop: false,
+            autoplay: true,
+            animationData: logoAnimation
+        })
     }
 
     createHtml() {
@@ -90,7 +113,6 @@ export default class IntroController {
     }
 
     toggleLineMovement() {
-        
         let height = 0
         if (this.fullLineConfigs[0].height === 0) height = this.waveHeight        
         ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
@@ -141,41 +163,82 @@ export default class IntroController {
             setTimeout(() => {
                 this.killFullLine()
                 this.enableSideLines()
+                // @ts-ignore
+                this.headPhoneImage.attributeStyleMap.set('display', 'inline-block')
+                setTimeout(() => {
+                    // @ts-ignore
+                    this.headPhoneImage.attributeStyleMap.set('opacity', 1)
+                }, 500);
             }, 2100)
-            // @ts-ignore
-            this.headPhoneImage.attributeStyleMap.set('display', 'inline-block')
-            // @ts-ignore
-            this.headPhoneImage.attributeStyleMap.set('opacity', 1)
         }, 500)
     }
 
     flyLines() {
-        gsap.to(this.fullLineConfigs[0], {
-            widthReductor: 1,
-            ease: 'power1.inOut',
-            duration: 2
+        ;[this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
+            gsap.to(configs[0], {
+                widthReductor: 1,
+                inflexionPoint: 0.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
+            gsap.to(configs[1], {
+                widthReductor: 1,
+                inflexionPoint: 0.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
+            gsap.to(configs[2], {
+                widthReductor: 1,
+                inflexionPoint: 0.5,
+                ease: 'power1.inOut',
+                duration: 2
+            })
         })
-        gsap.to(this.fullLineConfigs[1], {
-            widthReductor: 1,
-            ease: 'power1.inOut',
-            duration: 2
-        })
-        gsap.to(this.fullLineConfigs[2], {
-            widthReductor: 1,
-            ease: 'power1.inOut',
-            duration: 2
-        })
+
+        setTimeout(() => {
+            // @ts-ignore
+            this.leftCanvas.attributeStyleMap.set('transform', 'translateX(-40vw)')
+            // @ts-ignore
+            this.rightCanvas.attributeStyleMap.set('transform', 'translateX(40vw)')
+        }, 1000)
+        setTimeout(() => {
+            // @ts-ignore
+            this.leftCanvas.attributeStyleMap.set('opacity', 0)
+            // @ts-ignore
+            this.rightCanvas.attributeStyleMap.set('opacity', 0)
+        }, 1500)
+    }
+
+    assembleLines() {
+        // @ts-ignore
+        this.leftCanvas.attributeStyleMap.set('width', CSS.vw(50.1))
+        // @ts-ignore
+        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(50.1))        
+    }
+
+    hideHeadphone() {
+        this.headPhoneImage.attributeStyleMap.set('opacity', 0)
+        setTimeout(() => {
+            // @ts-ignore
+            this.headPhoneImage.attributeStyleMap.set('display', 'none')
+        }, 500);
+    }
+
+    revealLine() {
+        document.querySelector('.canvas-full').style.width = `100vw`
     }
 
     async initTicker() {
         await queue(() => {
-            this.showHeadphoneAdvice()
-        }, 2000)
-        await queue(() => {
-            this.flyLines()
+            this.revealLine()
         }, 5000)
         await queue(() => {
-            // this.stepOne()
+            this.showHeadphoneAdvice()
+        }, 5000)
+        await queue(() => {
+            // this.flyLines()
+            this.hideHeadphone()
+            this.assembleLines()
         }, 5000)
     }
 

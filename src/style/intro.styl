@@ -16,21 +16,47 @@
         font-size: 5.938rem
         text-transform: uppercase
         transition: opacity 0.5s ease
+        pointer-events: none
+        transform: scale(0.7)
+        position relative
+        top 10px
+
+        svg
+            filter: drop-shadow(0 0 1.25rem rgba(255,255,255,0.8)) drop-shadow(0 0 12.5rem rgba(255,255,255,0.24)) drop-shadow(0 0 31.25rem rgba(255,255,255,0.5));
 
     .headphone
+        opacity: 0
         transition: opacity 0.5s ease
         display: none
         z-index: 200
 
-    .bg
-        display: flex
-        height: 140vh
+    .bg-wrapper
+        height: 140vw
         width: 140vw
         position: absolute
-        top: -20vh
-        left: -20vh
+        top: -80vh
+        left: -30vh
+        animation: rotating 12s linear infinite
+
+    .bg
+        top: 0vh
+        left: 0vh
+        position: absolute
+        height: 100%
+        width: 100%
         background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
         animation: spinning 6s linear infinite
+
+    .canvas-full
+        overflow: hidden
+        // transform: scaleX(0)
+        transform-origin: left
+        will-change: width
+        transition: width 1.5s ease
+        position: absolute
+        top: 0
+        left: 0
+        width 0
 
     canvas
         position: absolute
@@ -39,6 +65,7 @@
         height: 100vh
 
         &#full
+            position: relative
             width: 100vw
 
         &#right
@@ -46,8 +73,9 @@
             left: initial
 
         &:not(#full)
+            opacity: 1
             width: 50vw
-            transition: width 0.5s ease
+            transition: width 0.5s ease, transform 6s ease, opacity 0.5s ease
 
 @keyframes spinning {
     0% {
@@ -70,4 +98,9 @@
         // background: linear-gradient(rgb(254, 224, 200) 25%, rgb(190, 224, 193) 75%)
         transform: translate(0, -20vh);
     }
+}
+
+@keyframes rotating {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
