@@ -1,4 +1,4 @@
-// import '@style/style.styl'
+import '@style/style.styl'
 // @ts-ignore
 import App from '@js/App'
 

@@ -5,12 +5,18 @@
   "main": "index.js",
   "scripts": {
     "start": "snowpack dev",
+    "build": "snowpack build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@snowpack/plugin-dotenv": "^2.1.0",
+    "@types/dat.gui": "^0.7.6",
+    "@types/gsap": "^1.20.2",
+    "@types/lodash": "^4.14.168",
     "@types/node": "^14.14.31",
+    "@types/spotify-web-playback-sdk": "^0.1.8",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "snowpack": "^3.0.11"
   },
@@ -19,7 +25,6 @@
     "@marlonmarcello/snowpack-plugin-pug": "^1.0.3",
     "@snowpack/plugin-optimize": "^0.2.13",
     "@snowpack/plugin-typescript": "^1.2.1",
-    "@types/gsap": "^1.20.2",
     "dat.gui": "^0.7.7",
     "event-emitter": "^0.3.5",
     "gl-matrix": "^3.3.0",

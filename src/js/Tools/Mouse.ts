@@ -1,4 +1,4 @@
-import { vec2, vec3 } from 'gl-matrix'
+import { vec2 } from 'gl-matrix'
 import Emitter from 'event-emitter'
 import RAF from './raf'
 
@@ -21,6 +21,7 @@ export class Mouse {
     preventDamping: boolean
     on: Function
     off: Function
+    targeted: HTMLElement | null
 
     constructor(target?) {
         this.cursor = vec2.fromValues(0, 0)
@@ -37,6 +38,7 @@ export class Mouse {
         this.isDown = false
         this.wheelDir = null
         this.emitter = {}
+        this.targeted = null
 
         Emitter(this.emitter)
         this.on = this.emitter.on.bind(this.emitter)
@@ -90,6 +92,7 @@ export class Mouse {
     }
 
     onMove(event) {
+        this.targeted = event.target
         this.cursor[0] = (event.clientX / this.screenWidth - 0.5) * 2
         this.cursor[1] = - (event.clientY / this.screenHeight - 0.5) * 2
         this.emitter.emit('move', this)

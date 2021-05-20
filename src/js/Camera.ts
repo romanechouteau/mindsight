@@ -1,4 +1,4 @@
-import { Object3D, PerspectiveCamera } from 'three'
+import { Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Matrix4 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 export default class Camera {
@@ -9,6 +9,7 @@ export default class Camera {
   camera: PerspectiveCamera
   orbitControls: OrbitControls
   debugFolder: any
+  raycasterPlane: Mesh
   constructor(options) {
     // Set Options
     this.sizes = options.sizes
@@ -22,13 +23,14 @@ export default class Camera {
     this.setCamera()
     this.setPosition()
     this.setOrbitControls()
+    this.setRaycasterPlane()
   }
   setCamera() {
     // Create camera
     this.camera = new PerspectiveCamera(
       75,
       this.sizes.viewport.width / this.sizes.viewport.height,
-      0.1,
+      0.001,
       1000
     )
     this.container.add(this.camera)
@@ -63,5 +65,31 @@ export default class Camera {
         .add(this.orbitControls, 'enabled')
         .name('Enable Orbit Control')
     }
+
+    this.orbitControls.addEventListener('change', () => {
+      const { rotation } = this.camera
+      this.raycasterPlane.rotation.x = rotation.x
+      this.raycasterPlane.rotation.y = rotation.y
+      this.raycasterPlane.rotation.z = rotation.z
+    })
+  }
+
+  setRaycasterPlane() {
+    const { rotation } = this.camera
+
+    const geometry = new PlaneGeometry(20, 20, 20)
+    const material = new MeshBasicMaterial({
+      depthWrite: false,
+      depthTest: false,
+      transparent: true,
+      opacity: 0
+    })
+    geometry.applyMatrix4( new Matrix4().makeTranslation(-this.camera.position.x, -this.camera.position.y, -this.camera.position.z + 2) )
+    this.raycasterPlane = new Mesh(geometry, material)
+    this.raycasterPlane.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+    this.raycasterPlane.rotation.x = rotation.x
+    this.raycasterPlane.rotation.y = rotation.y
+    this.raycasterPlane.rotation.z = rotation.z
+    this.container.add(this.raycasterPlane)
   }
 }

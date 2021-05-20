@@ -1,10 +1,17 @@
-import { Scene, sRGBEncoding, WebGLRenderer } from 'three'
+import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, MeshBasicMaterial, FogExp2 } from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import * as dat from 'dat.gui'
 
 // @ts-ignore
 import Sizes from '@tools/Sizes'
 // // @ts-ignore
 // import Time from '@tools/Time'
+// @ts-ignore
+import { Mouse } from '@tools/Mouse'
 // @ts-ignore
 // import Assets from '@tools/Loader'
 
@@ -14,9 +21,15 @@ import Camera from './Camera'
 import World from '@world/index'
 
 import Stats from 'stats.js'
-import mouse, { Mouse } from './Tools/Mouse'
 import Time from './Tools/Time'
 import { createState, State } from './World/State'
+import PointerCursor from './Tools/PointerCursor'
+
+// @ts-ignore
+import bloomVertShader from '@shaders/bloomVert.glsl'
+// @ts-ignore
+import bloomFragShader from '@shaders/bloomFrag.glsl'
+import { BLOOM_LAYER } from './constants'
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -30,11 +43,15 @@ export default class App {
   renderer: WebGLRenderer
   renderOnBlur: any
   camera: any
-  debug: any
+  debug: dat.GUI
   world: any
   mouse: Mouse
-
   state: { time: Time }
+  bloomLayer: Layers
+  pointerCursor: PointerCursor
+  bloomPass: UnrealBloomPass
+  bloomComposer: EffectComposer
+  finalComposer: EffectComposer
   constructor(options) {
     // Set options
     this.canvas = options.canvas
@@ -43,7 +60,7 @@ export default class App {
     this.time = new Time()
     this.sizes = new Sizes()
     // this.assets = new Assets()
-    this.mouse = mouse
+    this.mouse = new Mouse()
 
     // ! Only state shall be accessed on global App namespace
     this.state = createState()
@@ -51,22 +68,33 @@ export default class App {
     this.setConfig()
     this.setRenderer()
     this.setCamera()
+    this.setPostprocessing()
     this.setWorld()
+    this.setPointerCursor()
+
+  }
+  setPointerCursor() {
+    this.pointerCursor = PointerCursor
   }
   setRenderer() {
     // Set scene
     this.scene = new Scene()
+
+    // Bloom layers
+    this.bloomLayer = new Layers()
+    this.bloomLayer.set(BLOOM_LAYER)
+
     // Set renderer
     this.renderer = new WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
       antialias: true,
-      powerPreference: 'high-performance',
+      powerPreference: 'low-power',
     })
     this.renderer.outputEncoding = sRGBEncoding
     this.renderer.gammaFactor = 2.2
     // Set background color
-    this.renderer.setClearColor(0x212121, 1)
+    this.renderer.setClearColor(0xF4C5B5, 1)
     // Set renderer pixel ratio & sizes
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.sizes.viewport.width, this.sizes.viewport.height)
@@ -80,11 +108,16 @@ export default class App {
     // Set RequestAnimationFrame with 60fps
     this.time.on('tick', () => {
       // When tab is not visible (tab is not active or window is minimized), browser stops requesting animation frames. Thus, this does not work
-      // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one), 
+      // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one),
       // which might cause some performance or batteries issues when testing on multiple browsers
-      if (!(this.renderOnBlur?.activated && !document.hasFocus() ) ) {
+      if (!(this.renderOnBlur?.activated && !document.hasFocus())) {
         stats.begin()
-        this.renderer.render(this.scene, this.camera.camera)
+        this.scene.traverse(this.darkenNonBloomed.bind(this))
+        this.renderer.setClearColor(0x000000, 1.)
+        this.bloomComposer.render()
+        this.renderer.setClearColor(0xF4C5B5, 1.)
+        this.scene.traverse(this.restoreMaterial.bind(this))
+        this.finalComposer.render()
         stats.end()
       }
     })
@@ -108,6 +141,69 @@ export default class App {
     // Add camera to scene
     this.scene.add(this.camera.container)
   }
+
+  setPostprocessing() {
+    const renderScene = new RenderPass(this.scene, this.camera.camera)
+
+    // BLOOM COMPOSER
+    this.bloomComposer = new EffectComposer(this.renderer)
+
+    this.bloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
+    this.bloomPass.threshold = 0
+    this.bloomPass.strength = 1.5
+    this.bloomPass.radius = 0.1
+
+    const gammaCorrection = new ShaderPass(GammaCorrectionShader)
+
+    this.bloomComposer.addPass(renderScene)
+    this.bloomComposer.addPass(this.bloomPass)
+    this.bloomComposer.addPass(gammaCorrection)
+
+    // FINAL COMPOSER
+    const finalPass = new ShaderPass(
+      new ShaderMaterial({
+        uniforms: {
+          baseTexture: {
+            value: null
+          },
+          bloomTexture: {
+            value: this.bloomComposer.renderTarget2.texture
+          }
+        },
+        vertexShader: bloomVertShader,
+        fragmentShader: bloomFragShader,
+        defines: {}
+      }), "baseTexture"
+    )
+    finalPass.needsSwap = true
+
+    this.finalComposer = new EffectComposer(this.renderer)
+    this.finalComposer.addPass(renderScene)
+    this.finalComposer.addPass(finalPass)
+
+    // debug
+    if (this.debug) {
+      const folder = this.debug.addFolder('Bloom')
+      folder.open()
+      folder
+        .add(this.bloomPass, 'threshold')
+        .step(0.1)
+        .min(0)
+        .max(1)
+        .name('Threshold')
+      folder.add(this.bloomPass, 'strength')
+        .step(0.01)
+        .min(0)
+        .max(3)
+        .name('Strength')
+      folder.add(this.bloomPass, 'radius')
+        .step(0.01)
+        .min(0)
+        .max(1)
+        .name('Radius')
+    }
+  }
+
   setWorld() {
     // Create world instance
     this.world = new World({
@@ -116,7 +212,9 @@ export default class App {
       mouse: this.mouse,
       camera: this.camera,
       pixelRatio: this.renderer.getPixelRatio(),
-    //   assets: this.assets,
+      canvas: this.canvas,
+      globalScene: this.scene
+      //   assets: this.assets,
     })
     // Add world to scene
     this.scene.add(this.world.container)
@@ -124,6 +222,18 @@ export default class App {
   setConfig() {
     if (window.location.hash === '#debug') {
       this.debug = new dat.GUI({ width: 450 })
+    }
+  }
+
+  darkenNonBloomed(obj) {
+    if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {
+      obj.material.colorWrite = false
+    }
+  }
+
+  restoreMaterial(obj) {
+    if (obj.material) {
+      obj.material.colorWrite = true
     }
   }
 }

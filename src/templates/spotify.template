@@ -1,0 +1,14 @@
+<div class="audioWrapper spotify">
+    <div class="left"></div>
+    <div class="center">
+        <img src="{{search}}">
+        <div class="inputWrapper">
+            <div class="placeholder">Rechercher une musique</div>
+            <input type="text" placeholder="Rechercher une musique" class="spotify__input"></input>
+        </div>
+        <div class="results"></div>
+    </div>
+    <div class="right"></div>
+</div>
+<div class="player"></div>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
