@@ -17,5 +17,6 @@ export default {
     worldBuilder: {
         step: WORLDBUILDER_STEPS.GROUND
     },
-    environment: 0
+    environment: 0,
+    isIntro: true
   };

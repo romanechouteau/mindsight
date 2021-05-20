@@ -11,6 +11,7 @@ import PointerCursor from '../../Tools/PointerCursor'
 import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE } from '../../../js/constants';
 // @ts-ignore
 import Time from '@tools/Time'
+import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
 import MapHeighter from './MapHeighter';
 import Environments from '../../World/Environments';
 
@@ -84,9 +85,10 @@ export default class WorldBuilder extends Component {
         const canvas: HTMLCanvasElement = document.querySelector('#worldBuilder canvas')
         const ctx = canvas.getContext('2d')
         const {width, height} = canvas
+
         const config = { steps: 200, opacity: 1, waveLength: 50, speed: 250, offset: 0, height: 50, width: 0.2 }
         ctx.imageSmoothingEnabled = true;
-        const configs = [ {...config, opacity: 1}, {...config, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...config, opacity: 0.5, offset: 3, speed: 450, waveLength: 40, wavlength: 75 } ]
+        const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
         this.time.on('tick', () => {
             ctx.clearRect(0, 0, width, height)
             this.drawWave(ctx, width, height, configs[0])
@@ -108,14 +110,21 @@ export default class WorldBuilder extends Component {
         ctx.translate(0.5, height/2)
         ctx.translate(0.5, 0.5);
         ctx.beginPath()
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
+        ctx.shadowBlur = 3
+        ctx.shadowColor = 'white'
         ctx.strokeStyle = `rgba(255, 255, 255, ${config.opacity})`
         const inflexionPoint = (this.rangeValue.value) / WORLDBUILDER_MAX_VALUE
-        const sineLimits = [ Math.max(inflexionPoint - 0.1, 0), Math.min(inflexionPoint + 0.1, 1) ]
+        // const sineLimits = [ Math.max(inflexionPoint - 0.5, 0), Math.min(inflexionPoint + 0.5, 1) ]
+        const sineLimits = [ 0, 1 ]
         for (let x = 0; x < config.steps; x++) {
+            const inflexionPointDistance = Math.abs(inflexionPoint - (x/config.steps));
+            // debugger;
             let y = 0
             // const smoother = x > (sineLimits[1] - config.width/2 ) ? sineLimits[1] - x - sineLimits[0] : x - sineLimits[0]
             if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
-                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed)
+                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
             ctx.lineTo( x/config.steps * width, y * config.height )
         }
         ctx.stroke()

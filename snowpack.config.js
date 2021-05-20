@@ -32,7 +32,8 @@ module.exports = {
           exts: [".frag", ".vert", ".glsl", ".template"]
         }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
-        ["@snowpack/plugin-dotenv"]
+        ["@snowpack/plugin-dotenv"],
+        "snowpack-plugin-relative-css-urls",
         // [
         //     "@marlonmarcello/snowpack-plugin-pug",
         //     {

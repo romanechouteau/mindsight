@@ -19,11 +19,16 @@ import { Mouse } from '@tools/Mouse'
 import Camera from './Camera'
 // @ts-ignore
 import World from '@world/index'
+// @ts-ignore
+import store from '@store/index'
+
+import IntroController from './IntroController'
 
 import Stats from 'stats.js'
 import Time from './Tools/Time'
 import { createState, State } from './World/State'
 import PointerCursor from './Tools/PointerCursor'
+import Component from './Lib/Component'
 
 // @ts-ignore
 import bloomVertShader from '@shaders/bloomVert.glsl'
@@ -35,9 +40,9 @@ const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
 
-export default class App {
+export default class App extends Component {
   canvas: any
-  time: any
+  time: Time
   sizes: any
   scene: Scene
   renderer: WebGLRenderer
@@ -49,10 +54,15 @@ export default class App {
   state: { time: Time }
   bloomLayer: Layers
   pointerCursor: PointerCursor
+  intro: IntroController
   bloomPass: UnrealBloomPass
   bloomComposer: EffectComposer
   finalComposer: EffectComposer
   constructor(options) {
+    super({
+      store
+    })
+
     // Set options
     this.canvas = options.canvas
 
@@ -64,13 +74,13 @@ export default class App {
 
     // ! Only state shall be accessed on global App namespace
     this.state = createState()
-
     this.setConfig()
     this.setRenderer()
     this.setCamera()
     this.setPostprocessing()
     this.setWorld()
     this.setPointerCursor()
+    this.render()
 
   }
   setPointerCursor() {
@@ -225,6 +235,14 @@ export default class App {
     }
   }
 
+  render = () => {
+    if (store.state.isIntro) {
+      this.intro = new IntroController({time: this.time, debug: this.debug})
+    } else if (document.querySelector('#intro')) {
+      this.intro.dispose()
+    }
+  }
+  
   darkenNonBloomed(obj) {
     if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {
       obj.material.colorWrite = false
