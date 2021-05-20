@@ -14,7 +14,7 @@ import Component from '@lib/Component'
 import pointTemplate from '../../templates/eyetrackingPoint.template'
 // @ts-ignore
 import { htmlUtils } from '@tools/utils'
-import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE } from '../constants'
+import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE, SCENES } from '../constants'
 
 export default class EyeTrackingManager extends Component {
     sizes: any
@@ -31,8 +31,10 @@ export default class EyeTrackingManager extends Component {
         pupilShineMovement: number,
     }
     pupilR: number
+    stopped: Boolean
     centerX: number
     centerY: number
+    eyeZoom: any
     element: HTMLElement
     calibrated: boolean
     debugFolder: any
@@ -53,6 +55,7 @@ export default class EyeTrackingManager extends Component {
         this.debug = debug
 
         this.inZone = []
+        this.stopped = false
         this.calibrated = false
         this.currentPoint = 0
         this.pointsClicks = [0, 0, 0, 0, 0, 0, 0]
@@ -121,7 +124,7 @@ export default class EyeTrackingManager extends Component {
         const pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelectorAll('.pupil, .maskWrapper .pupilWhite'), {
             duration,
-            translateX: `${moveX * this.params.pupilMovement}%`,
+            translateX: `${moveX * this.params.pupilMovement * pupilBox.width * 0.01}px`,
             translateY: `${currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01}px`,
         })
         gsap.to(this.element.querySelectorAll('#maskPupil .maskWrapper'), {
@@ -153,6 +156,8 @@ export default class EyeTrackingManager extends Component {
         const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(this.params.radius, 2)
 
         if (this.inZone.length < this.params.duration) {
+            // const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
+            // this.zoomEye(percentage)
             return this.inZone.push(isInZone)
         }
 
@@ -160,10 +165,23 @@ export default class EyeTrackingManager extends Component {
         this.inZone.push(isInZone)
 
         const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
+        if (this.stopped === false) {
+            this.zoomEye(percentage)
+        }
 
         if (percentage > this.params.success) {
+            this.stopped = true
             this.stop()
         }
+    }
+
+    zoomEye(percentage) {
+        const scale = percentage / 0.8 * 0.2
+        gsap.to(this.element, {
+            duration: 0.5,
+            scaleX: `${1 + scale}`,
+            scaleY: `${1 + scale}`
+        })
     }
 
     listenMouseDown() {
@@ -258,13 +276,24 @@ export default class EyeTrackingManager extends Component {
     stop() {
         webgazer.pause()
         document.getElementById('webgazerVideoContainer').remove()
-
         this.eyeMovement.cancel()
 
-        htmlUtils.renderToDOM(this.element, '', {})
         this.render = () => {}
 
-        store.dispatch('updateScene', store.state.scene + 1)
+        store.dispatch('updateScene', SCENES.ENIVRONMENT)
+
+        gsap.to(document.querySelector('#background'), {
+            duration: 3,
+            opacity: 0
+        })
+        gsap.to(this.element, {
+            duration: 2,
+            scaleX: 4,
+            scaleY: 4,
+            onComplete: () => {
+                htmlUtils.renderToDOM(this.element, '', {})
+            }
+        })
     }
 
     setDebug() {
