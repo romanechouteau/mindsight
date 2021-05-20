@@ -106,7 +106,7 @@ export default class Camera {
       duration: 0.8,
       y: defaultY,
       z: defaultZ,
-      ease: 'power2.easeInOut'
+      ease: 'power3.inOut'
     })
   }
 }

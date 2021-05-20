@@ -283,19 +283,19 @@ export default class EyeTrackingManager extends Component {
 
         gsap.to(this.element, {
             delay: 0.3,
-            duration: 1,
+            duration: 1.3,
             scaleX: 10,
             scaleY: 10,
             opacity: 0,
-            ease: 'power2.easeInOut',
+            ease: 'power3.inOut',
             onComplete: () => {
                 htmlUtils.renderToDOM(this.element, '', {})
             }
         })
         gsap.to(document.querySelector('#background'), {
-            delay: 0.3,
-            duration: 1.5,
-            opacity: 0
+            delay: 0.5,
+            duration: 0.8,
+            opacity: 0,
         })
     }
 
