@@ -156,8 +156,8 @@ export default class EyeTrackingManager extends Component {
         const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(this.params.radius, 2)
 
         if (this.inZone.length < this.params.duration) {
-            const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
-            this.zoomEye(percentage)
+            // const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
+            // this.zoomEye(percentage)
             return this.inZone.push(isInZone)
         }
 
@@ -165,12 +165,12 @@ export default class EyeTrackingManager extends Component {
         this.inZone.push(isInZone)
 
         const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
-        if (this.stopped === false) {
-            this.zoomEye(percentage)
-        }
+        // if (this.stopped === false) {
+        //     this.zoomEye(percentage)
+        // }
 
         if (percentage > this.params.success) {
-            this.stopped = true
+            // this.stopped = true
             this.stop()
         }
     }
