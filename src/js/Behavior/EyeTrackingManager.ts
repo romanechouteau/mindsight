@@ -291,12 +291,16 @@ export default class EyeTrackingManager extends Component {
             ease: 'power3.inOut',
             onComplete: () => {
                 htmlUtils.renderToDOM(this.element, '', {})
+                this.element.remove()
             }
         })
         gsap.to(document.querySelector('#background'), {
             delay: 0.5,
             duration: 0.8,
             opacity: 0,
+            onComplete: function() {
+                this.targets()[0].remove()
+            }
         })
     }
 
