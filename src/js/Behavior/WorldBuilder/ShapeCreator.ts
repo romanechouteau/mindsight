@@ -71,10 +71,7 @@ export default class ShapeCreator {
         })
     }
 
-    handleChange(value) {
-        console.log(value);
-        
-        console.log('change morph');
+    handleChange(value: number) {
         // const value = parseInt(e.target.value)
         const shapeMesh = (this.container.getObjectByName('Cube002') as Mesh)
         const [ firstShapeIndex, secondShapeIndex ] = [ Math.floor(value/WORLDBUILDER_PRECISION) % this.shapes.length, (Math.floor(value/WORLDBUILDER_PRECISION) + 1) % this.shapes.length ]
