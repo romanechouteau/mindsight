@@ -20,12 +20,14 @@ import Component from '@lib/Component'
 import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
+import EyeTrackingManager from '../Behavior/EyeTrackingManager'
 import { SCENES } from '../constants'
 
 export default class World extends Component {
   time: Time
   debug: dat.GUI
   mouse: Mouse
+  sizes: any
   canvas: HTMLElement
   camera: Camera
   container: Object3D
@@ -43,6 +45,7 @@ export default class World extends Component {
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
   environments: Environments
+  eyeTrackingManager: EyeTrackingManager
   constructor(options) {
     super({
       store
@@ -51,12 +54,12 @@ export default class World extends Component {
     // Set options
     this.time = options.time
     this.debug = options.debug
+    this.sizes = options.sizes
     this.mouse = options.mouse
     this.camera = options.camera
     this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
     this.globalScene = options.globalScene
-
     // Set up
     this.container = new Object3D()
     this.container.name = 'World'
@@ -74,7 +77,6 @@ export default class World extends Component {
     this.setPointLight()
     this.setSceneManager()
     // this.setSuzanne()
-    this.setSceneManager()
     this.setFog()
     this.render()
   }
@@ -127,6 +129,7 @@ export default class World extends Component {
   }
 
   setEnvironments() {
+    this.camera.moveIntro()
     this.environments = new Environments({
       mouse: this.mouse,
       camera: this.camera
@@ -149,7 +152,12 @@ export default class World extends Component {
   }
 
   render() {
+    if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
+      this.setEyeTrackingManager()
+    }
+
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
+
       this.setEnvironments()
     } else if (store.state.scene !== SCENES.ENVIRONMENT && this.environments !== undefined && this.environments.stopped === false) {
       this.environments.stop()
@@ -175,5 +183,11 @@ export default class World extends Component {
     } else if (store.state.scene !== SCENES.AUDIO && AudioManager.started === true) {
       AudioManager.stop()
     }
+  }
+  setEyeTrackingManager() {
+    this.eyeTrackingManager = new EyeTrackingManager({
+      sizes: this.sizes,
+      debug: this.debug
+    })
   }
 }

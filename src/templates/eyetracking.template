@@ -1,0 +1,28 @@
+<svg viewBox="0 0 {{width}} {{height}}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <mask id="maskPupil" transformOrigin="center">
+            <g class="maskWrapper">
+                <circle vector-effect="non-scaling-stroke" class="pupilWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+                <circle cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" class="pupilBlack pupilCenterMask"></circle>
+            </g>
+        </mask>
+        <mask id="maskShine" transformOrigin="center">
+            <g class="maskWrapper">
+                <circle vector-effect="non-scaling-stroke" class="pupilWhite noDrop" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+            </g>
+        </mask>
+    </defs>
+    <g class="innerEye">
+        <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" r="{{innerEyeR}}" />
+    </g>
+    <g class="pupil">
+        <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}" mask="url(#maskPupil)"></circle>
+    </g>
+    <g class="pupilCenter">
+        <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" mask="url(#maskShine)"></circle>
+    </g>
+    <g class="outerEye">
+        <ellipse vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" rx="{{outerRX}}" ry="{{outerRY}}"/>
+        {{points}}
+    </g>
+</svg>

@@ -7,6 +7,8 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import * as dat from 'dat.gui'
 
 // @ts-ignore
+import Mouse from '@tools/Mouse'
+// @ts-ignore
 import Sizes from '@tools/Sizes'
 // // @ts-ignore
 // import Time from '@tools/Time'
@@ -69,6 +71,7 @@ export default class App extends Component {
     // Set up
     this.time = new Time()
     this.sizes = new Sizes()
+    this.mouse = Mouse
     // this.assets = new Assets()
     this.mouse = new Mouse()
 
@@ -220,11 +223,12 @@ export default class App extends Component {
       time: this.time,
       debug: this.debug,
       mouse: this.mouse,
+      sizes: this.sizes,
       camera: this.camera,
-      pixelRatio: this.renderer.getPixelRatio(),
       canvas: this.canvas,
-      globalScene: this.scene
-      //   assets: this.assets,
+      globalScene: this.scene,
+      pixelRatio: this.renderer.getPixelRatio()
+    //   assets: this.assets,
     })
     // Add world to scene
     this.scene.add(this.world.container)

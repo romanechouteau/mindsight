@@ -1,0 +1,3 @@
+<g class="point">
+    <circle vector-effect="non-scaling-stroke" class="pointCircle {{invisible}}" data-order="{{order}}" cx="{{x}}" cy="{{y}}" r="{{r}}" />
+</g>
