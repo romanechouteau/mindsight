@@ -61,7 +61,7 @@ export enum SCENES {
 
 export const EYETRACKING_RADIUS = 0.5
 
-export const EYETRACKING_DURATION = 60
+export const EYETRACKING_DURATION = 80
 
 export const EYETRACKING_SUCCESS = 0.8
 

@@ -156,8 +156,8 @@ export default class EyeTrackingManager extends Component {
         const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(this.params.radius, 2)
 
         if (this.inZone.length < this.params.duration) {
-            // const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
-            // this.zoomEye(percentage)
+            const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
+            this.focusProgress(percentage)
             return this.inZone.push(isInZone)
         }
 
@@ -165,22 +165,21 @@ export default class EyeTrackingManager extends Component {
         this.inZone.push(isInZone)
 
         const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
-        // if (this.stopped === false) {
-        //     this.zoomEye(percentage)
-        // }
+        if (this.stopped === false) {
+            this.focusProgress(percentage)
+        }
 
         if (percentage > this.params.success) {
-            // this.stopped = true
+            this.stopped = true
             this.stop()
         }
     }
 
-    zoomEye(percentage) {
-        const scale = percentage / 0.8 * 0.2
-        gsap.to(this.element, {
-            duration: 0.5,
-            scaleX: `${1 + scale}`,
-            scaleY: `${1 + scale}`
+    focusProgress(percentage) {
+        const scale = percentage / 0.8 * 50
+        gsap.to(document.querySelector('#background'), {
+            duration: 0.1,
+            backgroundColor: `rgb(${200 - scale}, 200, 200)`,
         })
     }
 
@@ -283,15 +282,19 @@ export default class EyeTrackingManager extends Component {
         store.dispatch('updateScene', SCENES.ENIVRONMENT)
 
         gsap.to(this.element, {
-            duration: 2,
-            scaleX: 4,
-            scaleY: 4,
+            delay: 0.3,
+            duration: 1,
+            scaleX: 10,
+            scaleY: 10,
+            opacity: 0,
+            ease: 'power2.easeInOut',
             onComplete: () => {
                 htmlUtils.renderToDOM(this.element, '', {})
             }
         })
         gsap.to(document.querySelector('#background'), {
-            duration: 3,
+            delay: 0.3,
+            duration: 1.5,
             opacity: 0
         })
     }

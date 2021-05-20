@@ -127,6 +127,7 @@ export default class World extends Component {
   }
 
   setEnvironments() {
+    this.camera.moveIntro()
     this.environments = new Environments({
       mouse: this.mouse,
       camera: this.camera
