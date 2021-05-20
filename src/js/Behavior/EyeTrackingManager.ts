@@ -213,8 +213,9 @@ export default class EyeTrackingManager extends Component {
         if (this.currentPoint === Math.floor(this.pointsClicks.length / 2) || this.currentPoint === this.pointsClicks.length - 1) {
             this.currentTranslate = this.currentPoint === this.pointsClicks.length - 1 ? 0 : -25
             return gsap.to(this.element.querySelectorAll('svg > g'), {
-                duration: 0.5,
-                translateY: `${this.currentTranslate}vh`
+                duration: 0.8,
+                translateY: `${this.currentTranslate}vh`,
+                ease: 'power3.inOut'
             })
         }
     }
