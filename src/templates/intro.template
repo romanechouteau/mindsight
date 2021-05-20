@@ -1,0 +1,12 @@
+<div class="intro">
+    <div class="bg-wrapper">
+        <div class="bg"></div>
+    </div>
+    <div class="canvas-full"/>
+        <canvas id="full" width="%width-full%" height="%height-full%"></canvas>
+    </div>
+    <canvas id="left" width="%width-left%" height="%height-left%"></canvas>
+    <canvas id="right" width="%width-right%" height="%height-right%"></canvas>
+    <div class="title"></div>
+    <img class="headphone" src="%hpSrc%" alt="headphone required">
+</div>

@@ -1,6 +1,12 @@
+@require "intro.styl"
 @require "spotify.styl"
 @require "worldBuilder.styl"
 @require "eyetracking.styl"
+
+@font-face {
+ font-family: "Displace";
+ src: url("../fonts/Displace20-Regular.ttf") format("truetype");
+}
 
 *, *::before, *::after
     box-sizing: border-box
@@ -215,3 +221,8 @@ body, html
         pointer-events: none
         top 0
         left: 0
+
+        transition: opacity 0.5s ease
+
+        &.hidden
+            opacity: 0

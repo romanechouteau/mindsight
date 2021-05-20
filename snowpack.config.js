@@ -17,7 +17,7 @@ module.exports = {
         '@models': './src/models/',
         '@shaders': './src/shaders/',
         '@sounds': './src/sounds/',
-        '@textures': './src/textures/',
+        '@textures': './src/images/textures/',
         '@js': './src/js/',
         '@tools': './src/js/Tools/',
         '@world': './src/js/World/',
@@ -32,7 +32,8 @@ module.exports = {
           exts: [".frag", ".vert", ".glsl", ".template"]
         }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
-        ["@snowpack/plugin-dotenv"]
+        ["@snowpack/plugin-dotenv"],
+        "snowpack-plugin-relative-css-urls",
         // [
         //     "@marlonmarcello/snowpack-plugin-pug",
         //     {

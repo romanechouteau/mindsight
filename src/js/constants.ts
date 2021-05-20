@@ -52,7 +52,7 @@ export const SHAPE_NUMBER = 4
 
 export enum SCENES {
     EYETRACKING = 1,
-    ENIVRONMENT = 2,
+    ENVIRONMENT = 2,
     PARAMETERS = 3,
     BRUSH = 4,
     AUDIO = 5,
@@ -74,3 +74,7 @@ export const PUPIL_MOVEMENT = 25
 export const PUPIL_SHINE_MOVEMENT = 30
 
 export const EYE_TRACKING_DEBOUNCE = 20
+
+export const CURSOR_SIZE = new Vector3(2, 2, 1)
+
+export const BLOOM_LAYER = 1

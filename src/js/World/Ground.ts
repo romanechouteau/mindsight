@@ -1,4 +1,4 @@
-import { Object3D, Mesh, MeshBasicMaterial, DoubleSide, Group, BoxBufferGeometry, MeshNormalMaterial, Vector3 } from 'three'
+import { Object3D, Mesh, MeshBasicMaterial, DoubleSide, Group, BoxBufferGeometry, MeshNormalMaterial, Vector3, ShaderMaterial, MeshLambertMaterial } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // @ts-ignore
 import reliefSrc from '@models/mapTest.glb'
@@ -33,6 +33,31 @@ export default class Ground {
     this.relief.scale.set(0.01, 0.01, 0.01)
     this.relief.rotation.y = Math.PI
     this.relief.position.z = 10
+    this.relief.name = 'relief'
+    // this.relief.getObjectByName('Plane').material = new MeshLambertMaterial({ emissive: 0x123fff })
+    // this.relief.getObjectByName('Plane').material = new ShaderMaterial({
+    //   vertexShader: `
+    //     varying vec3 vPosition;
+
+    //     void main() {
+    //       vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+        
+    //       vPosition = modelPosition.xyz;
+        
+    //       vec4 viewPosition = viewMatrix * modelPosition;
+    //       vec4 projectedPosition = projectionMatrix * viewPosition;
+    //       gl_Position = projectedPosition;
+    //     }
+    //   `,
+    //   fragmentShader: `
+    //   varying vec3 vPosition;
+      
+    //   void main()
+    //   {
+    //       gl_FragColor = vec4(vec3(vPosition.y), 1.);
+    //   }
+    //   `
+    // })
     // this.fakeGround = this.ground.clone(true)
     // this.fakeGround.children.forEach(mesh => (mesh as Mesh).material = new MeshBasicMaterial({ opacity: 0, side: DoubleSide }))
     // this.container.add(this.fakeGround)

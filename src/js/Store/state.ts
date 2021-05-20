@@ -15,7 +15,8 @@ export default {
         sectionIndex: null
     },
     worldBuilder: {
-        step: WORLDBUILDER_STEPS.SHAPE
+        step: WORLDBUILDER_STEPS.GROUND
     },
-    environment: 0
+    environment: 0,
+    isIntro: true
   };
