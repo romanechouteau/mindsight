@@ -282,10 +282,6 @@ export default class EyeTrackingManager extends Component {
 
         store.dispatch('updateScene', SCENES.ENIVRONMENT)
 
-        gsap.to(document.querySelector('#background'), {
-            duration: 3,
-            opacity: 0
-        })
         gsap.to(this.element, {
             duration: 2,
             scaleX: 4,
@@ -293,6 +289,10 @@ export default class EyeTrackingManager extends Component {
             onComplete: () => {
                 htmlUtils.renderToDOM(this.element, '', {})
             }
+        })
+        gsap.to(document.querySelector('#background'), {
+            duration: 3,
+            opacity: 0
         })
     }
 
