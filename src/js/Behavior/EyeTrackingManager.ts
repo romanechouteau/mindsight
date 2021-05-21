@@ -76,7 +76,6 @@ export default class EyeTrackingManager extends Component {
 
         this.setWebGazer()
         this.render()
-        this.listenMouseDown()
         this.eyeMovement = debounce(this.moveEye, EYE_TRACKING_DEBOUNCE, { leading: true })
     }
 
@@ -267,6 +266,8 @@ export default class EyeTrackingManager extends Component {
             pupilCenterX,
             pupilCenterY
         })
+
+        this.listenMouseDown()
     }
 
     getPointYEllipse (x, center, rX, rY, direction) {
@@ -280,7 +281,7 @@ export default class EyeTrackingManager extends Component {
 
         this.render = () => {}
 
-        store.dispatch('updateScene', SCENES.ENIVRONMENT)
+        store.dispatch('updateScene', SCENES.ENVIRONMENT)
 
         gsap.to(this.element, {
             delay: 0.3,
