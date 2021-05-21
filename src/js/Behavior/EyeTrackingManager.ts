@@ -76,7 +76,6 @@ export default class EyeTrackingManager extends Component {
 
         this.setWebGazer()
         this.render()
-        this.listenMouseDown()
         this.eyeMovement = debounce(this.moveEye, EYE_TRACKING_DEBOUNCE, { leading: true })
     }
 
@@ -96,7 +95,9 @@ export default class EyeTrackingManager extends Component {
         const x = (data.x / this.sizes.viewport.width - 0.5) * 2
         const y = - (data.y / this.sizes.viewport.height - 0.5) * 2
 
-        this.eyeMovement(x, -y)
+        if (this.stopped === false) {
+            this.eyeMovement(x, -y)
+        }
 
         if (this.calibrated) {
             this.checkInZone(x, y)
@@ -267,6 +268,8 @@ export default class EyeTrackingManager extends Component {
             pupilCenterX,
             pupilCenterY
         })
+
+        this.listenMouseDown()
     }
 
     getPointYEllipse (x, center, rX, rY, direction) {
@@ -275,12 +278,16 @@ export default class EyeTrackingManager extends Component {
 
     stop() {
         webgazer.pause()
-        document.getElementById('webgazerVideoContainer').remove()
         this.eyeMovement.cancel()
+        const webgazerContainer = document.getElementById('webgazerVideoContainer')
+        if (webgazerContainer) {
+            webgazerContainer.remove()
+        }
 
         this.render = () => {}
+        this.stopped = true
 
-        store.dispatch('updateScene', SCENES.ENIVRONMENT)
+        store.dispatch('updateScene', SCENES.ENVIRONMENT)
 
         gsap.to(this.element, {
             delay: 0.3,

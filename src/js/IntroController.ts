@@ -1,5 +1,5 @@
 import gsap from 'gsap/all'
-import template from '../templates/intro.template' 
+import template from '../templates/intro.template'
 import hpSrc from '../images/casque.svg'
 import { drawWave, waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
 import Time from './Tools/Time'
@@ -30,19 +30,19 @@ export default class IntroController {
         this.bindHtml()
         this.waveHeight = 200
         this.fullLineConfigs = [
-            { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }, 
-            { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }, 
+            { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 },
+            { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 },
             { ...waveBaseConfig, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }
         ]
 
         this.leftLineConfigs = [
-            { ...waveBaseConfig, offset: 5, widthReductor: 2, height: this.waveHeight, speed: 490, steps: 400, inflexionPoint: 0 }, 
-            { ...waveBaseConfig, offset: 2, widthReductor: 1.9, height: this.waveHeight, speed: 540, steps: 400 , inflexionPoint: 0}, 
+            { ...waveBaseConfig, offset: 5, widthReductor: 2, height: this.waveHeight, speed: 490, steps: 400, inflexionPoint: 0 },
+            { ...waveBaseConfig, offset: 2, widthReductor: 1.9, height: this.waveHeight, speed: 540, steps: 400 , inflexionPoint: 0},
             { ...waveBaseConfig, widthReductor: 2.3, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }
         ]
         this.rightLineConfigs = [
-            { ...waveBaseConfig, offset: 3, widthReductor: 1.8, height: this.waveHeight, speed: 450, steps: 400, inflexionPoint: 1 }, 
-            { ...waveBaseConfig, offset: 4, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 1 }, 
+            { ...waveBaseConfig, offset: 3, widthReductor: 1.8, height: this.waveHeight, speed: 450, steps: 400, inflexionPoint: 1 },
+            { ...waveBaseConfig, offset: 4, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 1 },
             { ...waveBaseConfig, widthReductor: 2.2, height: this.waveHeight, speed: 550, steps: 400, inflexionPoint: 1 }
         ]
 
@@ -114,7 +114,7 @@ export default class IntroController {
 
     toggleLineMovement() {
         let height = 0
-        if (this.fullLineConfigs[0].height === 0) height = this.waveHeight        
+        if (this.fullLineConfigs[0].height === 0) height = this.waveHeight
         ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
             gsap.to(configs[0], {
                 height: height,
@@ -213,7 +213,7 @@ export default class IntroController {
         // @ts-ignore
         this.leftCanvas.attributeStyleMap.set('width', CSS.vw(50.1))
         // @ts-ignore
-        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(50.1))        
+        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(50.1))
     }
 
     hideHeadphone() {
@@ -225,7 +225,10 @@ export default class IntroController {
     }
 
     revealLine() {
-        document.querySelector('.canvas-full').style.width = `100vw`
+        const canvas = document.querySelector('.canvas-full')
+        if (canvas) {
+            canvas.style.width = `100vw`
+        }
     }
 
     async initTicker() {

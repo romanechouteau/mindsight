@@ -154,6 +154,8 @@ export default class World extends Component {
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       this.setEyeTrackingManager()
+    } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
+      this.eyeTrackingManager.stop()
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {

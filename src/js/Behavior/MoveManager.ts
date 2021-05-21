@@ -49,7 +49,7 @@ export default class MoveManager {
         this.camera = camera
         this.canvas = canvas
         this.scene = scene
-        this.ground = ground.container.children[0].children[0]
+        this.ground = ground.container.children[0]
         this.pixelRatio = pixelRatio
 
         this.raycaster = new Raycaster()

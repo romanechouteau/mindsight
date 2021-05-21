@@ -34,7 +34,6 @@ export default class Environments {
     this.camera = camera
     this.stopped = false
     this.isMoving = false
-    this.camera.container.position.y = 3
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -63,7 +62,7 @@ export default class Environments {
       this.environments[i].rotation.y = Math.PI
       this.environments[i].position.y = -5
       this.environments[i].rotation.x = Math.PI/2
-      this.environments[i].position.z = - i * ENV_DISTANCE 
+      this.environments[i].position.z = - i * ENV_DISTANCE
     }
 
     this.container.add(...this.environments)
