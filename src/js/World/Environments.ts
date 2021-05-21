@@ -4,10 +4,12 @@ import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import { Mouse } from '../Tools/Mouse'
+import Time from '../Tools/Time'
 // @ts-ignore
 import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
+import Grass from './Grass'
 
 import { ENV_DISTANCE } from '../constants'
 import Camera from '../Camera'
@@ -19,6 +21,7 @@ import { modelLoader } from '../Tools/utils'
 const loader = new GLTFLoader()
 
 export default class Environments {
+  time: Time
   mouse: Mouse
   assets: any
   camera: Camera
@@ -27,9 +30,10 @@ export default class Environments {
   container: Object3D
   environments: Object3D[]
   handleScroll: Function
-  constructor(options: { assets?: any, mouse: Mouse, camera: Camera }) {
-    const { assets, mouse, camera } = options
+  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera }) {
+    const { time, assets, mouse, camera } = options
 
+    this.time = time
     this.mouse = mouse
     this.assets = assets
     this.camera = camera
@@ -49,13 +53,31 @@ export default class Environments {
 
   async createEnvironments() {
     this.environments = []
+
     for (let i = 0; i < 4; i++) {
-      this.environments[i] = (await loader.loadAsync(environmentsSrc)).scene
-      ;this.environments[i].children[0].scale.set(0.0005, 0.0005, 0.0005)
       this.environments[i].position.y = -2
+      const ground = (await loader.loadAsync(environmentsSrc)).scene
+      ;ground.children[0].scale.set(0.0005, 0.0005, 0.0005)
+
+      const grass = this.setGrass(ground)
+
+      this.environments[i] = new Object3D()
+      this.environments[i].add(ground, grass)
+      this.environments[i].position.y = -2
+      this.environments[i].position.z = - i * ENV_DISTANCE
     }
 
     this.container.add(...this.environments)
+  }
+
+  setGrass(ground) {
+    const grass = new Grass({
+      time: this.time,
+      assets: this.assets,
+      ground
+    })
+
+    return grass.container
   }
 
   setScroll() {

@@ -40,7 +40,7 @@ export default class WorldBuilder extends Component {
         super({ store })
         this.time = time
         this.scene = scene
-        this.ground = ground.container.children[0]
+        this.ground = ground.container.children[0].children[0]
         this.debug = debug
         this.onChange = () => null
         this.rangeValue = { value: 0 } // init
