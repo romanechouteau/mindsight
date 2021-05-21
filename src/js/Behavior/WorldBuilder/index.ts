@@ -35,12 +35,12 @@ export default class WorldBuilder extends Component {
     shapeCreator: ShapeCreator
     cursorAnimation?: any
     mapHeighter: MapHeighter
-    ground: Environments
+    ground: Object3D
     constructor({ scene, globalScene, time, debug, ground }: WorldBuilderParams) {
         super({ store })
         this.time = time
         this.scene = scene
-        this.ground = ground
+        this.ground = ground.container.children[0]
         this.debug = debug
         this.onChange = () => null
         this.rangeValue = { value: 0 } // init

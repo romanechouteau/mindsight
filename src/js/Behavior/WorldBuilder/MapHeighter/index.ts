@@ -15,7 +15,7 @@ import blendingVertex from '../../../../shaders/blendingVert.glsl'
 import blendingFragment from '../../../../shaders/blendingFrag.glsl'
 
 interface MapHeighterParams {
-    ground: Environments
+    ground: Mesh
     time: Time
 }
 
@@ -31,14 +31,14 @@ export default class MapHeighter {
     blendMaterial: RawShaderMaterial
     blendParams: { firstMapIndex, firstMapInfluence, secondMapIndex, secondMapInfluence }
     constructor({ ground, time }: MapHeighterParams) {
-        this.ground = ground.container.children[store.state.environment] as Mesh
+        this.ground = ground
         this.time = time
         this.handleChange = this.handleChange.bind(this)
         this.init()
     }
 
     async init() {
-        const src = [ collineSrc,montagneSrc,plaineSrc,valleeSrc,]        
+        const src = [ collineSrc,montagneSrc,plaineSrc,valleeSrc]
         const blendingScene = new Scene()
         const blendingRenderer = new WebGLRenderer()
         this.blendingCanvas = blendingRenderer.domElement
@@ -57,7 +57,7 @@ export default class MapHeighter {
                 map2: { type: "t", value: textures[1] } as IUniform,
                 map3: { type: "t", value: textures[2] } as IUniform,
                 map4: { type: "t", value: textures[3] } as IUniform,
-            }, 
+            },
         })
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )
 
@@ -78,7 +78,7 @@ export default class MapHeighter {
         const firstMapInfluence = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
         const secondMapInfluence = ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
         const values = [0, 0, 0, 0]
-        
+
         values[firstMapIndex] = firstMapInfluence
         values[secondMapIndex] = secondMapInfluence
         this.blendMaterial.uniforms.values.value = values
