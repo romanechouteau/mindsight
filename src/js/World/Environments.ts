@@ -1,16 +1,19 @@
-import { MeshStandardMaterial, Object3D, Color } from 'three'
+import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide } from 'three'
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import { Mouse } from '../Tools/Mouse'
 // @ts-ignore
-import envSrc1 from '@models/mapTest.glb'
+import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
 
 import { ENV_DISTANCE } from '../constants'
 import Camera from '../Camera'
+
+import collineSrc from '@textures/plage_colline_displacement.png'
+import { textureLoader } from '../Tools/utils'
 
 const loader = new GLTFLoader()
 
@@ -31,7 +34,6 @@ export default class Environments {
     this.camera = camera
     this.stopped = false
     this.isMoving = false
-    this.camera.container.position.y = 3
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -47,13 +49,20 @@ export default class Environments {
   async createEnvironments() {
     this.environments = []
     for (let i = 0; i < 4; i++) {
-      this.environments[i] = (await loader.loadAsync(envSrc1)).scene
-      this.environments[i].scale.set(0.01, 0.01, 0.01)
+      this.environments[i] = new Mesh(
+        new PlaneBufferGeometry(40, 40, 200, 200),
+        new MeshStandardMaterial({
+          color: new Color(`hsl(${255 / 4 * i}, 100%, 50%)`),
+          displacementMap: (await textureLoader.loadAsync(collineSrc)),
+          displacementScale: 10,
+          side: DoubleSide
+        })
+      )
+      // this.environments[i].scale.set(0.01, 0.01, 0.01)
       this.environments[i].rotation.y = Math.PI
+      this.environments[i].position.y = -5
+      this.environments[i].rotation.x = Math.PI/2
       this.environments[i].position.z = - i * ENV_DISTANCE
-      this.environments[i].children[0].material = new MeshStandardMaterial({
-        color: new Color(`hsl(${255 / 4 * i}, 100%, 50%)`)
-      })
     }
 
     this.container.add(...this.environments)

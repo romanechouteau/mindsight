@@ -1,5 +1,6 @@
 import { Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Matrix4 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import gsap from "gsap/all"
 
 export default class Camera {
   sizes: any
@@ -24,11 +25,12 @@ export default class Camera {
     this.setPosition()
     this.setOrbitControls()
     this.setRaycasterPlane()
+    this.moveIntro = this.moveIntro.bind(this)
   }
   setCamera() {
     // Create camera
     this.camera = new PerspectiveCamera(
-      75,
+      45,
       this.sizes.viewport.width / this.sizes.viewport.height,
       0.001,
       1000
@@ -45,7 +47,7 @@ export default class Camera {
   setPosition() {
     // Set camera position
     this.camera.position.x = 0
-    this.camera.position.y = 1
+    this.camera.position.y = 0
     this.camera.position.z = 5
   }
   setOrbitControls() {
@@ -91,5 +93,20 @@ export default class Camera {
     this.raycasterPlane.rotation.y = rotation.y
     this.raycasterPlane.rotation.z = rotation.z
     this.container.add(this.raycasterPlane)
+  }
+
+  moveIntro() {
+    const defaultY = this.camera.position.y
+    const defaultZ = this.camera.position.z
+    this.camera.position.y = 10
+    this.camera.position.z = 100
+
+    gsap.to(this.camera.position, {
+      delay: 0.3,
+      duration: 0.8,
+      y: defaultY,
+      z: defaultZ,
+      ease: 'power3.inOut'
+    })
   }
 }

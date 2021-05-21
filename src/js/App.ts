@@ -7,6 +7,8 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import * as dat from 'dat.gui'
 
 // @ts-ignore
+import Mouse from '@tools/Mouse'
+// @ts-ignore
 import Sizes from '@tools/Sizes'
 // // @ts-ignore
 // import Time from '@tools/Time'
@@ -19,11 +21,16 @@ import { Mouse } from '@tools/Mouse'
 import Camera from './Camera'
 // @ts-ignore
 import World from '@world/index'
+// @ts-ignore
+import store from '@store/index'
+
+import IntroController from './IntroController'
 
 import Stats from 'stats.js'
 import Time from './Tools/Time'
 import { createState, State } from './World/State'
 import PointerCursor from './Tools/PointerCursor'
+import Component from './Lib/Component'
 
 // @ts-ignore
 import bloomVertShader from '@shaders/bloomVert.glsl'
@@ -35,9 +42,9 @@ const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
 
-export default class App {
+export default class App extends Component {
   canvas: any
-  time: any
+  time: Time
   sizes: any
   scene: Scene
   renderer: WebGLRenderer
@@ -49,28 +56,34 @@ export default class App {
   state: { time: Time }
   bloomLayer: Layers
   pointerCursor: PointerCursor
+  intro: IntroController
   bloomPass: UnrealBloomPass
   bloomComposer: EffectComposer
   finalComposer: EffectComposer
   constructor(options) {
+    super({
+      store
+    })
+
     // Set options
     this.canvas = options.canvas
 
     // Set up
     this.time = new Time()
     this.sizes = new Sizes()
+    this.mouse = Mouse
     // this.assets = new Assets()
     this.mouse = new Mouse()
 
     // ! Only state shall be accessed on global App namespace
     this.state = createState()
-
     this.setConfig()
     this.setRenderer()
     this.setCamera()
     this.setPostprocessing()
     this.setWorld()
     this.setPointerCursor()
+    this.render()
 
   }
   setPointerCursor() {
@@ -210,11 +223,12 @@ export default class App {
       time: this.time,
       debug: this.debug,
       mouse: this.mouse,
+      sizes: this.sizes,
       camera: this.camera,
-      pixelRatio: this.renderer.getPixelRatio(),
       canvas: this.canvas,
-      globalScene: this.scene
-      //   assets: this.assets,
+      globalScene: this.scene,
+      pixelRatio: this.renderer.getPixelRatio()
+    //   assets: this.assets,
     })
     // Add world to scene
     this.scene.add(this.world.container)
@@ -225,6 +239,14 @@ export default class App {
     }
   }
 
+  render = () => {
+    if (store.state.isIntro) {
+      this.intro = new IntroController({time: this.time, debug: this.debug})
+    } else if (document.querySelector('#intro')) {
+      this.intro.dispose()
+    }
+  }
+  
   darkenNonBloomed(obj) {
     if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {
       obj.material.colorWrite = false

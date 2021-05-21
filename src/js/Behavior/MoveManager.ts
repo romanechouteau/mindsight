@@ -6,6 +6,7 @@ import Camera from '../Camera'
 // TODO: add app in global namespace
 import Ground from "../World/Ground"
 import { Mouse } from '../Tools/Mouse'
+
 import { BLOOM_LAYER, CURSOR_SIZE } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
@@ -48,7 +49,7 @@ export default class MoveManager {
         this.camera = camera
         this.canvas = canvas
         this.scene = scene
-        this.ground = ground.container.children[0].children[0]
+        this.ground = ground.container.children[0]
         this.pixelRatio = pixelRatio
 
         this.raycaster = new Raycaster()
@@ -176,6 +177,7 @@ export default class MoveManager {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
+
                 this.isMoving = true
                 gsap.to(this.camera.container.position, {
                     delay: 0.25,

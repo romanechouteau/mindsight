@@ -26,7 +26,7 @@ export const htmlUtils = {
     renderToDOM: (element: HTMLElement, string: string, variables: any) => {
         let html = string
         Object.keys(variables).forEach(variable => {
-            html = html.replace(new RegExp(`\{\{${variable}\}\}`, 'i'), variables[variable])
+            html = html.replace(new RegExp(`\{\{${variable}\}\}`, 'gi'), variables[variable])
         })
 
         const parser = new DOMParser()
@@ -36,5 +36,16 @@ export const htmlUtils = {
         for (const node of Array.from(markup.body.childNodes)) {
           element.appendChild(node)
         }
+    },
+    createHTMLFromTemplate: (string: string, variables: any) => {
+        let html = string
+        Object.keys(variables).forEach(variable => {
+            html = html.replace(new RegExp(`\{\{${variable}\}\}`, 'gi'), variables[variable])
+        })
+
+        return html
+    },
+    insertHTMLInTemplate: (template: string, html: string, name: string) => {
+        return template.replace(new RegExp(`\{\{${name}\}\}`, 'gi'), html)
     }
 }

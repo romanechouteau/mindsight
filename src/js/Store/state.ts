@@ -9,13 +9,14 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 2,
+    scene: 0,
     audioInputMode: AUDIO_INPUT_MODES.NONE,
     spotifyAudioData: {
         sectionIndex: null
     },
     worldBuilder: {
-        step: WORLDBUILDER_STEPS.SHAPE
+        step: WORLDBUILDER_STEPS.GROUND
     },
-    environment: 0
+    environment: 0,
+    isIntro: true
   };
