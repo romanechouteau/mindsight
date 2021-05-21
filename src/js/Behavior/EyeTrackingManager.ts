@@ -276,7 +276,10 @@ export default class EyeTrackingManager extends Component {
 
     stop() {
         webgazer.pause()
-        document.getElementById('webgazerVideoContainer').remove()
+        const webgazerContainer = document.getElementById('webgazerVideoContainer')
+        if (webgazerContainer) {
+            webgazerContainer.remove()
+        }
         this.eyeMovement.cancel()
 
         this.render = () => {}
