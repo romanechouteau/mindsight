@@ -280,6 +280,7 @@ export default class EyeTrackingManager extends Component {
         this.eyeMovement.cancel()
 
         this.render = () => {}
+        this.stopped = true
 
         store.dispatch('updateScene', SCENES.ENVIRONMENT)
 
