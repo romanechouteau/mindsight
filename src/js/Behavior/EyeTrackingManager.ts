@@ -95,7 +95,9 @@ export default class EyeTrackingManager extends Component {
         const x = (data.x / this.sizes.viewport.width - 0.5) * 2
         const y = - (data.y / this.sizes.viewport.height - 0.5) * 2
 
-        this.eyeMovement(x, -y)
+        if (this.stopped === false) {
+            this.eyeMovement(x, -y)
+        }
 
         if (this.calibrated) {
             this.checkInZone(x, y)
@@ -276,11 +278,11 @@ export default class EyeTrackingManager extends Component {
 
     stop() {
         webgazer.pause()
+        this.eyeMovement.cancel()
         const webgazerContainer = document.getElementById('webgazerVideoContainer')
         if (webgazerContainer) {
             webgazerContainer.remove()
         }
-        this.eyeMovement.cancel()
 
         this.render = () => {}
         this.stopped = true
