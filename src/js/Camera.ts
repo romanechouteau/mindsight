@@ -48,7 +48,7 @@ export default class Camera {
     // Set camera position
     this.camera.position.x = 0
     this.camera.position.y = 0
-    this.camera.position.z = 5
+    this.camera.position.z = 30
   }
   setOrbitControls() {
     // Set orbit control

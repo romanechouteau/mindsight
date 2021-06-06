@@ -72,7 +72,7 @@ export default class SkyCreator {
         const fogColor2 = this.mix(this.toRGB(secondColors[0]), this.toRGB(secondColors[1]), 0.5)
         const fogColor = this.mix(fogColor1, fogColor2, percentage, true)
 
-        this.globalScene.fog = new FogExp2(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`, 0.03)
+        // this.globalScene.fog = new FogExp2(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`, 0.03)
     }
 
     setMovement() {

@@ -239,13 +239,13 @@ export default class App extends Component {
     }
   }
 
-  render = () => {
-    if (store.state.isIntro && this.intro === undefined) {
-      this.intro = new IntroController({time: this.time, debug: this.debug})
-    } else if (document.querySelector('#intro')) {
-      this.intro.dispose()
-    }
-  }
+  // render = () => {
+  //   if (store.state.isIntro) {
+  //     this.intro = new IntroController({time: this.time, debug: this.debug})
+  //   } else if (document.querySelector('#intro')) {
+  //     this.intro.dispose()
+  //   }
+  // }
 
   darkenNonBloomed(obj) {
     if ((obj.isMesh || obj.isPoints) && this.bloomLayer.test(obj.layers) === false) {

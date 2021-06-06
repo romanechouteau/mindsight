@@ -1,9 +1,13 @@
-import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, Texture } from 'three'
+import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, Texture, ShaderMaterial, MeshStandardMaterial, Color, DoubleSide, MeshBasicMaterial } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
 
 // @ts-ignore
 import grassSrc from '@models/grass.gltf'
+// @ts-ignore
+import vertexShader from '@shaders/grassVert.glsl'
+// @ts-ignore
+import fragmentShader from '@shaders/grassFrag.glsl'
 
 const loader = new GLTFLoader()
 
@@ -22,6 +26,7 @@ export default class Grass {
   rotationX: number
   grassMesh: InstancedMesh
   container: Object3D
+  grassMaterial: ShaderMaterial
   displacementMap: Texture
   constructor(options: { time: any, assets: any, ground: Mesh, rotationX: number, displacementMap: Texture }) {
     // Options
@@ -48,13 +53,23 @@ export default class Grass {
 
   async init() {
     await this.createGrass()
+    this.setMovement()
   }
 
   async createGrass() {
     const grassScene = (await loader.loadAsync(grassSrc)).scene
     const grassModel = grassScene.children[0] as Mesh
     const grassGeometry = grassModel.geometry.clone()
-    this.grassMesh = new InstancedMesh(grassGeometry, grassModel.material, this.params.count)
+    this.grassMaterial = new ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        uTime: { value: 0 },
+        uDisplacement: { value: this.displacementMap }
+      },
+      side: DoubleSide
+    })
+    this.grassMesh = new InstancedMesh(grassGeometry, this.grassMaterial, this.params.count)
 
     const defaultTransform = new Matrix4()
         .makeRotationX(this.rotationX)
@@ -88,5 +103,11 @@ export default class Grass {
     }
 
     this.grassMesh.instanceMatrix.needsUpdate = true
+  }
+
+  setMovement () {
+    this.time.on('tick', () => {
+      this.grassMaterial.uniforms.uTime.value += 0.01
+    })
   }
 }
