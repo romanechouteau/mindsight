@@ -1,7 +1,11 @@
 import { Float32BufferAttribute, Group, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from "three"
+// @ts-ignore
 import shape3Src from '@models/testShape1.glb'
+// @ts-ignore
 import shape4Src from '@models/testShape2.glb'
+// @ts-ignore
 import shape1Src from '@models/Rond.gltf'
+// @ts-ignore
 import shape2Src from '@models/Triangle.gltf'
 import { modelLoader } from '../../Tools/utils';
 import { SHAPE_NUMBER, WORLDBUILDER_PRECISION } from "../../constants";
@@ -26,8 +30,8 @@ export default class ShapeCreator {
     async init () {
         this.container = new Group()
         this.container.name = 'World Shapes'
-        this.shapes = 
-            (await Promise.all([ 
+        this.shapes =
+            (await Promise.all([
                 modelLoader.loadAsync(shape1Src),
                 modelLoader.loadAsync(shape2Src),
                 modelLoader.loadAsync(shape3Src),

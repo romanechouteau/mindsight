@@ -12,6 +12,7 @@ import store from '@store/index'
 import { ENV_DISTANCE } from '../constants'
 import Camera from '../Camera'
 
+// @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
 import { textureLoader } from '../Tools/utils'
 

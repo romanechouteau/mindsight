@@ -4,6 +4,7 @@ import gsap from "gsap/all"
 
 import store from '../../../js/Store'
 import Component from '../../../js/Lib/Component';
+// @ts-ignore
 import template from '../../../templates/worldBuilder.template';
 import SkyCreator from './SkyCreator'
 import ShapeCreator from './ShapeCreator'
@@ -144,6 +145,7 @@ export default class WorldBuilder extends Component {
             })
             this.onChange = this.skyCreator.handleChange
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
+            // @ts-ignore
             this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time })
             this.onChange = this.mapHeighter.handleChange
         }
