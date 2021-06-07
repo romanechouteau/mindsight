@@ -1,4 +1,4 @@
-import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute } from 'three'
+import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute, Points, PointsMaterial } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
 
@@ -30,13 +30,12 @@ export default class Grass {
   container: Object3D
   grassMaterial: ShaderMaterial
   environmentKey: string
-  constructor(options: { time: any, assets: any, ground: Mesh, rotationX: number, environmentKey: string }) {
+  constructor(options: { time: any, assets: any, ground: Mesh, environmentKey: string }) {
     // Options
-    const { time, assets, ground, rotationX, environmentKey } = options
+    const { time, assets, ground, environmentKey } = options
     this.time = time
     this.assets = assets
     this.ground = ground
-    this.rotationX = rotationX
     this.environmentKey = environmentKey || ENVIRONMENTS.BEACH
 
     // Set up
@@ -77,8 +76,8 @@ export default class Grass {
     this.grassMesh = new InstancedMesh(grassGeometry, this.grassMaterial, this.params.count)
 
     const defaultTransform = new Matrix4()
-        .makeRotationX(this.rotationX + Math.PI / 2)
-        .multiply( new Matrix4().makeScale(0.005, 0.005, 0.005))
+        .makeRotationX(Math.PI / 2)
+        .multiply(new Matrix4().makeScale(10., 10., 10.))
 
     grassGeometry.applyMatrix4(defaultTransform)
     this.grassMesh.instanceMatrix.setUsage(DynamicDrawUsage)
@@ -96,6 +95,12 @@ export default class Grass {
     this.sampler = new MeshSurfaceSampler(this.surface)
         .setWeightAttribute(null)
         .build()
+
+    const testMaterial = new PointsMaterial({ morphTargets: true })
+    this.test = new Points(this.ground.geometry, testMaterial)
+    this.test.morphTargetInfluences = this.ground.morphTargetInfluences
+    this.test.morphTargetDictionary = this.ground.morphTargetDictionary
+    this.container.add(this.test)
 
     const special = []
 
@@ -121,6 +126,7 @@ export default class Grass {
   setMovement () {
     this.time.on('tick', () => {
       this.grassMaterial.uniforms.uTime.value += 0.01
+      this.test.morphTargetInfluences = this.ground.morphTargetInfluences
     })
   }
 }

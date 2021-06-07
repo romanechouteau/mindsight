@@ -57,14 +57,15 @@ export default class Environments {
 
     for (let i = 0; i < environmentKeys.length; i++) {
       const ground = (await loader.loadAsync(environmentsSrc)).scene
-      ;ground.children[0].scale.set(0.0005, 0.0005, 0.0005)
 
       const grass = this.setGrass(ground, environmentKeys[i])
 
       this.environments[i] = new Object3D()
-      this.environments[i].add(ground, grass)
+      // this.environments[i].add(ground, grass)
+      this.environments[i].add(grass)
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE
+      this.environments[i].scale.set(0.0005, 0.0005, 0.0005)
     }
 
     this.container.add(...this.environments)
@@ -74,7 +75,7 @@ export default class Environments {
     const grass = new Grass({
       time: this.time,
       assets: this.assets,
-      ground,
+      ground: ground.children[0],
       environmentKey
     })
 
