@@ -11,7 +11,7 @@ import envSrc1 from '@models/plane_vierge.glb'
 import store from '@store/index'
 import Grass from './Grass'
 
-import { ENV_DISTANCE } from '../constants'
+import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
 import environmentsSrc from '../../models/Environnement_MorphTag.glb'
@@ -53,13 +53,13 @@ export default class Environments {
 
   async createEnvironments() {
     this.environments = []
+    const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW, ENVIRONMENTS.TEST]
 
-    for (let i = 0; i < 4; i++) {
-      this.environments[i].position.y = -2
+    for (let i = 0; i < environmentKeys.length; i++) {
       const ground = (await loader.loadAsync(environmentsSrc)).scene
       ;ground.children[0].scale.set(0.0005, 0.0005, 0.0005)
 
-      const grass = this.setGrass(ground)
+      const grass = this.setGrass(ground, environmentKeys[i])
 
       this.environments[i] = new Object3D()
       this.environments[i].add(ground, grass)
@@ -70,11 +70,12 @@ export default class Environments {
     this.container.add(...this.environments)
   }
 
-  setGrass(ground) {
+  setGrass(ground, environmentKey) {
     const grass = new Grass({
       time: this.time,
       assets: this.assets,
-      ground
+      ground,
+      environmentKey
     })
 
     return grass.container
