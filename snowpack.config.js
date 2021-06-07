@@ -27,7 +27,7 @@ module.exports = {
     plugins: [
         '@snowpack/plugin-typescript',
         'snowpack-plugin-stylus',
-        '@canarise/snowpack-eslint-plugin',
+        // '@canarise/snowpack-eslint-plugin',
         ["snowpack-plugin-raw-file-loader", {
           exts: [".frag", ".vert", ".glsl", ".template"]
         }],
