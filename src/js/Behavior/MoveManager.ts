@@ -61,7 +61,8 @@ export default class MoveManager {
             transparent: true,
             uniforms: {
                 uTime: { value: 0. },
-                uOpacity: { value: 1. }
+                uOpacity: { value: 1. },
+                uMouse: { value: [0., 0.] }
             },
             side: DoubleSide
         })
@@ -92,9 +93,11 @@ export default class MoveManager {
             this.cursor.frustumCulled = true
             this.cursor.layers.enable(BLOOM_LAYER)
 
-            const geometry = new DecalGeometry(this.ground, this.cursor.position, new Euler(0, 0, 0, 'YXZ'), CURSOR_SIZE)
-            this.cursorBase = new Mesh(geometry, this.cursorMaterial)
-            this.cursorBase.position.y = 0.05
+            this.cursorBase = new Mesh(this.ground.geometry, this.cursorMaterial)
+            this.cursorBase.position.set(this.ground.position.x, this.ground.position.y, this.ground.position.z)
+            this.cursorBase.scale.set(this.ground.scale.x, this.ground.scale.y, this.ground.scale.z)
+            this.cursorBase.rotation.set(this.ground.rotation.x, this.ground.rotation.y, this.ground.rotation.z)
+            this.cursorBase.position.y += 0.02
             this.cursorBase.layers.enable(BLOOM_LAYER)
 
             this.scene.add(this.cursor)
@@ -134,18 +137,9 @@ export default class MoveManager {
 
                 if (this.lastIntersection) {
                     this.cursor.position.copy(this.lastIntersection.point)
-                    this.rotationHelper.position.copy(this.lastIntersection.point)
                     this.cursor.position.y += 0.05
 
-                    const orientation = this.lastIntersection.face.normal.clone()
-                    orientation.transformDirection( this.ground.matrixWorld )
-                    orientation.multiplyScalar( 10 )
-                    orientation.add(this.lastIntersection.point)
-
-                    this.rotationHelper.lookAt(orientation)
-                    const oldGeometry = this.cursorBase.geometry
-                    this.cursorBase.geometry = new DecalGeometry(this.ground, this.cursor.position, this.rotationHelper.rotation, CURSOR_SIZE)
-                    oldGeometry.dispose()
+                    this.cursorMaterial.uniforms.uMouse.value = this.lastIntersection.uv
                 }
 
                 // update shader
