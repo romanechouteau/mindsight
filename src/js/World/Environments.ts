@@ -1,4 +1,4 @@
-import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial } from 'three'
+import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial, FrontSide } from 'three'
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -52,7 +52,8 @@ export default class Environments {
     for (let i = 0; i < 4; i++) {
       this.environments[i] = (await loader.loadAsync(environmentsSrc)).scene
       ;this.environments[i].children[0].scale.set(0.0005, 0.0005, 0.0005)
-      this.environments[i].position.y = -2
+      ;(this.environments[i].children[0] as Mesh).material.side = FrontSide
+      ;this.environments[i].position.y = -2
     }
 
     this.container.add(...this.environments)

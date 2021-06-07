@@ -19,23 +19,20 @@ export default class Gravity {
     }
 
     initCollisions() {
-        console.log('fall');
-        
         this.time.on('tick', () => {
             for (const gObject of this.gravityObjects) {
-                debugger
                 if (gObject.raycaster.intersectObject(this.ground, true).length && gObject.raycaster.intersectObject(this.ground, true)[0].distance > 0) {
                     const {distance} = gObject.raycaster.intersectObject(this.ground, true)[0]
-                    // if (distance < 0.06) { // replace
-                        
-                    // } else 
-                    if (distance > 0.5) { // fall
-                        // debugger
+                    if (distance > 0.3) { // fall
                         gObject.object.position.y -= 0.05
                         gObject.raycaster.set( gObject.object.position, new Vector3(0, -1, 0) )
                     } // else, idle
+                    else if (distance < 0.2) {
+                        gObject.object.position.y += 0.05
+                        gObject.raycaster.set( gObject.object.position, new Vector3(0, -1, 0) )
+                    }
                 } else {
-                    gObject.object.position.y += 0.05
+                    gObject.object.position.y += 0.5
                     gObject.raycaster.set( gObject.object.position, new Vector3(0, -1, 0) )
                 }
             }
