@@ -143,7 +143,9 @@ export default class MoveManager {
                     orientation.add(this.lastIntersection.point)
 
                     this.rotationHelper.lookAt(orientation)
+                    const oldGeometry = this.cursorBase.geometry
                     this.cursorBase.geometry = new DecalGeometry(this.ground, this.cursor.position, this.rotationHelper.rotation, CURSOR_SIZE)
+                    oldGeometry.dispose()
                 }
 
                 // update shader
