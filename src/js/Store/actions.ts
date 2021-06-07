@@ -5,6 +5,9 @@ export default {
     updateScene(context, payload) {
         context.commit('updateScene', payload)
     },
+    updateWorldBuilderStep(context, payload) {
+        context.commit('updateWorldBuilderStep', payload)
+    },
     chooseAudio(context, payload) {
         context.commit('chooseAudio', payload)
     },

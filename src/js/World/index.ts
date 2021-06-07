@@ -15,6 +15,7 @@ import Suzanne from './Suzanne'
 import Environments from './Environments'
 import SceneManager from "../Behavior/SceneManager"
 import AudioManager from "../Behavior/AudioManager"
+import PointerCursor from '../Tools/PointerCursor'
 // @ts-ignore
 import Component from '@lib/Component'
 import PointLightSource from './PointLight'
@@ -45,6 +46,7 @@ export default class World extends Component {
   sceneManager: SceneManager
   worldBuilder: WorldBuilder
   environments: Environments
+  pointerCursor: PointerCursor
   eyeTrackingManager: EyeTrackingManager
   constructor(options) {
     super({
@@ -60,6 +62,7 @@ export default class World extends Component {
     this.canvas = options.canvas
     this.pixelRatio = options.pixelRatio
     this.globalScene = options.globalScene
+    this.pointerCursor = options.pointerCursor
     // Set up
     this.container = new Object3D()
     this.container.name = 'World'
@@ -139,7 +142,9 @@ export default class World extends Component {
   }
 
   setSceneManager() {
-    this.sceneManager = new SceneManager()
+    this.sceneManager = new SceneManager({
+      pointerCursor: this.pointerCursor
+    })
   }
 
   setWorldBuilder() {
@@ -148,7 +153,8 @@ export default class World extends Component {
       globalScene: this.globalScene,
       time: this.time,
       debug: this.debug,
-      ground: this.environments
+      ground: this.environments,
+      pointerCursor: this.pointerCursor
     })
   }
 
@@ -167,6 +173,8 @@ export default class World extends Component {
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.setWorldBuilder()
+    } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
+      this.worldBuilder.stop()
     }
 
     if (store.state.scene === SCENES.BRUSH) {

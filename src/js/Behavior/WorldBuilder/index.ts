@@ -20,7 +20,8 @@ interface WorldBuilderParams {
     scene: Object3D,
     globalScene: Scene
     debug?: dat.GUI
-    ground: Environments
+    ground: Environments,
+    pointerCursor: PointerCursor
 }
 
 export default class WorldBuilder extends Component {
@@ -28,7 +29,9 @@ export default class WorldBuilder extends Component {
     scene: Object3D
     range: HTMLInputElement
     debug?: dat.GUI
+    stopped: Boolean
     onChange: Function
+    controller: HTMLCanvasElement
     skyCreator: SkyCreator
     rangeValue: { value: number }
     globalScene: Scene
@@ -36,15 +39,18 @@ export default class WorldBuilder extends Component {
     cursorAnimation?: any
     mapHeighter: MapHeighter
     ground: Object3D
-    constructor({ scene, globalScene, time, debug, ground }: WorldBuilderParams) {
+    pointerCursor: PointerCursor
+    constructor({ scene, globalScene, time, debug, ground, pointerCursor }: WorldBuilderParams) {
         super({ store })
         this.time = time
         this.scene = scene
         this.ground = ground.container.children[0].children[0]
         this.debug = debug
+        this.stopped = false
         this.onChange = () => null
         this.rangeValue = { value: 0 } // init
         this.globalScene = globalScene
+        this.pointerCursor = pointerCursor
         this.init()
     }
 
@@ -59,26 +65,12 @@ export default class WorldBuilder extends Component {
         html = html.replace('%height%', window.innerHeight/5 * window.devicePixelRatio)
         document.querySelector('#worldBuilder').innerHTML = html
         this.addWaves()
-        const controller = document.querySelector('#worldBuilder canvas') as HTMLCanvasElement
-        controller.addEventListener('mouseenter', (e: MouseEvent) => {
-            PointerCursor.snap('y', controller.getBoundingClientRect().top + controller.height / 8)
-        })
-        controller.addEventListener('mouseleave', (e: MouseEvent) => {
-            PointerCursor.unsnap('y')
-        })
-        controller.addEventListener('mousemove', (e: MouseEvent) => {
-            const value = Math.round(e.clientX / window.innerWidth * WORLDBUILDER_MAX_VALUE)
-            this.cursorAnimation?.kill()
-            this.cursorAnimation = gsap.to(this.rangeValue, {
-                value,
-                ease: 'circ.out',
-                duration: 2,
-                onUpdate: this.onChange,
-                onUpdateParams: [this.rangeValue.value],
-                onComplete: this.onChange,
-                onCompleteParams: [this.rangeValue.value],
-            })
-        })
+        this.controller = document.querySelector('#worldBuilder canvas') as HTMLCanvasElement
+        this.controller.addEventListener('mouseenter', this.mouseEnter.bind(this))
+        this.controller.addEventListener('mouseleave', this.mouseLeave.bind(this))
+        this.controller.addEventListener('mousemove', this.mouseMove.bind(this))
+        this.controller.addEventListener('mousedown', this.mouseDown.bind(this))
+        this.controller.addEventListener('mouseup', this.mouseUp.bind(this))
     }
 
     addWaves() {
@@ -89,7 +81,7 @@ export default class WorldBuilder extends Component {
         const config = { steps: 200, opacity: 1, waveLength: 50, speed: 250, offset: 0, height: 50, width: 0.2 }
         ctx.imageSmoothingEnabled = true;
         const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
-        this.time.on('tick', () => {
+        this.time.on('tick.worldBuilder', () => {
             ctx.clearRect(0, 0, width, height)
             this.drawWave(ctx, width, height, configs[0])
             this.drawWave(ctx, width, height, configs[1])
@@ -133,10 +125,10 @@ export default class WorldBuilder extends Component {
     }
 
     render = () => {
-        if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SHAPE) {
+        if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SHAPE && this.shapeCreator === undefined) {
             this.shapeCreator = new ShapeCreator({scene: this.scene})
             this.onChange = this.shapeCreator.handleChange
-        } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
+        } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY && this.skyCreator === undefined) {
             this.skyCreator = new SkyCreator({
                 scene: this.scene,
                 globalScene: this.globalScene,
@@ -147,5 +139,61 @@ export default class WorldBuilder extends Component {
             this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time })
             this.onChange = this.mapHeighter.handleChange
         }
+    }
+
+    stop () {
+        document.querySelector('#worldBuilder').innerHTML = ''
+
+        this.render = () => {}
+        this.stopped = true
+
+        this.controller.removeEventListener('mouseenter', this.mouseEnter)
+        this.controller.removeEventListener('mouseleave', this.mouseLeave)
+        this.controller.removeEventListener('mousemove', this.mouseMove)
+        this.controller.removeEventListener('mousedown', this.mouseDown)
+        this.controller.removeEventListener('mouseup', this.mouseUp)
+        this.pointerCursor.unsnap('y')
+
+        this.time.off('tick.worldBuilder')
+    }
+
+    mouseEnter () {
+        this.pointerCursor.snap('y', this.controller.getBoundingClientRect().top + this.controller.height / 8)
+    }
+
+    mouseLeave () {
+        this.pointerCursor.unsnap('y')
+    }
+
+    mouseMove (e: MouseEvent) {
+        const value = Math.round(e.clientX / window.innerWidth * WORLDBUILDER_MAX_VALUE)
+        this.cursorAnimation?.kill()
+        this.cursorAnimation = gsap.to(this.rangeValue, {
+            value,
+            ease: 'circ.out',
+            duration: 2,
+            onUpdate: this.onChange,
+            onUpdateParams: [this.rangeValue.value],
+            onComplete: this.onChange,
+            onCompleteParams: [this.rangeValue.value],
+        })
+    }
+
+    mouseDown () {
+        this.pointerCursor.startHold(this.handleNextStep)
+    }
+
+    mouseUp () {
+        this.pointerCursor.stopHold()
+    }
+
+    handleNextStep () {
+        if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
+            return store.dispatch('updateScene', store.state.scene + 1)
+        }
+        const nextStep = store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND
+            ? WORLDBUILDER_STEPS.SHAPE
+            : WORLDBUILDER_STEPS.SKY
+        store.dispatch('updateWorldBuilderStep', nextStep)
     }
 }

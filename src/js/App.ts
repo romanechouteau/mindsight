@@ -81,13 +81,15 @@ export default class App extends Component {
     this.setRenderer()
     this.setCamera()
     this.setPostprocessing()
-    this.setWorld()
     this.setPointerCursor()
+    this.setWorld()
     this.render()
 
   }
   setPointerCursor() {
-    this.pointerCursor = PointerCursor
+    this.pointerCursor = new PointerCursor({
+      time: this.time
+    })
   }
   setRenderer() {
     // Set scene
@@ -227,7 +229,8 @@ export default class App extends Component {
       camera: this.camera,
       canvas: this.canvas,
       globalScene: this.scene,
-      pixelRatio: this.renderer.getPixelRatio()
+      pixelRatio: this.renderer.getPixelRatio(),
+      pointerCursor: this.pointerCursor
     //   assets: this.assets,
     })
     // Add world to scene
