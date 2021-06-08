@@ -1,5 +1,6 @@
-import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute, Points, PointsMaterial } from 'three'
+import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute, Points, PointsMaterial, MeshNormalMaterial } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
 
 // @ts-ignore
@@ -91,16 +92,41 @@ export default class Grass {
   resample () {
     const groundGeometry = this.ground.geometry.toNonIndexed()
     const groundMaterial = this.ground.material
-    this.surface = new Mesh(groundGeometry, groundMaterial)
-    this.sampler = new MeshSurfaceSampler(this.surface)
-        .setWeightAttribute(null)
-        .build()
+    // this.surface = new Mesh(groundGeometry, groundMaterial)
+    // this.sampler = new MeshSurfaceSampler(this.surface)
+    //     .setWeightAttribute(null)
+    //     .build()
 
     const testMaterial = new PointsMaterial({ morphTargets: true })
     this.test = new Points(this.ground.geometry, testMaterial)
     this.test.morphTargetInfluences = this.ground.morphTargetInfluences
     this.test.morphTargetDictionary = this.ground.morphTargetDictionary
     this.container.add(this.test)
+
+    const positions = Array.from(this.test.geometry.attributes.position.array)
+    let points = []
+    let i = 0
+    const influences = this.test.morphTargetInfluences
+    const targets = this.test.geometry.morphAttributes.position
+    console.log(this.test.geometry)
+    while (i < positions.length) {
+      // const x = influences[0] * targets[0].array[i] + influences[1] * targets[1].array[i] + influences[2] * targets[2].array[i]
+      // const y = influences[0] * targets[0].array[i + 1] + influences[1] * targets[1].array[i + 1] + influences[2] * targets[2].array[i + 1]
+      // const z = influences[0] * targets[0].array[i + 2] + influences[1] * targets[1].array[i + 2] + influences[2] * targets[2].array[i + 2]
+      // console.log(x)
+      // points.push(new Vector3(x, y, z))
+      // i += 5
+
+      points.push(new Vector3(positions[i],positions[i + 1], positions[i +2]))
+      i += 3
+    }
+    const surface = new ConvexGeometry(points)
+    const material = new MeshNormalMaterial
+
+    this.surface = new Mesh(surface, material)
+    this.sampler = new MeshSurfaceSampler(this.test)
+        .setWeightAttribute(null)
+        .build()
 
     const special = []
 
