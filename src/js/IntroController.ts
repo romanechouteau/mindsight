@@ -22,12 +22,15 @@ export default class IntroController {
     waveHeight: number
     debug?: dat.GUI
     timeouts: any
+    fullWorker: Worker
+    rightWorker: Worker
+    leftWorker: Worker
+    configKeys: string[]
 
     constructor({time, debug}) {
         this.time = time
         this.debug = debug
         this.createHtml()
-        this.bindHtml()
         this.waveHeight = 200
         this.fullLineConfigs = [
             { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 },
@@ -45,6 +48,14 @@ export default class IntroController {
             { ...waveBaseConfig, offset: 4, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 1 },
             { ...waveBaseConfig, widthReductor: 2.2, height: this.waveHeight, speed: 550, steps: 400, inflexionPoint: 1 }
         ]
+
+        this.configKeys = Object.keys(this.fullLineConfigs[0])
+
+        this.fullWorker = new Worker(new URL('./Workers/IntroControllerWorker.js', import.meta.url), { type: 'module' })
+        this.leftWorker = new Worker(new URL('./Workers/IntroControllerWorker.js', import.meta.url), { type: 'module' })
+        this.rightWorker = new Worker(new URL('./Workers/IntroControllerWorker.js', import.meta.url), { type: 'module' })
+        
+        this.bindHtml()
 
         this.timeouts = {
             fadeTitle: 2000,
@@ -66,7 +77,7 @@ export default class IntroController {
             Object.keys(this.timeouts).forEach(key => timeoutsFolder.add(this.timeouts, key))
         }
 
-        this.addWave(this.fullCanvas, 'tick.introFullCanvas', this.fullLineConfigs)
+        this.addWave(this.fullWorker, 'tick.introFullCanvas', this.fullLineConfigs)
         this.initTicker()
         this.initLogoAnimation()
     }
@@ -95,44 +106,60 @@ export default class IntroController {
 
     bindHtml() {
         this.fullCanvas = document.querySelector('canvas#full')
+        const fullOffscreen = this.fullCanvas.transferControlToOffscreen()
+        this.fullWorker.postMessage({ canvas: fullOffscreen }, [fullOffscreen])
         this.leftCanvas = document.querySelector('canvas#left')
+        const leftOffscreen = this.leftCanvas.transferControlToOffscreen()
+        this.leftWorker.postMessage({ canvas: leftOffscreen }, [leftOffscreen])
         this.rightCanvas = document.querySelector('canvas#right')
+        const rightOffscreen = this.rightCanvas.transferControlToOffscreen()
+        this.rightWorker.postMessage({ canvas: rightOffscreen }, [rightOffscreen])
         this.title = document.querySelector('.title')
         this.headPhoneImage = document.querySelector('.headphone')
     }
 
-    addWave(canvas: HTMLCanvasElement, evtNameSpace: string , configs: drawWaveConfig[]) {
-        const ctx = canvas.getContext('2d')
-        const {width, height} = canvas
+    addWave(worker: Worker, evtNameSpace: string , configs: drawWaveConfig[]) {
+        // const _configs: drawWaveConfig = {}
+
+        worker.postMessage({ configs: configs.map(conf => ({ ...conf, _gsap: null })) })
         this.time.on(evtNameSpace, () => {
-            ctx.clearRect(0, 0, width, height)
-            drawWave(ctx, width, height, configs[0], this.time)
-            drawWave(ctx, width, height, configs[1], this.time)
-            drawWave(ctx, width, height, configs[2], this.time)
+            worker.postMessage({ action: 'drawWave', elapsed: this.time.elapsed })
         })
     }
 
     toggleLineMovement() {
         let height = 0
         if (this.fullLineConfigs[0].height === 0) height = this.waveHeight
-        ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
-            gsap.to(configs[0], {
+        ;[{conf: this.fullLineConfigs, worker: this.fullWorker}, {conf: this.leftLineConfigs, worker: this.leftWorker}, {conf: this.rightLineConfigs, worker: this.rightWorker}].forEach(configs => {
+            gsap.to(configs.conf[0], {
                 height: height,
                 widthReductor: 1.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    // debugger
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
+                }
             })
-            gsap.to(configs[1], {
+            gsap.to(configs.conf[1], {
                 height: height,
                 widthReductor: 1.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    // debugger
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
+                }
             })
-            gsap.to(configs[2], {
+            gsap.to(configs.conf[2], {
                 height: height,
                 widthReductor: 1.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    // debugger
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
+                }
             })
         })
     }
@@ -144,8 +171,8 @@ export default class IntroController {
     }
 
     enableSideLines() {
-        this.addWave(this.leftCanvas, 'tick.introLeftCanvas', this.leftLineConfigs)
-        this.addWave(this.rightCanvas, 'tick.introRightCanvas', this.rightLineConfigs)
+        this.addWave(this.leftWorker, 'tick.introLeftCanvas', this.leftLineConfigs)
+        this.addWave(this.rightWorker, 'tick.introRightCanvas', this.rightLineConfigs)
         // @ts-ignore
         this.leftCanvas.attributeStyleMap.set('width', CSS.vw(40))
         // @ts-ignore
@@ -174,24 +201,33 @@ export default class IntroController {
     }
 
     flyLines() {
-        ;[this.leftLineConfigs, this.rightLineConfigs].forEach(configs => {
-            gsap.to(configs[0], {
+        ;[{conf: this.leftLineConfigs, worker: this.leftWorker}, {conf: this.rightLineConfigs, worker: this.rightWorker}].forEach(configs => {
+            gsap.to(configs.conf[0], {
                 widthReductor: 1,
                 inflexionPoint: 0.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    configs.worker.postMessage({ configs: configs.conf })
+                }
             })
-            gsap.to(configs[1], {
+            gsap.to(configs.conf[1], {
                 widthReductor: 1,
                 inflexionPoint: 0.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    configs.worker.postMessage({ configs: configs.conf })
+                }
             })
-            gsap.to(configs[2], {
+            gsap.to(configs.conf[2], {
                 widthReductor: 1,
                 inflexionPoint: 0.5,
                 ease: 'power1.inOut',
-                duration: 2
+                duration: 2,
+                onUpdate: () => {
+                    configs.worker.postMessage({ configs: configs.conf })
+                }
             })
         })
 
