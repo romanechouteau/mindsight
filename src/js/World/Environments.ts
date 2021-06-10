@@ -1,4 +1,4 @@
-import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial } from 'three'
+import { Object3D } from 'three'
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -14,7 +14,7 @@ import Grass from './Grass'
 import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
-import environmentsSrc from '../../models/Environnement_MorphTag.glb'
+import environmentsSrc from '../../models/ground.gltf'
 import collineSrc from '@textures/plage_colline_displacement.png'
 import { modelLoader } from '../Tools/utils'
 
@@ -58,23 +58,26 @@ export default class Environments {
     for (let i = 0; i < environmentKeys.length; i++) {
       const ground = (await loader.loadAsync(environmentsSrc)).scene
 
-      const grass = this.setGrass(ground, environmentKeys[i])
-
       this.environments[i] = new Object3D()
-      // this.environments[i].add(ground, grass)
-      this.environments[i].add(grass)
+
+      this.environments[i].scale.set(ground.children[0].scale.x * 0.05, ground.children[0].scale.y * 0.05, ground.children[0].scale.z * 0.05)
+      ground.children[0].scale.set(1., 1., 1.)
+
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE
-      this.environments[i].scale.set(0.0005, 0.0005, 0.0005)
+
+      const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
+
+      this.environments[i].add(ground, grass)
     }
 
     this.container.add(...this.environments)
   }
 
-  setGrass(ground, environmentKey) {
+  setGrass(ground, environmentKey, scale) {
     const grass = new Grass({
       time: this.time,
-      assets: this.assets,
+      scale,
       ground: ground.children[0],
       environmentKey
     })
