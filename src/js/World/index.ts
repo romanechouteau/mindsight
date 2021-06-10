@@ -102,7 +102,7 @@ export default class World extends Component {
     this.container.add(this.light.container)
   }
   setFog() {
-    // this.globalScene.fog = new FogExp2(0xF4C5B5, 0.03)
+    this.globalScene.fog = new FogExp2(0xF4C5B5, 0.03)
   }
 
   setUser() {
