@@ -43,6 +43,7 @@ export default class MoveManager {
     cursorGeometry: BufferGeometry
     pixelRatio: number
     rotationHelper: Object3D
+    groundContainer: Mesh
     cursorParticlesMaterial: ShaderMaterial
     constructor({ camera, mouse, ground, canvas, scene, pixelRatio }) {
         this.mouse = mouse
@@ -51,6 +52,7 @@ export default class MoveManager {
         this.scene = scene
         this.ground = ground.container.children[0].children[0].children[0]
         this.pixelRatio = pixelRatio
+        this.groundContainer = ground.container.children[0]
 
         this.raycaster = new Raycaster()
         this.interfaceEmpty = document.querySelector('.brushInterface')
@@ -59,6 +61,7 @@ export default class MoveManager {
             vertexShader: moveCursorVertex,
             fragmentShader: moveCursorFragment,
             transparent: true,
+            morphTargets: true,
             uniforms: {
                 uTime: { value: 0. },
                 uOpacity: { value: 1. },
@@ -94,9 +97,10 @@ export default class MoveManager {
             this.cursor.layers.enable(BLOOM_LAYER)
 
             this.cursorBase = new Mesh(this.ground.geometry, this.cursorMaterial)
-            this.cursorBase.position.set(this.ground.position.x, this.ground.position.y, this.ground.position.z)
-            this.cursorBase.scale.set(this.ground.scale.x, this.ground.scale.y, this.ground.scale.z)
-            this.cursorBase.rotation.set(this.ground.rotation.x, this.ground.rotation.y, this.ground.rotation.z)
+            this.cursorBase.position.set(0, this.groundContainer.position.y, 0)
+            this.cursorBase.scale.set(this.groundContainer.scale.x, this.groundContainer.scale.y, this.groundContainer.scale.z)
+            this.cursorBase.rotation.set(this.groundContainer.rotation.x, this.groundContainer.rotation.y, this.groundContainer.rotation.z)
+            this.cursorBase.morphTargetInfluences = this.ground.morphTargetInfluences
             this.cursorBase.position.y += 0.02
             this.cursorBase.layers.enable(BLOOM_LAYER)
 
@@ -125,13 +129,11 @@ export default class MoveManager {
         // @ts-ignore
         App.state.time.on('tick', () => {
             if (store.state.brush.canDraw === false) {
-                const value = this.cursorMaterial.uniforms.uOpacity.value + 0.06
-                this.cursorMaterial.uniforms.uOpacity.value = Math.min(value, 1)
-                this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.min(value, 1)
+                this.cursorMaterial.uniforms.uTime.value += 0.01
+                this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
 
                 const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
                 this.raycaster.setFromCamera(cursor, this.camera.camera)
-
                 const lastPoint = this.lastIntersection
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
 
@@ -140,11 +142,12 @@ export default class MoveManager {
                     this.cursor.position.y += 0.05
 
                     this.cursorMaterial.uniforms.uMouse.value = this.lastIntersection.uv
+
+                    this.showCursor()
+                } else {
+                    this.hideCursor()
                 }
 
-                // update shader
-                this.cursorMaterial.uniforms.uTime.value += 0.01
-                this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
                 if (lastPoint && this.lastIntersection) {
                     const oldDirection = this.cursorParticlesMaterial.uniforms.uDirection.value
                     const difference = new Vector2(this.lastIntersection.point.x - lastPoint.point.x, this.lastIntersection.point.z - lastPoint.point.z)
@@ -157,11 +160,21 @@ export default class MoveManager {
                 if (!this.camera.orbitControls.enabled) this.camera.camera?.quaternion.setFromEuler( this.euler )
                 this.camera.raycasterPlane.quaternion.setFromEuler( this.euler )
             } else {
-                const value = this.cursorMaterial.uniforms.uOpacity.value - 0.06
-                this.cursorMaterial.uniforms.uOpacity.value = Math.max(value, 0)
-                this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.max(value, 0)
+                this.hideCursor()
             }
         })
+    }
+
+    showCursor () {
+        const value = this.cursorMaterial.uniforms.uOpacity.value + 0.06
+        this.cursorMaterial.uniforms.uOpacity.value = Math.min(value, 1)
+        this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.min(value, 1)
+    }
+
+    hideCursor () {
+        const value = this.cursorMaterial.uniforms.uOpacity.value - 0.06
+        this.cursorMaterial.uniforms.uOpacity.value = Math.max(value, 0)
+        this.cursorParticlesMaterial.uniforms.uOpacity.value = Math.max(value, 0)
     }
 
     handleMove() {
