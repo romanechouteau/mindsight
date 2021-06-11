@@ -1,18 +1,20 @@
-import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial } from 'three'
+import { Object3D } from 'three'
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import { Mouse } from '../Tools/Mouse'
+import Time from '../Tools/Time'
 // @ts-ignore
 import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
+import Grass from './Grass'
 
-import { ENV_DISTANCE } from '../constants'
+import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
-import environmentsSrc from '../../models/Environnement_MorphTag.glb'
+import environmentsSrc from '../../models/ground.gltf'
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
 import { modelLoader } from '../Tools/utils'
@@ -20,6 +22,7 @@ import { modelLoader } from '../Tools/utils'
 const loader = new GLTFLoader()
 
 export default class Environments {
+  time: Time
   mouse: Mouse
   assets: any
   camera: Camera
@@ -28,9 +31,10 @@ export default class Environments {
   container: Object3D
   environments: Object3D[]
   handleScroll: Function
-  constructor(options: { assets?: any, mouse: Mouse, camera: Camera }) {
-    const { assets, mouse, camera } = options
+  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera }) {
+    const { time, assets, mouse, camera } = options
 
+    this.time = time
     this.mouse = mouse
     this.assets = assets
     this.camera = camera
@@ -50,13 +54,36 @@ export default class Environments {
 
   async createEnvironments() {
     this.environments = []
-    for (let i = 0; i < 4; i++) {
-      this.environments[i] = (await loader.loadAsync(environmentsSrc)).scene
-      ;this.environments[i].children[0].scale.set(0.0005, 0.0005, 0.0005)
+    const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW, ENVIRONMENTS.TEST]
+
+    for (let i = 0; i < environmentKeys.length; i++) {
+      const ground = (await loader.loadAsync(environmentsSrc)).scene
+
+      this.environments[i] = new Object3D()
+
+      this.environments[i].scale.set(ground.children[0].scale.x * 0.05, ground.children[0].scale.y * 0.05, ground.children[0].scale.z * 0.05)
+      ground.children[0].scale.set(1., 1., 1.)
+
       this.environments[i].position.y = -2
+      this.environments[i].position.z = - i * ENV_DISTANCE
+
+      const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
+
+      this.environments[i].add(ground, grass)
     }
 
     this.container.add(...this.environments)
+  }
+
+  setGrass(ground, environmentKey, scale) {
+    const grass = new Grass({
+      time: this.time,
+      scale,
+      ground: ground.children[0],
+      environmentKey
+    })
+
+    return grass.container
   }
 
   setScroll() {
