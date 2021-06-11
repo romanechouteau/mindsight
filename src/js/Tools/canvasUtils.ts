@@ -24,8 +24,11 @@ export const waveBaseConfig = {
 }
 
 // TODO: refactor params
-export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: number, config: drawWaveConfig, _time?: Time) {
+export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: number, config: drawWaveConfig, _time?: Time|number) {
     const time = this?.time ?? _time
+    let elapsed
+    if (typeof(time) === 'number') elapsed = time
+    else elapsed = time.elapsed
     ctx.save()
     ctx.translate(0.5, height/2)
     ctx.translate(0.5, 0.5);
@@ -44,7 +47,7 @@ export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: n
         // debugger;
         let y = 0
         if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
-            y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + time.elapsed/config.speed + config.offset) * Math.sin(time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
+            y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + elapsed/config.speed + config.offset) * Math.sin(elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
         ctx.lineTo( x/config.steps * width, y * config.height )
     }
     ctx.stroke()

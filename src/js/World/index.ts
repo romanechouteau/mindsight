@@ -23,6 +23,7 @@ import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
 import EyeTrackingManager from '../Behavior/EyeTrackingManager'
 import { SCENES } from '../constants'
+import Gravity from '../Behavior/Gravity'
 
 export default class World extends Component {
   time: Time
@@ -160,12 +161,21 @@ export default class World extends Component {
 
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
-      this.setEyeTrackingManager()
+      setTimeout(() => {
+        if (store.state.scene === SCENES.EYETRACKING) {
+          this.setEyeTrackingManager()
+        }
+      }, 22000);
     } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
       this.eyeTrackingManager.stop()
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
+      // TODO: remove for prod
+      if (document.querySelector('#eyetrackingManager')) {
+        document.querySelector('#eyetrackingManager').remove()
+      }
+
       this.setEnvironments()
     } else if (store.state.scene !== SCENES.ENVIRONMENT && this.environments !== undefined && this.environments.stopped === false) {
       this.environments.stop()
@@ -173,6 +183,7 @@ export default class World extends Component {
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.setWorldBuilder()
+      new Gravity({ objects: [this.camera.camera], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
     }

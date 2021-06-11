@@ -55,6 +55,7 @@ export default class App extends Component {
   mouse: Mouse
   state: { time: Time }
   bloomLayer: Layers
+  // @ts-ignore
   pointerCursor: PointerCursor
   intro: IntroController
   bloomPass: UnrealBloomPass
@@ -243,7 +244,7 @@ export default class App extends Component {
   }
 
   render = () => {
-    if (store.state.isIntro) {
+    if (store.state.isIntro && this.intro === undefined) {
       this.intro = new IntroController({time: this.time, debug: this.debug})
     } else if (document.querySelector('#intro')) {
       this.intro.dispose()

@@ -24,11 +24,14 @@ class NeuronBuilder {
             this.container = new Group()
             this.container.name = 'NeuronContainer'
 
+            // @ts-ignore
             this.time = App.time
+            // @ts-ignore
             this.pixelRatio = App.renderer.getPixelRatio()
 
             this.setGeometry()
 
+            // @ts-ignore
             App.scene.add(this.container)
             this.setMovement()
             this.removeNeurons = this.removeNeurons.bind(this)

@@ -9,7 +9,7 @@ export default {
         canDraw: false,
     },
     emotion: 'joy',
-    scene: 0,
+    scene: 1,
     audioInputMode: AUDIO_INPUT_MODES.NONE,
     spotifyAudioData: {
         sectionIndex: null

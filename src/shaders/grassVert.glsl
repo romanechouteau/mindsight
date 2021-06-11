@@ -19,16 +19,25 @@ float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-mat4 rotationMatrix(vec3 axis, float angle) {
-    axis = normalize(axis);
-    float s = sin(angle);
-    float c = cos(angle);
-    float oc = 1.0 - c;
+mat3 rotateAlign( vec3 v1, vec3 v2)
+{
+    vec3 axis = cross( v1, v2 );
 
-    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
-                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
-                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
-                0.0,                                0.0,                                0.0,                                1.0);
+    float cosA = dot( v1, v2 );
+    float k = 1.0f / (1.0f + cosA);
+
+    mat3 result = mat3( (axis.x * axis.x * k) + cosA,
+                 (axis.y * axis.x * k) - axis.z,
+                 (axis.z * axis.x * k) + axis.y,
+                 (axis.x * axis.y * k) + axis.z,
+                 (axis.y * axis.y * k) + cosA,
+                 (axis.z * axis.y * k) - axis.x,
+                 (axis.x * axis.z * k) - axis.y,
+                 (axis.y * axis.z * k) + axis.x,
+                 (axis.z * axis.z * k) + cosA
+                 );
+
+    return result;
 }
 
 vec4 displace(vec4 modelPosition, vec3 morphTargets1, vec3 morphTargets2, vec3 morphTargets3) {
@@ -57,12 +66,10 @@ void main() {
     pos.y += 200.;
 
     vec3 normal = displaceNormals(aNormals, aNormalsTarget1, aNormalsTarget2, aNormalsTarget3);
-    mat4 xRotation = rotationMatrix(vec3(0.0, 0.0, 1.0), normal.x);
-    mat4 yRotation = rotationMatrix(vec3(0.0, 1.0, 0.0), normal.y);
-    mat4 zRotation = rotationMatrix(vec3(1.0, 0.0, 0.0), normal.z);
-    mat4 rotateMatrix = xRotation * yRotation * zRotation;
+    mat3 rotateMatrix = rotateAlign(aNormals, normal);
+    pos *= rotateMatrix;
 
-    vec4 modelPosition = modelMatrix * instanceMatrix * rotateMatrix * vec4(pos, 1.0);
+    vec4 modelPosition = modelMatrix * instanceMatrix * vec4(pos, 1.0);
     modelPosition = displace(modelPosition, aMorphTargets1, aMorphTargets2, aMorphTargets3);
 
     float delay = (modelPosition.x * 0.05);
