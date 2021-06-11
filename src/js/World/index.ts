@@ -22,6 +22,7 @@ import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
 import EyeTrackingManager from '../Behavior/EyeTrackingManager'
 import { SCENES } from '../constants'
+import Gravity from '../Behavior/Gravity'
 
 export default class World extends Component {
   time: Time
@@ -132,7 +133,8 @@ export default class World extends Component {
     this.camera.moveIntro()
     this.environments = new Environments({
       mouse: this.mouse,
-      camera: this.camera
+      camera: this.camera,
+      time: this.time
     })
     this.container.add(this.environments.container)
   }
@@ -175,6 +177,7 @@ export default class World extends Component {
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.setWorldBuilder()
+      new Gravity({ objects: [this.camera.camera], time: this.time, ground: this.environments.container.children[0] })
     }
 
     if (store.state.scene === SCENES.BRUSH) {

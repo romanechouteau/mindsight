@@ -1,10 +1,13 @@
 import gsap from 'gsap/all'
+// @ts-ignore
 import template from '../templates/intro.template'
+// @ts-ignore
 import hpSrc from '../images/casque.svg'
 import { drawWave, waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
 import Time from './Tools/Time'
 import { queue } from './Tools/asyncUtils'
 import lottie from 'lottie-web'
+// @ts-ignore
 import logoAnimation from '../images/mindisight_logo_animation.json'
 
 // TODO: replace all magical numbers
@@ -258,6 +261,7 @@ export default class IntroController {
     }
 
     hideHeadphone() {
+        // @ts-ignore
         this.headPhoneImage.attributeStyleMap.set('opacity', 0)
         setTimeout(() => {
             // @ts-ignore
@@ -268,6 +272,7 @@ export default class IntroController {
     revealLine() {
         const canvas = document.querySelector('.canvas-full')
         if (canvas) {
+            // @ts-ignore
             canvas.style.width = `100vw`
         }
     }

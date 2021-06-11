@@ -427,7 +427,7 @@ export default class Brush extends Component {
       })
     })
 
-    this.element.querySelectorAll('.paramsGroup input').forEach((input) => {
+    this.element.querySelectorAll('.paramsGroup input').forEach((input: HTMLInputElement) => {
       const param = input.getAttribute('name')
       const type = input.getAttribute('type')
 

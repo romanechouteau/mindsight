@@ -2,6 +2,7 @@ import { Object3D, Mesh, MeshBasicMaterial, DoubleSide, Group, BoxBufferGeometry
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 // @ts-ignore
 import reliefSrc from '@models/mapTest.glb'
+// @ts-ignore
 import groundSrc from '@models/sol__.glb'
 
 const loader = new GLTFLoader()
@@ -41,9 +42,9 @@ export default class Ground {
 
     //     void main() {
     //       vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-        
+
     //       vPosition = modelPosition.xyz;
-        
+
     //       vec4 viewPosition = viewMatrix * modelPosition;
     //       vec4 projectedPosition = projectionMatrix * viewPosition;
     //       gl_Position = projectedPosition;
@@ -51,7 +52,7 @@ export default class Ground {
     //   `,
     //   fragmentShader: `
     //   varying vec3 vPosition;
-      
+
     //   void main()
     //   {
     //       gl_FragColor = vec4(vec3(vPosition.y), 1.);
