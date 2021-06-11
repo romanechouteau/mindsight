@@ -154,13 +154,19 @@ export default class World extends Component {
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       setTimeout(() => {
-        this.setEyeTrackingManager()
+        if (store.state.scene === SCENES.EYETRACKING) {
+          this.setEyeTrackingManager()
+        }
       }, 22000);
     } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
       this.eyeTrackingManager.stop()
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
+      // TODO: remove for prod
+      if (document.querySelector('#eyetrackingManager')) {
+        document.querySelector('#eyetrackingManager').remove()
+      }
 
       this.setEnvironments()
     } else if (store.state.scene !== SCENES.ENVIRONMENT && this.environments !== undefined && this.environments.stopped === false) {
