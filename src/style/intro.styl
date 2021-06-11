@@ -7,6 +7,9 @@
     display: flex
     justify-content: center
     align-items: center
+    opacity 1
+    transition: opacity 0.5s ease
+    will-change: opacity 
 
     .title
         z-index: 200
@@ -22,7 +25,7 @@
         top 10px
 
         svg
-            filter: drop-shadow(0 0 1.25rem rgba(255,255,255,0.8)) drop-shadow(0 0 12.5rem rgba(255,255,255,0.24)) drop-shadow(0 0 31.25rem rgba(255,255,255,0.5));
+            filter: drop-shadow(0 0 1.25rem rgba(255,255,255,0.8)) drop-shadow(0 0 31.25rem rgba(255,255,255,0.5));
 
     .headphone
         opacity: 0

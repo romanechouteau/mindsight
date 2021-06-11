@@ -74,6 +74,10 @@ export default class EyeTrackingManager extends Component {
             this.setDebug()
         }
 
+        setTimeout(() => {
+            this.element.style.opacity = `1`
+        }, 5000);
+
         this.setWebGazer()
         this.render()
         this.eyeMovement = debounce(this.moveEye, EYE_TRACKING_DEBOUNCE, { leading: true })
@@ -301,12 +305,13 @@ export default class EyeTrackingManager extends Component {
                 this.element.remove()
             }
         })
-        gsap.to(document.querySelector('#background'), {
+        gsap.to(document.querySelector('#intro'), {
             delay: 0.5,
             duration: 0.8,
             opacity: 0,
             onComplete: function() {
-                this.targets()[0].remove()
+                // document.querySelector('#intro').remove()
+                // store.dispatch('updateScene', SCENES.ENVIRONMENT)
             }
         })
     }
