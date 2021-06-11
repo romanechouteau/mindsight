@@ -165,9 +165,11 @@ export default class IntroController {
     }
 
     killFullLine() {
-        this.time.off('tick.introFullCanvas')
-        // @ts-ignore
-        this.fullCanvas.attributeStyleMap.set('display', 'none')
+        setTimeout(() => {
+            this.time.off('tick.introFullCanvas')
+            // @ts-ignore
+            this.fullCanvas.attributeStyleMap.set('display', 'none')
+        }, 100);
     }
 
     enableSideLines() {
@@ -188,8 +190,8 @@ export default class IntroController {
             this.title.attributeStyleMap.set('display', 'none')
             this.toggleLineMovement()
             setTimeout(() => {
-                this.killFullLine()
                 this.enableSideLines()
+                this.killFullLine()
                 // @ts-ignore
                 this.headPhoneImage.attributeStyleMap.set('display', 'inline-block')
                 setTimeout(() => {
@@ -203,40 +205,43 @@ export default class IntroController {
     flyLines() {
         ;[{conf: this.leftLineConfigs, worker: this.leftWorker}, {conf: this.rightLineConfigs, worker: this.rightWorker}].forEach(configs => {
             gsap.to(configs.conf[0], {
-                widthReductor: 1,
-                inflexionPoint: 0.5,
+                // widthReductor: 1,
+                // inflexionPoint: 0.5,
+                height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    configs.worker.postMessage({ configs: configs.conf })
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null})) })
                 }
             })
             gsap.to(configs.conf[1], {
-                widthReductor: 1,
-                inflexionPoint: 0.5,
+                // widthReductor: 1,
+                // inflexionPoint: 0.5,
+                height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    configs.worker.postMessage({ configs: configs.conf })
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null})) })
                 }
             })
             gsap.to(configs.conf[2], {
-                widthReductor: 1,
-                inflexionPoint: 0.5,
+                // widthReductor: 1,
+                // inflexionPoint: 0.5,
+                height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    configs.worker.postMessage({ configs: configs.conf })
+                    configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null})) })
                 }
             })
         })
 
-        setTimeout(() => {
-            // @ts-ignore
-            this.leftCanvas.attributeStyleMap.set('transform', 'translateX(-40vw)')
-            // @ts-ignore
-            this.rightCanvas.attributeStyleMap.set('transform', 'translateX(40vw)')
-        }, 1000)
+        // setTimeout(() => {
+        //     // @ts-ignore
+        //     this.leftCanvas.attributeStyleMap.set('transform', 'translateX(-40vw)')
+        //     // @ts-ignore
+        //     this.rightCanvas.attributeStyleMap.set('transform', 'translateX(40vw)')
+        // }, 1000)
         setTimeout(() => {
             // @ts-ignore
             this.leftCanvas.attributeStyleMap.set('opacity', 0)
@@ -279,10 +284,17 @@ export default class IntroController {
             this.hideHeadphone()
             this.assembleLines()
         }, 5000)
+        await queue(() => {
+            this.flyLines()
+        }, 5000)
     }
 
     dispose() {
-        document.body.removeChild(document.querySelector('#intro'))
+        setTimeout(() => {
+            if (document.querySelector('#intro')) {
+                document.body.removeChild(document.querySelector('#intro'))
+            }
+        }, 5000);
     }
 
 }

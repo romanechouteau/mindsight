@@ -153,7 +153,9 @@ export default class World extends Component {
 
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
-      this.setEyeTrackingManager()
+      setTimeout(() => {
+        this.setEyeTrackingManager()
+      }, 22000);
     } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
       this.eyeTrackingManager.stop()
     }
