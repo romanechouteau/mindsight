@@ -13,6 +13,7 @@ import { ENV_DISTANCE } from '../constants'
 import Camera from '../Camera'
 
 import environmentsSrc from '../../models/Environnement_MorphTag.glb'
+// @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
 import { modelLoader } from '../Tools/utils'
 

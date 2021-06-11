@@ -1,9 +1,14 @@
 import { CanvasTexture, Group, Mesh, MeshNormalMaterial, MeshStandardMaterial, PlaneBufferGeometry, Texture, Scene, WebGLRenderer, PerspectiveCamera, RawShaderMaterial, IUniform } from "three"
+// @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
+// @ts-ignore
 import montagneSrc from '@textures/plage_montages_displacement.png'
+// @ts-ignore
 import plaineSrc from '@textures/plage_plaine_displacement.png'
+// @ts-ignore
 import valleeSrc from '@textures/plage_vallee_displacement.png'
 import { textureLoader } from '../../../Tools/utils'
+// @ts-ignore
 import { WORLDBUILDER_PRECISION } from "@/js/constants"
 import Environments from "../../../World/Environments"
 import { throttle } from 'lodash'
@@ -11,7 +16,9 @@ import store from '../../../Store'
 // @ts-ignore
 import Time from '@tools/Time'
 
+// @ts-ignore
 import blendingVertex from '../../../../shaders/blendingVert.glsl'
+// @ts-ignore
 import blendingFragment from '../../../../shaders/blendingFrag.glsl'
 
 interface MapHeighterParams {
