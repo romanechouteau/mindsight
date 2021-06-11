@@ -1,4 +1,4 @@
-import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide } from 'three'
+import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial } from 'three'
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -12,9 +12,10 @@ import store from '@store/index'
 import { ENV_DISTANCE } from '../constants'
 import Camera from '../Camera'
 
+import environmentsSrc from '../../models/Environnement_MorphTag.glb'
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
-import { textureLoader } from '../Tools/utils'
+import { modelLoader } from '../Tools/utils'
 
 const loader = new GLTFLoader()
 
@@ -25,7 +26,7 @@ export default class Environments {
   stopped: Boolean
   isMoving: Boolean
   container: Object3D
-  environments: any[]
+  environments: Object3D[]
   handleScroll: Function
   constructor(options: { assets?: any, mouse: Mouse, camera: Camera }) {
     const { assets, mouse, camera } = options
@@ -50,20 +51,9 @@ export default class Environments {
   async createEnvironments() {
     this.environments = []
     for (let i = 0; i < 4; i++) {
-      this.environments[i] = new Mesh(
-        new PlaneBufferGeometry(40, 40, 200, 200),
-        new MeshStandardMaterial({
-          color: new Color(`hsl(${255 / 4 * i}, 100%, 50%)`),
-          displacementMap: (await textureLoader.loadAsync(collineSrc)),
-          displacementScale: 10,
-          side: DoubleSide
-        })
-      )
-      // this.environments[i].scale.set(0.01, 0.01, 0.01)
-      this.environments[i].rotation.y = Math.PI
-      this.environments[i].position.y = -5
-      this.environments[i].rotation.x = Math.PI/2
-      this.environments[i].position.z = - i * ENV_DISTANCE
+      this.environments[i] = (await loader.loadAsync(environmentsSrc)).scene
+      ;this.environments[i].children[0].scale.set(0.0005, 0.0005, 0.0005)
+      this.environments[i].position.y = -2
     }
 
     this.container.add(...this.environments)
