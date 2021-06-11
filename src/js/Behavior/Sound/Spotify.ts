@@ -1,6 +1,8 @@
 // import { render } from 'pug';
 import { htmlUtils } from '../../Tools/utils'
+// @ts-ignore
 import template from '../../../templates/spotify.template'
+// @ts-ignore
 import store from '@store/index'
 // @ts-ignore
 import search from '../../../images/search.svg'
@@ -9,6 +11,7 @@ export default class SpotifyManager {
 
     searchTracks: {name: string; uri: string; id: string; artists: any[]}[]
     deviceId: string
+    // @ts-ignore
     player: Spotify.Player
     accessToken: string
     domElements: {
@@ -117,9 +120,12 @@ export default class SpotifyManager {
             $track.dataset.uri = track.uri
             $track.dataset.id = track.id
             $track.addEventListener('click', ev => {
+                // @ts-ignore
                 this.handleSetTrack(ev.target.dataset.uri)
                 this.resetSearch()
+                // @ts-ignore
                 this.registerMusicMood(track)
+                // @ts-ignore
                 this.setParticlesMovement(ev.target.dataset.id)
             })
             document.querySelector('.results').appendChild($track)
