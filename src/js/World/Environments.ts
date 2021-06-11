@@ -15,6 +15,7 @@ import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
 import environmentsSrc from '../../models/ground.gltf'
+// @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
 import { modelLoader } from '../Tools/utils'
 

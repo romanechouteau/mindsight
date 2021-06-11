@@ -55,6 +55,7 @@ export default class App extends Component {
   mouse: Mouse
   state: { time: Time }
   bloomLayer: Layers
+  // @ts-ignore
   pointerCursor: PointerCursor
   intro: IntroController
   bloomPass: UnrealBloomPass
