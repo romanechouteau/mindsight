@@ -1,4 +1,5 @@
-import { Object3D } from 'three'
+import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial, FrontSide } from 'three'
+
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
@@ -54,6 +55,7 @@ export default class Environments {
 
   async createEnvironments() {
     this.environments = []
+
     const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW, ENVIRONMENTS.TEST]
 
     for (let i = 0; i < environmentKeys.length; i++) {
@@ -63,6 +65,7 @@ export default class Environments {
 
       this.environments[i].scale.set(ground.children[0].scale.x * 0.05, ground.children[0].scale.y * 0.05, ground.children[0].scale.z * 0.05)
       ground.children[0].scale.set(1., 1., 1.)
+      ;(ground.children[0] as Mesh).material.side = FrontSide
 
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE

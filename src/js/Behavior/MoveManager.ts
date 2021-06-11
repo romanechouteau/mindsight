@@ -53,6 +53,7 @@ export default class MoveManager {
         this.pixelRatio = pixelRatio
 
         this.raycaster = new Raycaster()
+        // this.gravity = new Raycaster()
         this.interfaceEmpty = document.querySelector('.brushInterface')
         this.rotationHelper = new Object3D()
         this.cursorMaterial = new ShaderMaterial({
