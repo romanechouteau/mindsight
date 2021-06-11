@@ -2,25 +2,35 @@ import gsap from 'gsap/all'
 
 // @ts-ignore
 import store from '@store/index'
+// @ts-ignore
+import Time from '@tools/Time'
 import Component from '../Lib/Component'
-import { SCENES } from '../constants'
+import { SCENES, HOLD_DURATION, HOLD_DELAY } from '../constants'
 
 type Direction = 'x' | 'y'
 
-class PointerCursor extends Component {
+export default class PointerCursor extends Component {
+    time: Time
     cursor: SVGElement
     render: Function
+    circle: SVGCircleElement
     snapped: {
         x?: number,
         y?: number
     }
-    constructor() {
+    holdTime: number
+    strokeDashArray: number
+    constructor(options: { time: Time }) {
         super({
             store,
             element: document.querySelector('#pointerCursor')
         })
 
+        const { time } = options
+
+        this.time = time
         this.render = this.renderCursor
+        this.holdTime = 0
 
         this.snapped = { x: null, y: null }
         this.render()
@@ -29,6 +39,11 @@ class PointerCursor extends Component {
 
     init() {
         const {width, height} = this.element.getBoundingClientRect()
+
+        this.circle = this.element.querySelector('circle')
+        this.strokeDashArray = Math.PI * (parseInt(this.circle.getAttribute('r')) * 2)
+        this.circle.setAttribute('stroke-dasharray', `${this.strokeDashArray}`)
+
         window.addEventListener('mousemove', e => {
             gsap.to(this.element, {
                 x: this.snapped.x ?? e.clientX - width/2,
@@ -60,6 +75,36 @@ class PointerCursor extends Component {
         })
     }
 
+    startHold (callback) {
+        this.time.on('tick.hold', () => {
+            if (this.holdTime >= HOLD_DURATION + HOLD_DELAY) {
+                this.holdTime = 0
+                gsap.to(this.circle, {
+                    duration: 0.3,
+                    strokeDashoffset: '0'
+                })
+                this.time.off('tick.hold')
+                return callback()
+            }
+
+            this.holdTime += 1
+
+            if (this.holdTime >= HOLD_DELAY) {
+                const percent = (this.holdTime - HOLD_DELAY) / HOLD_DURATION
+                this.circle.style.strokeDashoffset = `${(percent) * this.strokeDashArray}`
+            }
+        })
+    }
+
+    stopHold () {
+        this.holdTime = 0
+        gsap.to(this.circle, {
+            duration: 0.3,
+            strokeDashoffset: '0'
+        })
+        this.time.off('tick.hold')
+    }
+
     renderCursor() {
         if (store.state.scene === SCENES.BRUSH && store.state.brush.canDraw === false) {
             this.element.classList.add('hidden')
@@ -68,6 +113,3 @@ class PointerCursor extends Component {
         }
     }
 }
-
-const instance = new PointerCursor()
-export default instance

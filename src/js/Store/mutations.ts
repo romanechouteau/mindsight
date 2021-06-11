@@ -13,6 +13,11 @@ export default {
 
         return state
     },
+    updateWorldBuilderStep(state, payload) {
+        state.worldBuilder.step = payload
+
+        return state
+    },
     chooseAudio(state, payload) {
         state.audioInputMode = payload
 
