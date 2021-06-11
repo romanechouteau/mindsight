@@ -191,9 +191,11 @@ export default class WorldBuilder extends Component {
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
             return store.dispatch('updateScene', store.state.scene + 1)
         }
-        const nextStep = store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND
-            ? WORLDBUILDER_STEPS.SHAPE
-            : WORLDBUILDER_STEPS.SKY
+        // TODO fix shape and put shape step back
+        // const nextStep = store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND
+        //     ? WORLDBUILDER_STEPS.SHAPE
+        //     : WORLDBUILDER_STEPS.SKY
+        const nextStep = WORLDBUILDER_STEPS.SKY
         store.dispatch('updateWorldBuilderStep', nextStep)
     }
 }

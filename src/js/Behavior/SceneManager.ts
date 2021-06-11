@@ -16,7 +16,8 @@ export default class SceneManager {
     }
 
     mouseDown () {
-        if (store.state.scene !== SCENES.PARAMETERS && store.state.scene <= LAST_SCENE) {
+        // TODO add cursor toggle
+        if (store.state.scene !== SCENES.PARAMETERS && store.state.scene !== SCENES.BRUSH && store.state.scene <= LAST_SCENE) {
             this.pointerCursor.startHold(this.handleNextScene)
         }
     }
