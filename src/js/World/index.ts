@@ -182,8 +182,8 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
-      this.setWorldBuilder()
-      new Gravity({ objects: [this.camera.camera], time: this.time, ground: this.environments.container.children[0] })
+      this.setWorldBuilder()      
+      new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
     }
