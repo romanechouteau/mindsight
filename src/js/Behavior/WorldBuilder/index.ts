@@ -9,7 +9,7 @@ import template from '../../../templates/worldBuilder.template';
 import SkyCreator from './SkyCreator'
 import ShapeCreator from './ShapeCreator'
 import PointerCursor from '../../Tools/PointerCursor'
-import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE } from '../../../js/constants';
+import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants';
 // @ts-ignore
 import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
@@ -56,6 +56,11 @@ export default class WorldBuilder extends Component {
     }
 
     init () {
+        gsap.to(this.globalScene.fog, {
+            far: DEFAULT_FOG_FAR,
+            duration: 1,
+            ease: 'Power1.easeInOut'
+        })
         this.createHtmlControls()
         this.render()
     }
