@@ -49,7 +49,7 @@ export default class Water {
             }
         )
         this.waterMesh.rotation.x = -Math.PI/2
-        this.waterMesh.position.y -= 1
+        this.waterMesh.position.y -= 50
         this.container.add(this.waterMesh)
         this.waterMesh.material.uniforms[ 'size' ].value = 10.
 
