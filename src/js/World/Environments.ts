@@ -68,8 +68,7 @@ export default class Environments {
 
       this.environments[i].scale.set(ground.children[0].scale.x * GROUND_SCALE, ground.children[0].scale.y * GROUND_SCALE, ground.children[0].scale.z * GROUND_SCALE)
       ground.children[0].scale.set(1., 1., 1.)
-      // ;(ground.children[0] as Mesh).material.depthWrite = false
-      ;(ground.children[0] as Mesh).material.side = FrontSide
+      ;(ground.children[0] as Mesh).material.side = DoubleSide
 
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE

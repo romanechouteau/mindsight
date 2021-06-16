@@ -98,8 +98,8 @@ export default class Camera {
   moveIntro() {
     const defaultY = this.camera.position.y
     const defaultZ = this.camera.position.z
-    this.camera.position.y = 10
-    this.camera.position.z = 100
+    this.camera.position.y = 50
+    this.camera.position.z = 500
 
     gsap.to(this.camera.position, {
       delay: 0.3,

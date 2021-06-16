@@ -97,4 +97,9 @@ export const HOLD_DURATION = 60
 
 export const HOLD_DELAY = 10
 
-export const GROUND_SCALE = 0.05
+export const GROUND_SCALE = 0.1
+export const ENVIRONMENTS_BORDERS_MARGIN = 5
+
+export const START_FOG_FAR = 30
+
+export const DEFAULT_FOG_FAR = 50

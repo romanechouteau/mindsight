@@ -1,4 +1,4 @@
-import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute } from 'three'
+import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, ShaderMaterial, Color, DoubleSide, InstancedBufferAttribute, UniformsLib, UniformsUtils } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 // @ts-ignore
@@ -54,19 +54,24 @@ export default class Grass {
     const grassScene = (await loader.loadAsync(grassSrc)).scene
     const grassModel = grassScene.children[0] as Mesh
     const grassGeometry = grassModel.geometry.clone()
+
     this.grassMaterial = new ShaderMaterial({
+      fog: true,
       vertexShader,
       fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uPI: { value: Math.PI },
-        uScale: { value: this.scale },
-        uColor1: { value: new Color(GRASS_COLOR[this.environmentKey][0]) },
-        uColor2: { value: new Color(GRASS_COLOR[this.environmentKey][1]) },
-        uColorSpecial1: { value: new Color(GRASS_COLOR[this.environmentKey][2]) },
-        uColorSpecial2: { value: new Color(GRASS_COLOR[this.environmentKey][3]) },
-        uMorphInfluences: { value: [0, 0, 0] }
-      },
+      uniforms: UniformsUtils.merge([
+        UniformsLib['fog'],
+        {
+          uTime: { value: 0 },
+          uPI: { value: Math.PI },
+          uScale: { value: this.scale },
+          uColor1: { value: new Color(GRASS_COLOR[this.environmentKey][0]) },
+          uColor2: { value: new Color(GRASS_COLOR[this.environmentKey][1]) },
+          uColorSpecial1: { value: new Color(GRASS_COLOR[this.environmentKey][2]) },
+          uColorSpecial2: { value: new Color(GRASS_COLOR[this.environmentKey][3]) },
+          uMorphInfluences: { value: [0, 0, 0] }
+        }
+      ]),
       side: DoubleSide
     })
 

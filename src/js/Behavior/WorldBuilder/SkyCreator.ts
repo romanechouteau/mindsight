@@ -1,4 +1,4 @@
-import { BackSide, Mesh, Object3D, ShaderMaterial, SphereBufferGeometry, FogExp2, Scene, PMREMGenerator } from 'three'
+import { BackSide, Mesh, Object3D, ShaderMaterial, SphereBufferGeometry, Scene, FogExp2, Color } from 'three'
 import { WORLDBUILDER_PRECISION, SKY_COLORS, MOODS, LIST_MOODS, WORLDBUILDER_MAX_VALUE } from '../../../js/constants'
 
 // @ts-ignore
@@ -13,7 +13,6 @@ export default class SkyCreator {
     scene: Object3D
     globalScene: Scene
     skyMaterial: ShaderMaterial
-    pmremGenerator: PMREMGenerator
     sky: Mesh
     constructor(options: { scene: Object3D, globalScene: Scene, time: Time }) {
         const { scene, globalScene, time } = options
@@ -81,8 +80,7 @@ export default class SkyCreator {
         const fogColor = this.mix(fogColor1, fogColor2, percentage, true)
 
         this.globalScene.fog = new FogExp2(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`, 0.03)
-        // @ts-ignore
-        // ;(this.scene as Scene).environment = this.pmremGenerator.fromScene(this.sky).texture
+        this.globalScene.fog.color = new Color(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`)
     }
 
     setMovement() {
