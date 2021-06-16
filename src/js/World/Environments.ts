@@ -11,8 +11,9 @@ import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
 import Grass from './Grass'
+import Water from './Water/Water'
 
-import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
+import { ENV_DISTANCE, ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
 import Camera from '../Camera'
 
 import environmentsSrc from '../../models/ground.gltf'
@@ -32,8 +33,9 @@ export default class Environments {
   container: Object3D
   environments: Object3D[]
   handleScroll: Function
-  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera }) {
-    const { time, assets, mouse, camera } = options
+  debug: dat.GUI
+  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI }) {
+    const { time, assets, mouse, camera, debug } = options
 
     this.time = time
     this.mouse = mouse
@@ -41,6 +43,7 @@ export default class Environments {
     this.camera = camera
     this.stopped = false
     this.isMoving = false
+    this.debug = debug
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -63,8 +66,9 @@ export default class Environments {
 
       this.environments[i] = new Object3D()
 
-      this.environments[i].scale.set(ground.children[0].scale.x * 0.05, ground.children[0].scale.y * 0.05, ground.children[0].scale.z * 0.05)
+      this.environments[i].scale.set(ground.children[0].scale.x * GROUND_SCALE, ground.children[0].scale.y * GROUND_SCALE, ground.children[0].scale.z * GROUND_SCALE)
       ground.children[0].scale.set(1., 1., 1.)
+      // ;(ground.children[0] as Mesh).material.depthWrite = false
       ;(ground.children[0] as Mesh).material.side = FrontSide
 
       this.environments[i].position.y = -2
@@ -72,7 +76,12 @@ export default class Environments {
 
       const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
 
-      this.environments[i].add(ground, grass)
+      let water
+      if (i === ENVIRONMENT_INDICES.beach) {
+        water = this.setWater(ground.children[0] as Mesh)
+      }
+
+      this.environments[i].add(ground, grass, water)
     }
 
     this.container.add(...this.environments)
@@ -87,6 +96,17 @@ export default class Environments {
     })
 
     return grass.container
+  }
+
+  setWater(groundMesh: Mesh) {
+    groundMesh.geometry.computeBoundingBox()
+    const size = new Vector3()
+    groundMesh.geometry.boundingBox.getSize(size)
+    size.multiplyScalar(1 - GROUND_SCALE*3) // seems to fit best like this
+    // debugger
+    const water = new Water({ time: this.time, dimensions: { width: size.x, height: size.z }, debug: this.debug})
+
+    return water.container
   }
 
   setScroll() {

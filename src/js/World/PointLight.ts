@@ -1,4 +1,4 @@
-import { Object3D, PointLight, Color } from 'three'
+import { Object3D, PointLight, Color, DirectionalLight } from 'three'
 
 export default class PointLightSource {
   debug: any
@@ -35,6 +35,11 @@ export default class PointLightSource {
       this.params.positionZ
     )
     this.container.add(this.light)
+
+    // const light = new DirectionalLight(this.params.color, 1);
+    // light.position.set(0, 10, 0);
+    // light.target.position.set(-5, 0, 0);
+    // this.container.add(light)
   }
   setDebug() {
     // Color debug

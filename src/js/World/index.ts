@@ -137,7 +137,8 @@ export default class World extends Component {
     this.environments = new Environments({
       mouse: this.mouse,
       camera: this.camera,
-      time: this.time
+      time: this.time,
+      debug: this.debug
     })
     this.container.add(this.environments.container)
   }

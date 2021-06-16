@@ -90,6 +90,14 @@ export const GRASS_COLOR = {
     [ENVIRONMENTS.MEADOW]: [0x2A3B3A, 0x728762, 0x425d5c, 0x869b75],
     [ENVIRONMENTS.TEST]: [0x1c3838, 0x3f6e6e, 0x305f5f, 0x467a7a]
 }
+
+export const ENVIRONMENT_INDICES = {
+    [ENVIRONMENTS.BEACH]: 0,
+    [ENVIRONMENTS.MEADOW]: 1,
+    [ENVIRONMENTS.TEST]: 2 
+} 
 export const HOLD_DURATION = 60
 
 export const HOLD_DELAY = 10
+
+export const GROUND_SCALE = 0.05
