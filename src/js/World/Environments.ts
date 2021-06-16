@@ -12,9 +12,10 @@ import envSrc1 from '@models/plane_vierge.glb'
 import store from '@store/index'
 import Grass from './Grass'
 
-import { ENV_DISTANCE, ENVIRONMENTS } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
+// @ts-ignore
 import environmentsSrc from '../../models/ground.gltf'
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
@@ -56,9 +57,7 @@ export default class Environments {
   async createEnvironments() {
     this.environments = []
 
-    const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW, ENVIRONMENTS.TEST]
-
-    for (let i = 0; i < environmentKeys.length; i++) {
+    for (let i = 0; i < LIST_ENVIRONMENTS.length; i++) {
       const ground = (await loader.loadAsync(environmentsSrc)).scene
 
       this.environments[i] = new Object3D()
@@ -66,11 +65,12 @@ export default class Environments {
       this.environments[i].scale.set(ground.children[0].scale.x * 0.1, ground.children[0].scale.y * 0.1, ground.children[0].scale.z * 0.1)
       ground.children[0].scale.set(1., 1., 1.)
       ;(ground.children[0] as Mesh).material.side = DoubleSide
+      ;(ground.children[0] as Mesh).material.vertexColors = false
 
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE
 
-      const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
+      const grass = this.setGrass(ground, LIST_ENVIRONMENTS[i], this.environments[i].scale)
 
       this.environments[i].add(ground, grass)
     }

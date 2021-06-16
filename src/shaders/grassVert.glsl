@@ -5,9 +5,11 @@ uniform vec3 uMorphInfluences;
 
 varying vec2 vUv;
 varying float vSpecial;
+varying float vVisible;
 
 attribute float aSpecial;
 attribute vec3 aNormals;
+attribute vec4 aVisible;
 attribute vec3 aMorphTargets1;
 attribute vec3 aMorphTargets2;
 attribute vec3 aMorphTargets3;
@@ -53,16 +55,23 @@ vec4 displace(vec4 modelPosition, vec3 morphTargets1, vec3 morphTargets2, vec3 m
 
 vec3 displaceNormals(vec3 normals, vec3 normalsTarget1, vec3 normalsTarget2, vec3 normalsTarget3) {
     vec3 normal = normals;
-    normal.x += (normalsTarget1.x * uMorphInfluences.x + normalsTarget2.x * uMorphInfluences.y + normalsTarget3.x * uMorphInfluences.z);
-    normal.y += (normalsTarget1.y * uMorphInfluences.x + normalsTarget2.y * uMorphInfluences.y + normalsTarget3.y * uMorphInfluences.z);
-    normal.z += (normalsTarget1.z * uMorphInfluences.x + normalsTarget2.z * uMorphInfluences.y + normalsTarget3.z * uMorphInfluences.z);
+    normal.x += normalsTarget1.x * uMorphInfluences.x + normalsTarget2.x * uMorphInfluences.y + normalsTarget3.x * uMorphInfluences.z;
+    normal.y += normalsTarget1.y * uMorphInfluences.x + normalsTarget2.y * uMorphInfluences.y + normalsTarget3.y * uMorphInfluences.z;
+    normal.z += normalsTarget1.z * uMorphInfluences.x + normalsTarget2.z * uMorphInfluences.y + normalsTarget3.z * uMorphInfluences.z;
 
     return normal;
+}
+
+float displaceVisible(float visible, float visibleTarget1, float visibleTarget2, float visibleTarget3) {
+    float restMorphInfluences = 1. - uMorphInfluences.x - uMorphInfluences.y - uMorphInfluences.z;
+
+    return visible * restMorphInfluences + visibleTarget1 * uMorphInfluences.x + visibleTarget2 * uMorphInfluences.y + visibleTarget3 * uMorphInfluences.z;
 }
 
 void main() {
     vUv = uv;
     vSpecial = aSpecial;
+    vVisible = displaceVisible(aVisible.x, aVisible.y, aVisible.z, aVisible.w);
 
     vec3 pos = position;
     pos.y += 200.;
