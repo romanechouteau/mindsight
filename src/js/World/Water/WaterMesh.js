@@ -88,7 +88,7 @@ class WaterMesh extends Mesh {
 					'mirrorSampler': { value: null },
 					'alpha': { value: 0.5 },
 					'time': { value: 0.0 },
-					'size': { value: 1.0 },
+					'size': { value: 10.0 },
 					'distortionScale': { value: 20.0 },
 					'textureMatrix': { value: new Matrix4() },
 					'sunColor': { value: new Color( 0x7F7F7F ) },
@@ -222,6 +222,13 @@ class WaterMesh extends Mesh {
 		material.uniforms[ 'eye' ].value = eye;
 
 		scope.material = material;
+
+		function update () {
+			material.uniforms[ 'time' ].value += 0.5
+			console.log('wesh');
+			window.requestAnimationFrame(update)
+		}
+		update()
 
 		scope.onBeforeRender = function ( renderer, scene, camera ) {
 

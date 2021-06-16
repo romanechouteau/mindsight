@@ -105,9 +105,9 @@ export default class App extends Component {
       canvas: this.canvas,
       alpha: true,
       antialias: true,
-      powerPreference: 'low-power',
+      powerPreference: 'high-performance',
     })
-    // this.renderer.outputEncoding = sRGBEncoding
+    this.renderer.outputEncoding = sRGBEncoding
     this.renderer.gammaFactor = 2.2
     // Set background color
     this.renderer.setClearColor(0xF4C5B5, 1)
