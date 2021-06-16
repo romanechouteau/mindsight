@@ -34,6 +34,7 @@ export default class Environments {
   environments: Object3D[]
   handleScroll: Function
   debug: dat.GUI
+  current: number
   constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI }) {
     const { time, assets, mouse, camera, debug } = options
 
@@ -44,6 +45,7 @@ export default class Environments {
     this.stopped = false
     this.isMoving = false
     this.debug = debug
+    this.current = 0
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -59,7 +61,7 @@ export default class Environments {
   async createEnvironments() {
     this.environments = []
 
-    const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW, ENVIRONMENTS.TEST]
+    const environmentKeys = [ENVIRONMENTS.BEACH, ENVIRONMENTS.MEADOW]
 
     for (let i = 0; i < environmentKeys.length; i++) {
       const ground = (await loader.loadAsync(environmentsSrc)).scene
@@ -76,9 +78,13 @@ export default class Environments {
       const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
 
       let water
-      if (i === ENVIRONMENT_INDICES.beach) {
-        water = this.setWater(ground.children[0] as Mesh)
-      }
+      if (i === ENVIRONMENT_INDICES.beach) water = this.setWater(ground.children[0] as Mesh)
+
+      // Todo: refactor to handle all cases
+      this.environments[this.environments.length - 1].visible = false
+      this.environments[0].visible = true
+
+      // if (i === this.current) this.environments[i].visible = false
 
       this.environments[i].add(ground, grass, water)
     }
@@ -119,6 +125,9 @@ export default class Environments {
             const index = (store.state.environment + direction) % this.environments.length
             const environment = index < 0 ? lastEnvironment : index
 
+            const water = this.environments[environment].getObjectByName('WaterContainer')
+            if (water) water.visible = false
+
             const [currentLimit, oppositeLimit] = direction > 0 ? [lastEnvironment, 0] : [0, lastEnvironment]
             this.environments[oppositeLimit].position.z = - ENV_DISTANCE * oppositeLimit
 
@@ -130,13 +139,18 @@ export default class Environments {
               this.environments[currentLimit].position.z = - ENV_DISTANCE * currentLimit
             }
 
+            this.environments[environment].visible = true
+            this.environments[Math.abs(environment - 1)].visible = true
+            
             gsap.to(this.container.position, {
-                duration: 0.9,
-                ease: 'power3.inOut',
-                z: - this.environments[environment].position.z,
-                onComplete: () => {
-                    this.isMoving = false
-                    store.dispatch('updateEnvironment', environment)
+              duration: 0.9,
+              ease: 'power3.inOut',
+              z: - this.environments[environment].position.z,
+              onComplete: () => {
+                this.isMoving = false
+                store.dispatch('updateEnvironment', environment)
+                this.environments[Math.abs(environment - 1)].visible = false
+                if (water) water.visible = true
                 }
             })
         }
