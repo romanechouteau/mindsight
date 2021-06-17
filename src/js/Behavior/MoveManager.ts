@@ -100,7 +100,7 @@ export default class MoveManager {
                 }
             })
             this.cursor = new Points(this.cursorGeometry, this.cursorParticlesMaterial)
-            this.cursor.frustumCulled = true
+            this.cursor.frustumCulled = false
             this.cursor.layers.enable(BLOOM_LAYER)
 
             this.cursorBase = new Mesh(this.ground.geometry, this.cursorMaterial)
