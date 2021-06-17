@@ -1,0 +1,65 @@
+#HUD
+    position: absolute
+    left: 0
+    top: 0
+    width: 100%
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
+    padding: 32px
+    font-family: 'Lato', sans-serif
+
+    & > div
+        display: none
+        animation: 1s ease 1 both appear
+
+        &.visible
+            display: flex
+
+        .mode
+            display: none
+            margin: 4px
+            animation: 1s ease 1 both appear
+
+            .modeButton
+                width: 3rem
+                height: 3rem
+                opacity: 0.5
+                background-color: transparent
+                color: white
+                display: flex
+                justify-content: center
+                align-items: center
+                border: 1px solid white
+                border-radius: 0.75rem
+                user-select: none
+                font-weight: bold
+                font-size: 0.75rem
+                cursor: pointer
+                transition: box-shadow 0.5s ease, opacity 0.5s ease, filter 0.5s ease
+
+                & .text
+                    position: relative
+                    top: 0
+                    transition: top 0.5s ease
+
+                &.selected, &:hover
+                    opacity: 1
+                    box-shadow: inset 0 -4px white
+                    filter: drop-shadow( 0 0 3px white)
+
+                    & .text
+                        top: -4px
+
+            &.visible
+                display: flex
+
+    @keyframes appear {
+        from {
+            opacity: 0
+        }
+        to {
+            opacity: 1
+        }
+    }

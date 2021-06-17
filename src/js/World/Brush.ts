@@ -17,7 +17,7 @@ import vertexShader from '@shaders/brushvert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/brushfrag.glsl'
 
-import { AUDIO_INPUT_MODES } from '../constants'
+import { AUDIO_INPUT_MODES, CURSOR_MODES } from '../constants'
 
 import VoiceManager from '../Behavior/VoiceManager'
 
@@ -70,7 +70,6 @@ export default class Brush extends Component {
   resizeListener: EventListener
   particlesOffset: number[]
   mouseUpListener: Function
-  keyboardListener: EventListener
   paintingGeometry: BufferGeometry
   paintedMaterials: ShaderMaterial[]
   paintedGeometries: BufferGeometry[]
@@ -147,7 +146,6 @@ export default class Brush extends Component {
     this.setMovement()
     this.listenMouseDown()
     this.listenMouseUp()
-    this.listenKeyboard()
 
     this.resizeListener = debounce(() => this.render(), 150)
     window.addEventListener('resize', this.resizeListener)
@@ -192,7 +190,7 @@ export default class Brush extends Component {
         })
       }
 
-      if (isEqual(store.state.brush.canDraw, true)) {
+      if (store.state.cursorMode === CURSOR_MODES.BRUSH) {
         const onCanvas = isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)
         if (onCanvas && this.material.uniforms.uOpacity.value < 1) {
           const value = this.material.uniforms.uOpacity.value + 0.06
@@ -264,7 +262,7 @@ export default class Brush extends Component {
 
   listenMouseDown() {
     this.mouseDownListener = () => {
-      if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)) && isEqual(store.state.brush.canDraw, true)) {
+      if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
         this.isPainting = true
         this.paintingGeometry = new BufferGeometry()
         this.paintingPositions = []
@@ -279,7 +277,7 @@ export default class Brush extends Component {
 
   listenMouseUp() {
     this.mouseUpListener = () => {
-      if (isEqual(this.isPainting, true) && isEqual(store.state.brush.canDraw, true)) {
+      if (isEqual(this.isPainting, true) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
         this.isPainting = false
         this.paintedMaterials.push(this.material)
         this.paintedGeometries.push(this.paintingGeometry)
@@ -299,18 +297,6 @@ export default class Brush extends Component {
       }
     }
     this.mouse.on('up', this.mouseUpListener)
-  }
-
-  listenKeyboard() {
-    this.keyboardListener = (event) => {
-      event.preventDefault()
-      // @ts-ignore
-      const key = event.key || event.keyCode
-      if (isEqual(key, ' ') || isEqual(key, 'Space') || isEqual(key, 32)) {
-        store.dispatch('updateBrushParams', { param: 'canDraw', value: !store.state.brush.canDraw })
-      }
-    }
-    document.addEventListener('keyup', this.keyboardListener)
   }
 
   render() {
@@ -644,12 +630,13 @@ export default class Brush extends Component {
     this.mouse.off('up', this.mouseUpListener)
     this.mouse.off('down', this.mouseDownListener)
     window.removeEventListener('resize', this.resizeListener)
-    document.removeEventListener('keyup', this.keyboardListener)
 
     this.render = () => {}
     this.stopped = true
 
-    store.dispatch('updateBrushParams', { param: 'canDraw', value: false })
+    if (store.state.cursorMode === CURSOR_MODES.BRUSH) {
+      store.dispatch('chooseCursor', CURSOR_MODES.DEFAULT)
+    }
   }
 
   setSpotifyMovement = () => {

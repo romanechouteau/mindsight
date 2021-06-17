@@ -1,7 +1,5 @@
 import { Vector3 } from "three"
 
-export const LAST_SCENE = 5
-
 export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]
@@ -27,6 +25,12 @@ export enum AUDIO_INPUT_MODES {
     SPOTIFY = 'spotify',
     VOICE = 'voice',
     NONE = 'none'
+}
+
+export enum CURSOR_MODES {
+    DEFAULT = 'default',
+    MOVE = 'move',
+    BRUSH = 'brush'
 }
 
 export enum WORLDBUILDER_STEPS {
@@ -58,6 +62,8 @@ export enum SCENES {
     AUDIO = 5,
     SUMUP = 6
 }
+
+export const LAST_SCENE = SCENES.AUDIO
 
 export const EYETRACKING_RADIUS = 0.5
 

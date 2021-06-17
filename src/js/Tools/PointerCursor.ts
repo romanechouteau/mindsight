@@ -5,7 +5,7 @@ import store from '@store/index'
 // @ts-ignore
 import Time from '@tools/Time'
 import Component from '../Lib/Component'
-import { SCENES, HOLD_DURATION, HOLD_DELAY } from '../constants'
+import { HOLD_DURATION, HOLD_DELAY, CURSOR_MODES } from '../constants'
 
 type Direction = 'x' | 'y'
 
@@ -106,7 +106,7 @@ export default class PointerCursor extends Component {
     }
 
     renderCursor() {
-        if (store.state.scene === SCENES.BRUSH && store.state.brush.canDraw === false) {
+        if (store.state.cursorMode !== CURSOR_MODES.DEFAULT && store.state.cursorMode !== CURSOR_MODES.BRUSH) {
             this.element.classList.add('hidden')
         } else {
             this.element.classList.remove('hidden')

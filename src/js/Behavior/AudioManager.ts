@@ -25,7 +25,6 @@ class AudioManager extends Component {
     rendering: number
     canvasCtx: CanvasRenderingContext2D
     resizeListener: EventListener
-    keyboardListener: EventListener
     constructor() {
         super({
             store,
@@ -41,8 +40,6 @@ class AudioManager extends Component {
     start() {
         this.started = true
 
-        this.listenKeyboard()
-
         store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
         this.spotify = new Spotify()
         this.render()
@@ -52,39 +49,12 @@ class AudioManager extends Component {
         this.started = false
 
         window.removeEventListener('resize', this.resizeListener)
-        document.removeEventListener('keyup', this.keyboardListener)
 
         VoiceManager.stop()
         window.cancelAnimationFrame(this.rendering)
 
         this.render = () => {}
         this.element.innerHTML = ''
-    }
-
-    listenKeyboard() {
-        this.keyboardListener = (event) => {
-            event.preventDefault()
-            if ((event.target as HTMLElement).tagName === 'INPUT') return
-            // @ts-ignore
-            const key = event.key || event.keyCode
-            if (key === ' ' || key === 'Space' || key === 32) {
-                const value = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE  ? AUDIO_INPUT_MODES.SPOTIFY : AUDIO_INPUT_MODES.VOICE
-                store.dispatch('chooseAudio', value)
-
-                if (value === AUDIO_INPUT_MODES.VOICE) {
-                    VoiceManager.start()
-                    this.drawSine()
-                } else if (value === AUDIO_INPUT_MODES.SPOTIFY) {
-                    VoiceManager.stop()
-                    window.cancelAnimationFrame(this.rendering)
-
-                    if (this.spotify === undefined) {
-                        this.spotify = new Spotify()
-                    }
-                }
-            }
-        }
-        document.addEventListener('keyup', this.keyboardListener)
     }
 
     render() {
@@ -108,6 +78,13 @@ class AudioManager extends Component {
             this.canvas.width = window.innerWidth
             this.canvas.height = window.innerHeight / 10
             this.canvasCtx = this.canvas.getContext("2d")
+
+            if (VoiceManager.started !== false) {
+                return
+            }
+
+            VoiceManager.start()
+            this.drawSine()
             return
         }
 
@@ -115,6 +92,15 @@ class AudioManager extends Component {
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
             this.spotify.handleSearch((el.target as HTMLInputElement).value)
         })
+
+        if (this.spotify === undefined) {
+            this.spotify = new Spotify()
+        }
+
+        if (VoiceManager.started === true) {
+            VoiceManager.stop()
+            window.cancelAnimationFrame(this.rendering)
+        }
     }
 
     drawSine() {
