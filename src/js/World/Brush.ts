@@ -1,6 +1,6 @@
 import { Object3D, Raycaster, Vector2, BufferGeometry, BufferAttribute, Points, ShaderMaterial, Color, Group } from 'three'
 import * as dat from 'dat.gui'
-import { isEqual, nth, first, debounce } from 'lodash'
+import { debounce } from 'lodash'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -191,7 +191,7 @@ export default class Brush extends Component {
       }
 
       if (store.state.cursorMode === CURSOR_MODES.BRUSH) {
-        const onCanvas = isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)
+        const onCanvas = this.mouse.targeted === this.canvas || this.mouse.targeted === this.element
         if (onCanvas && this.material.uniforms.uOpacity.value < 1) {
           const value = this.material.uniforms.uOpacity.value + 0.06
           this.material.uniforms.uOpacity.value = Math.min(value, 1)
@@ -262,7 +262,7 @@ export default class Brush extends Component {
 
   listenMouseDown() {
     this.mouseDownListener = () => {
-      if ((isEqual(this.mouse.targeted, this.canvas) || isEqual(this.mouse.targeted, this.element)) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
+      if ((this.mouse.targeted === this.canvas || this.mouse.targeted === this.element) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
         this.isPainting = true
         this.paintingGeometry = new BufferGeometry()
         this.paintingPositions = []
@@ -277,7 +277,7 @@ export default class Brush extends Component {
 
   listenMouseUp() {
     this.mouseUpListener = () => {
-      if (isEqual(this.isPainting, true) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
+      if (this.isPainting === true && store.state.cursorMode === CURSOR_MODES.BRUSH) {
         this.isPainting = false
         this.paintedMaterials.push(this.material)
         this.paintedGeometries.push(this.paintingGeometry)
@@ -364,7 +364,7 @@ export default class Brush extends Component {
       const param = range.id
       const min = parseFloat(range.getAttribute('data-min'))
       const max = parseFloat(range.getAttribute('data-max'))
-      const isRounded = isEqual(range.getAttribute('data-round'), 'true')
+      const isRounded = range.getAttribute('data-round') === 'true'
 
       range.addEventListener('mousedown', (event: Event) => {
         const thumb = range.querySelector('.rangeThumb')
@@ -417,7 +417,7 @@ export default class Brush extends Component {
       const param = input.getAttribute('name')
       const type = input.getAttribute('type')
 
-      if (isEqual(type, 'range')) {
+      if (type === 'range') {
         input.addEventListener('input', () => {
           const value = parseFloat(input.value)
           this.params[param] = value
@@ -440,7 +440,7 @@ export default class Brush extends Component {
     ctx.beginPath()
     ctx.arc(paletteSize / 2, paletteSize / 2, paletteSize / 2, 0, 2 * Math.PI, false)
 
-    ctx.fillStyle = `rgb(${first(colors[store.state.emotion])})`
+    ctx.fillStyle = `rgb(${colors[store.state.emotion][0]})`
     ctx.fill()
 
     angles.forEach((angle, i) => {
@@ -449,8 +449,8 @@ export default class Brush extends Component {
       const endX = (Math.cos(angle + Math.PI) * 0.5 + 0.5) * paletteSize
       const endY = (- Math.sin(angle + Math.PI) * 0.5 + 0.5) * paletteSize
       const grd = ctx.createLinearGradient(x, y, endX, endY)
-      grd.addColorStop(0, `rgba(${nth(colors[store.state.emotion], i + 1)}, 1)`)
-      grd.addColorStop(0.45, `rgba(${nth(colors[store.state.emotion], i + 1)}, 0)`)
+      grd.addColorStop(0, `rgba(${colors[store.state.emotion][i + 1]}, 1)`)
+      grd.addColorStop(0.45, `rgba(${colors[store.state.emotion][i + 1]}, 0)`)
       ctx.fillStyle = grd
       ctx.fill()
     })
@@ -459,7 +459,7 @@ export default class Brush extends Component {
   }
 
   getBrushPreviewParam(param, i, value?) {
-    if (isEqual(param, 'size')) {
+    if (param === 'size') {
       const randomAngle = random(i * i) * Math.PI * 2
       const randomDist = random(i * i + 1)
       const x = Math.cos(randomAngle) * randomDist
@@ -467,11 +467,11 @@ export default class Brush extends Component {
       return [50 - ((x * this.params.size) * 70), 50 - ((y * this.params.size) * 70)]
     }
 
-    if (isEqual(param, 'particleSize')) {
+    if (param === 'particleSize') {
       return Math.max(this.params.particleSize * 0.1  * (1 + (random(i * 2) - 0.3)), 0.5)
     }
 
-    if (isEqual(param, 'color')) {
+    if (param === 'color') {
       const transparency = i <= this.params.count * 3 ? 1 - random(i * 8) * 0.7 : 0
       return `rgba(${value.r * 255}, ${value.g * 255}, ${value.b * 255}, ${transparency})`
     }
@@ -561,7 +561,7 @@ export default class Brush extends Component {
   }
 
   updateParam(param) {
-    if (isEqual(param, 'count')) {
+    if (param === 'count') {
       this.particlesOffset = []
       for (let i = 0; i < this.params.count; i++) {
           this.particlesOffset.push(
@@ -578,7 +578,7 @@ export default class Brush extends Component {
       return this.particlesOffset
     }
 
-    if (isEqual(param, 'particleSize')) {
+    if (param ==='particleSize') {
       this.brushPreview.forEach((elem, i) => {
         elem.setAttribute('r', `${this.getBrushPreviewParam('particleSize', i)}`)
       })
@@ -586,7 +586,7 @@ export default class Brush extends Component {
       return this.material.uniforms.uParticleSize.value = this.params.particleSize * this.pixelRatio
     }
 
-    if (isEqual(param, 'size')) {
+    if (param === 'size') {
       this.brushPreview.forEach((elem, i) => {
         const [x, y] = <number[]> this.getBrushPreviewParam('size', i)
         elem.setAttribute('cx', `${x}`)
@@ -595,7 +595,7 @@ export default class Brush extends Component {
       return this.material.uniforms.uSize.value = this.params.size
     }
 
-    if (isEqual(param, 'color')) {
+    if (param === 'color') {
       const color = this.getColorInGradient()
 
       this.brushPreview.forEach((elem, i) => {

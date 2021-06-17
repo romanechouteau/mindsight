@@ -1,5 +1,3 @@
-import { map, has } from 'lodash'
-
 export default class PubSub {
     events: {
       [key: string]: any
@@ -9,7 +7,7 @@ export default class PubSub {
     }
 
     subscribe(event, callback) {
-        if(!has(this.events, event)) {
+        if(!this.events.hasOwnProperty(event)) {
             this.events[event] = []
         }
 
@@ -17,10 +15,10 @@ export default class PubSub {
     }
 
     publish(event, data = {}) {
-        if(!has(this.events, event)) {
+        if(!this.events.hasOwnProperty(event)) {
           return []
         }
 
-        return map(this.events[event], callback => callback(data))
+        return this.events[event].map(callback => callback(data))
       }
   }
