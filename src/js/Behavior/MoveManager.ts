@@ -7,7 +7,7 @@ import Ground from "../World/Ground"
 import Gravity from "./Gravity"
 import { Mouse } from '../Tools/Mouse'
 
-import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN } from '../constants'
+import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN, CURSOR_MODES } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 // @ts-ignore
@@ -135,7 +135,7 @@ export default class MoveManager {
     setMoveCursor() {
         // @ts-ignore
         App.state.time.on('tick', () => {
-            if (store.state.brush.canDraw === false) {
+            if (store.state.cursorMode === CURSOR_MODES.MOVE) {
                 this.cursorMaterial.uniforms.uTime.value += 0.01
                 this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
 
@@ -189,7 +189,7 @@ export default class MoveManager {
         this.mouse.on('click', () => {
             if (this.camera.orbitControls.enabled) return;
             if (this.lastIntersection === undefined) return;
-            if (store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
+            if (store.state.cursorMode !== CURSOR_MODES.MOVE || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
@@ -306,11 +306,11 @@ export default class MoveManager {
 
     handleLookAround() {
         this.mouse.on('down', () => {
-            if (store.state.brush.canDraw === true) return
+            if (store.state.cursorMode !== CURSOR_MODES.MOVE) return
             this.prevEuler = this.euler
         })
         this.mouse.on('drag', ev => {
-            if (this.camera.orbitControls.enabled || store.state.brush.canDraw === true || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
+            if (this.camera.orbitControls.enabled || store.state.cursorMode !== CURSOR_MODES.MOVE || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
             if (!this.isLooking) this.toggleLooking(true)
             this.euler.y = this.prevEuler.y - (this.mouse.lastCursor[0] - this.mouse.cursor[0])
             this.euler.x = this.prevEuler.x + (this.mouse.lastCursor[1] - this.mouse.cursor[1])

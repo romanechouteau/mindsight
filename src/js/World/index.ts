@@ -24,6 +24,7 @@ import WorldBuilder from "../Behavior/WorldBuilder"
 import EyeTrackingManager from '../Behavior/EyeTrackingManager'
 import { SCENES, START_FOG_FAR } from '../constants'
 import Gravity from '../Behavior/Gravity'
+import ModeManager from '../Behavior/ModeManager'
 
 export default class World extends Component {
   time: Time
@@ -50,6 +51,7 @@ export default class World extends Component {
   pointerCursor: PointerCursor
   eyeTrackingManager: EyeTrackingManager
   gravity: Gravity
+  modeManager: ModeManager
   constructor(options) {
     super({
       store
@@ -163,6 +165,10 @@ export default class World extends Component {
     })
   }
 
+  setModeManager() {
+    this.modeManager = new ModeManager()
+  }
+
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       setTimeout(() => {
@@ -172,6 +178,10 @@ export default class World extends Component {
       }, 22000);
     } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
       this.eyeTrackingManager.stop()
+    }
+
+    if (store.state.scene >= SCENES.EYETRACKING && this.modeManager === undefined) {
+      this.setModeManager()
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
@@ -209,6 +219,7 @@ export default class World extends Component {
       AudioManager.stop()
     }
   }
+
   setEyeTrackingManager() {
     this.eyeTrackingManager = new EyeTrackingManager({
       sizes: this.sizes,

@@ -2,10 +2,9 @@
 import store from '@store/index'
 import PointerCursor from '../Tools/PointerCursor'
 
-import { LAST_SCENE, SCENES } from '../constants'
+import { CURSOR_MODES, LAST_SCENE, SCENES } from '../constants'
 
 export default class SceneManager {
-    element: HTMLElement
     pointerCursor: PointerCursor
     constructor(options: { pointerCursor: PointerCursor }) {
         const { pointerCursor } = options
@@ -16,14 +15,13 @@ export default class SceneManager {
     }
 
     mouseDown () {
-        // TODO add cursor toggle
-        if (store.state.scene !== SCENES.PARAMETERS && store.state.scene !== SCENES.BRUSH && store.state.scene <= LAST_SCENE) {
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
             this.pointerCursor.startHold(this.handleNextScene)
         }
     }
 
     mouseUp () {
-        if (store.state.scene !== SCENES.PARAMETERS && store.state.scene <= LAST_SCENE) {
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
             this.pointerCursor.stopHold()
         }
     }

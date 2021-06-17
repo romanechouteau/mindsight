@@ -1,0 +1,29 @@
+<div class="cursorMode visible">
+    <div class="mode visible {{cursorMode1}}" data-mode="{{cursorMode1}}">
+        <div class="modeButton">
+            <div class="text">1</div>
+        </div>
+    </div>
+    <div class="mode {{cursorMode2}}" data-mode="{{cursorMode2}}">
+        <div class="modeButton">
+            <div class="text">2</div>
+        </div>
+    </div>
+    <div class="mode {{cursorMode3}}" data-mode="{{cursorMode3}}">
+        <div class="modeButton">
+            <div class="text">3</div>
+        </div>
+    </div>
+</div>
+<div class="audioInputMode">
+    <div class="mode visible {{audioInputMode9}}" data-mode="{{audioInputMode9}}">
+        <div class="modeButton">
+            <div class="text">9</div>
+        </div>
+    </div>
+    <div class="mode visible {{audioInputMode0}}" data-mode="{{audioInputMode0}}">
+        <div class="modeButton">
+            <div class="text">0</div>
+        </div>
+    </div>
+</div>

@@ -32,5 +32,10 @@ export default {
         state.environment = payload
 
         return state
+    },
+    chooseCursor (state, payload) {
+        state.cursorMode = payload
+
+        return state
     }
 }

@@ -18,5 +18,8 @@ export default {
     updateEnvironment(context, payload) {
         context.commit('updateEnvironment', payload)
         context.events.publish('updateEnvironment')
-    }
+    },
+    chooseCursor(context, payload) {
+        context.commit('chooseCursor', payload)
+    },
 }
