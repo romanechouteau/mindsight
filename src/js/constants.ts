@@ -112,3 +112,20 @@ export const ENVIRONMENTS_BORDERS_MARGIN = 7
 export const START_FOG_FAR = 30
 
 export const DEFAULT_FOG_FAR = 50
+
+// dynamic import is impossible with snowpack
+// TODO: try with require.context plugin
+import bPlaine from '@textures/beach/Plaine_Surface_Color.jpg'
+import bColline from '@textures/beach/Colline_Surface_Color.jpg'
+import bVallee from '@textures/beach/Vallee_Surface_Color.jpg'
+import bMontagnes from '@textures/beach/Montagnes_Surface_Color.jpg'
+
+import mPlaine from '@textures/meadow/PlaineSurface_Color.jpg'
+import mColline from '@textures/meadow/CollinesSurface_Color.jpg'
+import mVallee from '@textures/meadow/ValleeSurface_Color.jpg'
+import mMontagnes from '@textures/meadow/MontagnesSurface_Color.jpg'
+
+export const ENVIRONMENTS_COLOR_MAPS = {
+    [ENVIRONMENTS.BEACH]: [ bPlaine, bColline, bVallee, bMontagnes ],
+    [ENVIRONMENTS.MEADOW]: [ mPlaine, mColline, mVallee, mMontagnes ],
+}

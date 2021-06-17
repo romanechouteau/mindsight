@@ -3,7 +3,7 @@ import { Color, DoubleSide, FrontSide, Mesh, MeshBasicMaterial, Object3D, PlaneB
 import Time from "../../Tools/Time"
 // import { WaterMesh } from './WaterMesh2'
 import { Water as WaterMesh } from 'three/examples/jsm/objects/Water'
-import waterNormalsSrc from '../../../images/textures/plage/waternormals.jpeg'
+import waterNormalsSrc from '../../../images/textures/beach/waternormals.jpeg'
 
 interface WaterParams {
     time: Time
