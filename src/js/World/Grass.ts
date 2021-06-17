@@ -8,7 +8,7 @@ import vertexShader from '@shaders/grassVert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/grassFrag.glsl'
 
-import { GRASS_COLOR, ENVIRONMENTS } from '../constants'
+import { GRASS_COLOR, ENVIRONMENTS, LIST_ENVIRONMENTS } from '../constants'
 
 const loader = new GLTFLoader()
 
@@ -26,8 +26,8 @@ export default class Grass {
   grassMesh: InstancedMesh
   container: Object3D
   grassMaterial: ShaderMaterial
-  environmentKey: string
-  constructor(options: { time: any, ground: Mesh, scale: Vector3, environmentKey: string }) {
+  environmentKey: ENVIRONMENTS
+  constructor(options: { time: any, ground: Mesh, scale: Vector3, environmentKey: ENVIRONMENTS }) {
     const { time, ground, scale, environmentKey } = options
     this.time = time
     this.scale = scale
@@ -92,10 +92,18 @@ export default class Grass {
     this.positions = Array.from(this.ground.geometry.attributes.position.array)
     const targetPositions = this.ground.geometry.morphAttributes.position
     const targetNormals = this.ground.geometry.morphAttributes.normal
+    const morphTargetsCount = this.ground.morphTargetInfluences.length + 1
+    const colors = []
+    for (let j = 0; j < morphTargetsCount; j++) {
+      const index = LIST_ENVIRONMENTS.indexOf(this.environmentKey) * morphTargetsCount + j
+      const attributeKey = index === 0 ? 'color' : `color_${index}`
+      colors.push(this.ground.geometry.attributes[attributeKey])
+    }
 
     this.indexes = []
     const special = []
     const normals = []
+    const visible = []
     const morphTargets1 = []
     const morphTargets2 = []
     const morphTargets3 = []
@@ -127,6 +135,8 @@ export default class Grass {
       normalsTarget2.push(...morphTargetsNormals[1])
       normalsTarget3.push(...morphTargetsNormals[2])
 
+      visible.push(this.getColor(colors[0], randomIndex), this.getColor(colors[1], randomIndex), this.getColor(colors[2], randomIndex), this.getColor(colors[3], randomIndex))
+
       special.push(randomSpecial)
       this.indexes.push(randomIndex)
     }
@@ -155,9 +165,16 @@ export default class Grass {
     this.grassMesh.geometry.setAttribute('aNormalsTarget3',
       new InstancedBufferAttribute(new Float32Array(normalsTarget3), 3)
     )
+    this.grassMesh.geometry.setAttribute('aVisible',
+      new InstancedBufferAttribute(new Float32Array(visible), 4)
+    )
 
     this.grassMesh.instanceMatrix.needsUpdate = true
     this.grassMaterial.uniforms.uMorphInfluences.value = this.ground.morphTargetInfluences
+  }
+
+  getColor(colors, index) {
+    return colors.array[index * colors.itemSize]
   }
 
   getAttributeData(attribute, index) {
