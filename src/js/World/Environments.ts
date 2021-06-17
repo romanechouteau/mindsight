@@ -82,20 +82,20 @@ export default class Environments {
       let water
       if (i === ENVIRONMENT_INDICES.beach) {
         water = this.setWater(ground.children[0] as Mesh)
-        ground.children[0].material = new MeshBasicMaterial({ 
+        ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineBeachTexture),
           morphTargets: true
-        }) 
+        })
         // = textureLoader.load(plaineBeachTexture)
       } else {
-        ground.children[0].material = new MeshBasicMaterial({ 
+        ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineMeadowTexture),
           morphTargets: true
-        }) 
+        })
         // = textureLoader.load(plaineMeadowTexture)
       }
 
-      this.environments[i].userData.envName = environmentKeys[i]
+      this.environments[i].userData.envName = LIST_ENVIRONMENTS[i]
 
       // Todo: refactor to handle all cases
       this.environments[this.environments.length - 1].visible = false
@@ -158,7 +158,7 @@ export default class Environments {
 
             this.environments[environment].visible = true
             this.environments[Math.abs(environment - 1)].visible = true
-            
+
             gsap.to(this.container.position, {
               duration: 0.9,
               ease: 'power3.inOut',

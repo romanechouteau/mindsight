@@ -49,7 +49,7 @@ export default class MapHeighter {
     }
 
     async init() {
-        
+
         const src = ENVIRONMENTS_COLOR_MAPS[this.envIndex]
         const blendingScene = new Scene()
         const blendingRenderer = new WebGLRenderer()
@@ -57,7 +57,7 @@ export default class MapHeighter {
         const blendingCamera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
         blendingCamera.position.z = 8
         blendingRenderer.setSize(500, 500)
-        document.querySelector('.heighterDebug').appendChild(blendingRenderer.domElement)
+        // document.querySelector('.heighterDebug').appendChild(blendingRenderer.domElement)
         const geometry = new PlaneBufferGeometry(2, 2, 1, 1)
         const textures = await Promise.all(src.map( _src => (textureLoader.loadAsync(_src))))
         this.blendMaterial = new RawShaderMaterial({
@@ -69,9 +69,9 @@ export default class MapHeighter {
                 map2: { type: "t", value: textures[1] } as IUniform,
                 map3: { type: "t", value: textures[2] } as IUniform,
                 map4: { type: "t", value: textures[3] } as IUniform,
-            }, 
+            },
         })
-        debugger
+        // debugger
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )
 
         this.time.on('tick', () => {
@@ -93,7 +93,7 @@ export default class MapHeighter {
 
     handleChange(value: number) {
         const values = [0, 0, 0, 0]
-        
+
         const [ firstMapIndex, secondMapIndex ] = [ Math.floor(value/WORLDBUILDER_PRECISION) % values.length, (Math.floor(value/WORLDBUILDER_PRECISION) + 1) % values.length ]
         const firstMapInfluence = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
         const secondMapInfluence = ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
