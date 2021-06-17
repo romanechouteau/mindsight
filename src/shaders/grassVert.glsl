@@ -15,6 +15,8 @@ attribute vec3 aNormalsTarget1;
 attribute vec3 aNormalsTarget2;
 attribute vec3 aNormalsTarget3;
 
+#include <fog_pars_vertex>
+
 float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
@@ -76,7 +78,11 @@ void main() {
     float displacement = cos(uTime + delay) * (pow(1. - uv.y, 2.) * 0.05);
     modelPosition.x += displacement;
 
-    vec4 viewPosition = viewMatrix * modelPosition;
-    vec4 projectedPosition = projectionMatrix * viewPosition;
+
+    vec4 mvPosition = viewMatrix * modelPosition;
+
+    vec4 projectedPosition = projectionMatrix * mvPosition;
     gl_Position = projectedPosition;
+
+    #include <fog_vertex>
 }

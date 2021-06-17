@@ -1,4 +1,4 @@
-import { AxesHelper, FogExp2, Object3D, Scene } from 'three'
+import { AxesHelper, Fog, Object3D, Scene } from 'three'
 
 // @ts-ignore
 import Time from '@tools/Time'
@@ -22,7 +22,7 @@ import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
 import EyeTrackingManager from '../Behavior/EyeTrackingManager'
-import { SCENES } from '../constants'
+import { SCENES, START_FOG_FAR } from '../constants'
 import Gravity from '../Behavior/Gravity'
 
 export default class World extends Component {
@@ -49,6 +49,7 @@ export default class World extends Component {
   environments: Environments
   pointerCursor: PointerCursor
   eyeTrackingManager: EyeTrackingManager
+  gravity: Gravity
   constructor(options) {
     super({
       store
@@ -106,7 +107,7 @@ export default class World extends Component {
     this.container.add(this.light.container)
   }
   setFog() {
-    this.globalScene.fog = new FogExp2(0xF4C5B5, 0.03)
+    this.globalScene.fog = new Fog(0xF4C5B5, 0.01, START_FOG_FAR)
   }
 
   setUser() {
@@ -116,7 +117,9 @@ export default class World extends Component {
       ground: this.environments,
       canvas: this.canvas,
       scene: this.container,
-      pixelRatio: this.pixelRatio
+      gravity: this.gravity,
+      pixelRatio: this.pixelRatio,
+      globalScene: this.globalScene
     })
   }
   setBrush() {
@@ -182,8 +185,8 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
-      this.setWorldBuilder()      
-      new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
+      this.setWorldBuilder()
+      this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
     }

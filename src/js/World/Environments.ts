@@ -63,9 +63,9 @@ export default class Environments {
 
       this.environments[i] = new Object3D()
 
-      this.environments[i].scale.set(ground.children[0].scale.x * 0.05, ground.children[0].scale.y * 0.05, ground.children[0].scale.z * 0.05)
+      this.environments[i].scale.set(ground.children[0].scale.x * 0.1, ground.children[0].scale.y * 0.1, ground.children[0].scale.z * 0.1)
       ground.children[0].scale.set(1., 1., 1.)
-      ;(ground.children[0] as Mesh).material.side = FrontSide
+      ;(ground.children[0] as Mesh).material.side = DoubleSide
 
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE

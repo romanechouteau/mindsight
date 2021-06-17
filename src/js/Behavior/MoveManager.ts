@@ -1,13 +1,13 @@
-import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color, Vector2 } from "three";
+import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, ShaderMaterial, BufferGeometry, Points, BufferAttribute, Color, Vector2, Scene } from "three";
 import gsap from "gsap/all";
-import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js'
 
 import Camera from '../Camera'
 // TODO: add app in global namespace
 import Ground from "../World/Ground"
+import Gravity from "./Gravity"
 import { Mouse } from '../Tools/Mouse'
 
-import { BLOOM_LAYER, CURSOR_SIZE } from '../constants'
+import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 // @ts-ignore
@@ -25,11 +25,13 @@ import store from '@store/index'
 export default class MoveManager {
     raycaster: Raycaster
     mouse: Mouse
+    dummy: Object3D
     canvas: HTMLElement
     camera: Camera
     ground: Mesh
     scene: Object3D
     cursor: Points
+    globalScene: Scene
     groundInstance: Ground
     cursorMaterial: ShaderMaterial
     cursorBase: Mesh
@@ -45,14 +47,18 @@ export default class MoveManager {
     rotationHelper: Object3D
     groundContainer: Mesh
     cursorParticlesMaterial: ShaderMaterial
-    constructor({ camera, mouse, ground, canvas, scene, pixelRatio }) {
+    gravity: Gravity
+    constructor({ camera, mouse, ground, canvas, scene, pixelRatio, globalScene, gravity }) {
         this.mouse = mouse
         this.camera = camera
         this.canvas = canvas
         this.scene = scene
         this.ground = ground.container.children[0].children[0].children[0]
         this.pixelRatio = pixelRatio
+        this.globalScene = globalScene
         this.groundContainer = ground.container.children[0]
+        this.gravity = gravity
+        this.dummy = new Object3D()
 
         this.raycaster = new Raycaster()
         // this.gravity = new Raycaster()
@@ -86,7 +92,7 @@ export default class MoveManager {
                 fragmentShader,
                 transparent: true,
                 uniforms: {
-                    uParticleSize: { value: 50 * this.pixelRatio },
+                    uParticleSize: { value: 30 * this.pixelRatio },
                     uTime: { value: 0. },
                     uColor: { value: new Color(0xFFFFFF) },
                     uOpacity: { value: 1. },
@@ -187,18 +193,115 @@ export default class MoveManager {
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
-
                 this.isMoving = true
+                const scale = this.groundContainer.scale
+                const borders = this.ground.geometry.boundingBox
+
+                const distances = this.getDistances(borders, scale, this.cursor.position)
+                const outAxis = distances.find(distance => distance.min <= ENVIRONMENTS_BORDERS_MARGIN || distance.max <= ENVIRONMENTS_BORDERS_MARGIN)
+                const otherAxis = distances.find(distance => distance !== outAxis)
+                const translate = {
+                    x: this.cursor.position.x - this.camera.container.position.x,
+                    z: this.cursor.position.z - this.camera.camera.position.z - this.camera.container.position.z
+                }
+
+                const duration = Math.min(this.lastIntersection.distance/5, 2)
+                const delay = 0.25
+                const ease = outAxis && otherAxis ? 'Power2.easeIn' : 'Power2.easeInOut'
+
                 gsap.to(this.camera.container.position, {
-                    delay: 0.25,
-                    duration: this.lastIntersection.distance/5,
+                    delay,
+                    duration,
                     x: this.cursor.position.x,
-                    y: this.cursor.position.y,
-                    z: this.cursor.position.z - 5,
-                    onComplete: () => this.isMoving = false
+                    y: this.cursor.position.y + this.camera.camera.position.y,
+                    z: this.cursor.position.z - this.camera.camera.position.z,
+                    onComplete: () => {
+                        if (!outAxis) {
+                            this.isMoving = false
+                        }
+                    },
+                    ease
                 })
+
+                if (outAxis && otherAxis) {
+                    gsap.to(this.globalScene.fog, {
+                        far: 0.01,
+                        duration: duration,
+                        delay,
+                    })
+                    this.handleOutOfBorders(outAxis, otherAxis, scale, borders, translate, duration)
+                }
+
             }
         })
+    }
+
+    handleOutOfBorders(outAxis, otherAxis, scale, borders, translate, duration) {
+        const fade = document.querySelector('#fade') as HTMLElement
+        fade.style.display = 'block'
+
+        const offset = { z: - this.camera.camera.position.z, x: 0 }
+        const margin = { min: ENVIRONMENTS_BORDERS_MARGIN, max: - ENVIRONMENTS_BORDERS_MARGIN }
+        const factor = { min: 1, max: -1 }
+
+        const appear = () => {
+            const direction = Math.min(outAxis.min, outAxis.max) === outAxis.min ? 'max' : 'min'
+            const otherDirection = Math.min(otherAxis.min, otherAxis.max) === otherAxis.min ? 'max' : 'min'
+
+            const position = borders[direction][outAxis.axis] * scale[outAxis.axis] + offset[outAxis.axis] + margin[direction]
+            const otherPosition = borders[otherDirection][otherAxis.axis] * scale[otherAxis.axis] + offset[otherAxis.axis] + Math.min(otherAxis.min, otherAxis.max) * factor[otherDirection]
+
+            this.camera.container.position[outAxis.axis] = position - translate[outAxis.axis]
+            this.camera.container.position[otherAxis.axis] = otherPosition - translate[otherAxis.axis]
+            this.dummy.position.y = 100
+            this.dummy.position[outAxis.axis] = position
+            this.dummy.position[otherAxis.axis] = otherPosition
+            this.gravity.instantCollision(this.dummy, this.camera.camera)
+            this.camera.container.position.y = this.dummy.position.y
+
+            gsap.to(this.camera.container.position, {
+                delay: 0.25,
+                duration,
+                [outAxis.axis]: position,
+                [otherAxis.axis]: otherPosition,
+                ease: 'Power2.easeOut',
+                onComplete: () => {
+                    this.isMoving = false
+                }
+            })
+            gsap.to(fade, {
+                delay: 0.25,
+                duration: 1,
+                opacity: 0,
+                onComplete: () => fade.style.display = 'none'
+            })
+            gsap.to(this.globalScene.fog, {
+                far: DEFAULT_FOG_FAR,
+                duration: 3,
+                delay: 0.25,
+                ease: 'Power1.easeInOut'
+            })
+        }
+
+        gsap.to(fade, {
+            delay: Math.min(this.lastIntersection.distance / 5, 2) - 0.75,
+            duration: 1,
+            opacity: 1,
+            onComplete: appear
+        })
+    }
+
+    getDistances(borders, scale, position) {
+        const distancesX = this.getAxisDistance('x', borders, scale, position)
+        const distancesZ = this.getAxisDistance('z', borders, scale, position)
+
+        return [distancesX, distancesZ]
+    }
+
+    getAxisDistance(axis, borders, scale, position) {
+        const minDistance = Math.abs(borders.min[axis] * scale[axis] - position[axis])
+        const maxDistance = Math.abs(borders.max[axis] * scale[axis] - position[axis])
+        return { min: minDistance, max: maxDistance, axis }
     }
 
     handleLookAround() {
