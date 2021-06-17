@@ -94,7 +94,7 @@ export const HOLD_DURATION = 60
 
 export const HOLD_DELAY = 10
 
-export const ENVIRONMENTS_BORDERS_MARGIN = 5
+export const ENVIRONMENTS_BORDERS_MARGIN = 7
 
 export const START_FOG_FAR = 30
 
