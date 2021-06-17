@@ -11,15 +11,24 @@ import Camera from '@js/Camera'
 // @ts-ignore
 import { Mouse } from '@tools/Mouse'
 // @ts-ignore
+import { toRGB } from '@tools/colorUtils'
+// @ts-ignore
+import { random } from '@tools/mathUtils'
+// @ts-ignore
+import template from '../../templates/brushInterface.template'
+// @ts-ignore
 import Component from '@lib/Component'
+// @ts-ignore
+import { htmlUtils } from '@tools/utils'
+import VoiceManager from '../Behavior/VoiceManager'
 // @ts-ignore
 import vertexShader from '@shaders/brushvert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/brushfrag.glsl'
 
-import { AUDIO_INPUT_MODES, CURSOR_MODES } from '../constants'
 
-import VoiceManager from '../Behavior/VoiceManager'
+import { AUDIO_INPUT_MODES, CURSOR_MODES, BRUSH_PALETTE_ANGLES,
+  BRUSH_LAST_POSITIONS, BRUSH_PALETTE_COLORS, LIST_MOODS_PALETTE } from '../constants'
 
 const configShaderMaterial = {
   depthWrite: false,
@@ -28,23 +37,6 @@ const configShaderMaterial = {
   vertexShader,
   fragmentShader,
   transparent: true
-}
-
-const angles = [
-  Math.PI * 2 / 3,
-  Math.PI * 4 / 3,
-  2 * Math.PI,
-]
-
-const colors = {
-  joy: [[255, 0, 0], [255, 255, 0], [0, 255, 255], [85, 0, 255]]
-}
-
-const lastPositions = 5
-
-const random = (index) => {
-  const number = Math.sin(index * 12.9898 + index * 78.233) * 43758.5453
-  return number - Math.floor(number);
 }
 
 export default class Brush extends Component {
@@ -125,7 +117,7 @@ export default class Brush extends Component {
     this.scene.add(this.container)
     this.debug = debug
 
-    this.render()
+    this.firstRender()
 
     this.material = new ShaderMaterial({
       ...configShaderMaterial,
@@ -147,7 +139,7 @@ export default class Brush extends Component {
     this.listenMouseDown()
     this.listenMouseUp()
 
-    this.resizeListener = debounce(() => this.render(), 150)
+    this.resizeListener = debounce(() => this.resizePalette(), 150)
     window.addEventListener('resize', this.resizeListener)
   }
 
@@ -181,21 +173,13 @@ export default class Brush extends Component {
             new BufferAttribute(new Float32Array(values), 1)
           )
         })
-      } else {
-        this.paintedGeometries.forEach(geometry => {
-          geometry.setAttribute(
-            'audioData',
-            new BufferAttribute(new Float32Array(Array(geometry.attributes.position.count).fill(0)), 1)
-          )
-        })
       }
 
       if (store.state.cursorMode === CURSOR_MODES.BRUSH) {
-        const onCanvas = this.mouse.targeted === this.canvas || this.mouse.targeted === this.element
-        if (onCanvas && this.material.uniforms.uOpacity.value < 1) {
+        if (this.mouse.targeted === this.canvas && this.material.uniforms.uOpacity.value < 1) {
           const value = this.material.uniforms.uOpacity.value + 0.06
           this.material.uniforms.uOpacity.value = Math.min(value, 1)
-        } else if (!onCanvas && this.material.uniforms.uOpacity.value > 0) {
+        } else if (this.mouse.targeted !== this.canvas && this.material.uniforms.uOpacity.value > 0) {
           const value = this.material.uniforms.uOpacity.value - 0.03
           this.material.uniforms.uOpacity.value = Math.max(value, 0)
         }
@@ -209,7 +193,7 @@ export default class Brush extends Component {
           const position = intersection[0].point
           const currentPositions = []
           this.brushPositions = this.brushPositions.length % this.params.count * 3 === 0
-            ? this.brushPositions.slice((-this.params.count * 3 * lastPositions))
+            ? this.brushPositions.slice((-this.params.count * 3 * BRUSH_LAST_POSITIONS))
             : []
 
           if (this.isPainting) {
@@ -262,7 +246,7 @@ export default class Brush extends Component {
 
   listenMouseDown() {
     this.mouseDownListener = () => {
-      if ((this.mouse.targeted === this.canvas || this.mouse.targeted === this.element) && store.state.cursorMode === CURSOR_MODES.BRUSH) {
+      if (this.mouse.targeted === this.canvas && store.state.cursorMode === CURSOR_MODES.BRUSH) {
         this.isPainting = true
         this.paintingGeometry = new BufferGeometry()
         this.paintingPositions = []
@@ -299,63 +283,19 @@ export default class Brush extends Component {
     this.mouse.on('up', this.mouseUpListener)
   }
 
-  render() {
-    const sizePosition = this.getThumbPosition(0, 0.7, store.state.brush.size)
+  firstRender () {
+    const sizePosition = this.getThumbPosition(0, 0.5, store.state.brush.size)
     const paletteSize = Math.floor(0.1 * window.innerHeight)
 
-    this.element.innerHTML = `
-      <div class="paramsGroup bigAndSmallCircles">
-        <div class="inputGroup circleRangeGroup">
-          <div
-              class="circleRange"
-              id="size"
-              data-min="0"
-              data-max="0.7">
-            <div
-                class="rangeThumb"
-                style="top: ${sizePosition[1]}%; left: ${sizePosition[0]}%;"></div>
-            <div class="brushPreview">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div class="inputGroup colorRangeGroup">
-          <div
-              class="colorRange"
-              id="color"
-              style="width: ${paletteSize}px; height: ${paletteSize}px;">
-              <canvas
-                id="colorPalette"></canvas>
-            <div
-                class="rangeThumb"
-                style="top: ${store.state.brush.color[1]}%; left: ${store.state.brush.color[0]}%;"></div>
-          </div>
-        </div>
-      </div>
-      <div class="paramsGroup">
-        <div class="inputGroup">
-        <input
-        type="range"
-        min="1"
-        max="50"
-        step="1"
-        name="particleSize"
-        id="particleSize"
-        value="${store.state.brush.particleSize}" />
-        </div>
-        <div class="inputGroup">
-          <input
-            type="range"
-            min="1"
-            max="50"
-            step="1"
-            name="count"
-            id="count"
-            value="${store.state.brush.count}" />
-        </div>
-      </div>
-    `
+    htmlUtils.renderToDOM(this.element, template, {
+      count: store.state.brush.count,
+      paletteSize,
+      particleSize: store.state.brush.particleSize,
+      brushColorTop: store.state.brush.color[1],
+      brushColorLeft: store.state.brush.color[0],
+      sizePositionTop: sizePosition[1],
+      sizePositionLeft: sizePosition[0],
+     })
 
     this.createPalette(paletteSize)
     this.renderBrushPreview()
@@ -432,25 +372,53 @@ export default class Brush extends Component {
     })
   }
 
+
+  render () {
+    if (store.state.cursorMode === CURSOR_MODES.BRUSH) {
+      this.element.classList.add('visible')
+    } else {
+      this.element.classList.remove('visible')
+    }
+
+    if (store.state.audioInputMode !== AUDIO_INPUT_MODES.VOICE) {
+      this.paintedGeometries.forEach(geometry => {
+        geometry.setAttribute(
+          'audioData',
+          new BufferAttribute(new Float32Array(Array(geometry.attributes.position.count).fill(0)), 1)
+        )
+      })
+    }
+  }
+
+  resizePalette () {
+    const paletteSize = Math.floor(0.1 * window.innerHeight)
+    this.createPalette(paletteSize)
+  }
+
   createPalette(paletteSize) {
-    const colorCanvas = <HTMLCanvasElement>this.element.querySelector('#colorPalette')
+    const colorCanvas = this.element.querySelector('#colorPalette') as HTMLCanvasElement
+    const colorRange = this.element.querySelector('.colorRange') as HTMLElement
+    colorRange.style.width = paletteSize
+    colorRange.style.height = paletteSize
     colorCanvas.width = paletteSize
     colorCanvas.height = paletteSize
+
     const ctx = colorCanvas.getContext("2d")
+    ctx.clearRect(0, 0, paletteSize, paletteSize)
     ctx.beginPath()
     ctx.arc(paletteSize / 2, paletteSize / 2, paletteSize / 2, 0, 2 * Math.PI, false)
 
-    ctx.fillStyle = `rgb(${colors[store.state.emotion][0]})`
+    ctx.fillStyle = `rgb(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[0]]).join(',')})`
     ctx.fill()
 
-    angles.forEach((angle, i) => {
+    BRUSH_PALETTE_ANGLES.forEach((angle, i) => {
       const x = (Math.cos(angle) * 0.5 + 0.5) * paletteSize
       const y = (- Math.sin(angle) * 0.5 + 0.5) * paletteSize
       const endX = (Math.cos(angle + Math.PI) * 0.5 + 0.5) * paletteSize
       const endY = (- Math.sin(angle + Math.PI) * 0.5 + 0.5) * paletteSize
       const grd = ctx.createLinearGradient(x, y, endX, endY)
-      grd.addColorStop(0, `rgba(${colors[store.state.emotion][i + 1]}, 1)`)
-      grd.addColorStop(0.45, `rgba(${colors[store.state.emotion][i + 1]}, 0)`)
+      grd.addColorStop(0, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i + 1]]).join(',')}, 1)`)
+      grd.addColorStop(0.45, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i + 1]]).join(',')}, 0)`)
       ctx.fillStyle = grd
       ctx.fill()
     })
@@ -464,7 +432,7 @@ export default class Brush extends Component {
       const randomDist = random(i * i + 1)
       const x = Math.cos(randomAngle) * randomDist
       const y = Math.sin(randomAngle) * randomDist
-      return [50 - ((x * this.params.size) * 70), 50 - ((y * this.params.size) * 70)]
+      return [50 - ((x * this.params.size) * 100), 50 - ((y * this.params.size) * 100)]
     }
 
     if (param === 'particleSize') {
@@ -478,12 +446,12 @@ export default class Brush extends Component {
   }
 
   renderBrushPreview() {
-    const brushPreviewSvg = <HTMLElement> this.element.querySelector('.brushPreview svg')
+    const brushPreviewSvg = this.element.querySelector('.brushPreview svg') as HTMLElement
     const color = this.getColorInGradient()
 
     brushPreviewSvg.innerHTML = ''
     for (let i = 0; i < 50 * 3; i++) {
-      const [x, y] = <number[]> this.getBrushPreviewParam('size', i)
+      const [x, y] = this.getBrushPreviewParam('size', i) as number[]
       brushPreviewSvg.innerHTML += `
         <circle
           cx="${x}"
@@ -572,7 +540,7 @@ export default class Brush extends Component {
       }
       const color = this.getColorInGradient()
       this.brushPreview.forEach((elem, i) => {
-        elem.style.fill = <string> this.getBrushPreviewParam('color', i, color)
+        elem.style.fill = this.getBrushPreviewParam('color', i, color) as string
       })
 
       return this.particlesOffset
@@ -588,7 +556,7 @@ export default class Brush extends Component {
 
     if (param === 'size') {
       this.brushPreview.forEach((elem, i) => {
-        const [x, y] = <number[]> this.getBrushPreviewParam('size', i)
+        const [x, y] = this.getBrushPreviewParam('size', i) as number[]
         elem.setAttribute('cx', `${x}`)
         elem.setAttribute('cy', `${y}`)
       })
@@ -599,7 +567,7 @@ export default class Brush extends Component {
       const color = this.getColorInGradient()
 
       this.brushPreview.forEach((elem, i) => {
-        elem.style.fill = <string> this.getBrushPreviewParam('color', i, color)
+        elem.style.fill = this.getBrushPreviewParam('color', i, color) as string
       })
 
       return this.material.uniforms.uColor.value = color

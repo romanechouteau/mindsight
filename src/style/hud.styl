@@ -9,18 +9,35 @@
     align-items: center
     padding: 32px
     font-family: 'Lato', sans-serif
+    pointer-events: none
 
     & > div
-        display: none
-        animation: 1s ease 1 both appear
+        display: flex
+        opacity: 0
+        visibility: hidden
+        pointer-events: none
+        transition: opacity 0.5s ease, visibility 0s 0.5s ease
 
         &.visible
-            display: flex
+            opacity: 1
+            visibility: visible
+            pointer-events: all
+            transition: opacity 0.5s ease
+
+            .mode
+                &.visible
+                    opacity: 1
+                    visibility: visible
+                    pointer-events: all
+                    transition: opacity 0.5s ease
 
         .mode
-            display: none
+            display: flex
             margin: 4px
-            animation: 1s ease 1 both appear
+            opacity: 0
+            visibility: hidden
+            pointer-events: none
+            transition: opacity 0.5s ease, visibility 0s 0.5s ease
 
             .modeButton
                 width: 3rem
@@ -51,9 +68,6 @@
 
                     & .text
                         top: -4px
-
-            &.visible
-                display: flex
 
     @keyframes appear {
         from {
