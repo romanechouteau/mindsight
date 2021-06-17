@@ -41,8 +41,10 @@ export default class WorldBuilder extends Component {
     mapHeighter: MapHeighter
     ground: Object3D
     pointerCursor: PointerCursor
+    envName: string
     constructor({ scene, globalScene, time, debug, ground, pointerCursor }: WorldBuilderParams) {
         super({ store })
+        this.envName = ground.container.children[0].userData.envName
         this.time = time
         this.scene = scene
         this.ground = ground.container.children[0].children[0]
@@ -143,7 +145,7 @@ export default class WorldBuilder extends Component {
             this.onChange = this.skyCreator.handleChange
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
             // @ts-ignore
-            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time })
+            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time, envIndex: this.envName })
             this.onChange = this.mapHeighter.handleChange
         }
     }

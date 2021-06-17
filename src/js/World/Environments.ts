@@ -17,9 +17,11 @@ import { ENV_DISTANCE, ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '.
 import Camera from '../Camera'
 
 import environmentsSrc from '../../models/ground.gltf'
+import plaineBeachTexture from '../../images/textures/beach/Plaine_Surface_Color.jpg'
+import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
-import { modelLoader } from '../Tools/utils'
+import { modelLoader, textureLoader } from '../Tools/utils'
 
 const loader = new GLTFLoader()
 
@@ -78,7 +80,22 @@ export default class Environments {
       const grass = this.setGrass(ground, environmentKeys[i], this.environments[i].scale)
 
       let water
-      if (i === ENVIRONMENT_INDICES.beach) water = this.setWater(ground.children[0] as Mesh)
+      if (i === ENVIRONMENT_INDICES.beach) {
+        water = this.setWater(ground.children[0] as Mesh)
+        ground.children[0].material = new MeshBasicMaterial({ 
+          map: textureLoader.load(plaineBeachTexture),
+          morphTargets: true
+        }) 
+        // = textureLoader.load(plaineBeachTexture)
+      } else {
+        ground.children[0].material = new MeshBasicMaterial({ 
+          map: textureLoader.load(plaineMeadowTexture),
+          morphTargets: true
+        }) 
+        // = textureLoader.load(plaineMeadowTexture)
+      }
+
+      this.environments[i].userData.envName = environmentKeys[i]
 
       // Todo: refactor to handle all cases
       this.environments[this.environments.length - 1].visible = false
