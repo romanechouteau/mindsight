@@ -15,7 +15,9 @@ import search from '../../images/search.svg'
 import { AUDIO_INPUT_MODES } from '../constants'
 import { htmlUtils } from '../Tools/utils'
 // @ts-ignore
-import template from '../../templates/spotify.template'
+import voiceTemplate from '../../templates/voice.template'
+// @ts-ignore
+import spotifyTemplate from '../../templates/spotify.template'
 
 class AudioManager extends Component {
     canvas: HTMLCanvasElement
@@ -64,15 +66,7 @@ class AudioManager extends Component {
         }
 
         if (store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE) {
-            this.element.innerHTML = `
-                <div class="audioWrapper">
-                    <canvas id="sine">
-                    </canvas>
-                    <div class="center sine">
-                        <img src="${microphone}">
-                    </div>
-                </div>
-            `
+            htmlUtils.renderToDOM(this.element, voiceTemplate, { microphone })
 
             this.canvas = this.element.querySelector('#sine')
             this.canvas.width = window.innerWidth
@@ -88,7 +82,7 @@ class AudioManager extends Component {
             return
         }
 
-        htmlUtils.renderToDOM(this.element, template, { search })
+        htmlUtils.renderToDOM(this.element, spotifyTemplate, { search })
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
             this.spotify.handleSearch((el.target as HTMLInputElement).value)
         })
