@@ -8,6 +8,9 @@ import fragmentShader from '@shaders/skyfrag.glsl'
 // @ts-ignore
 import Time from '@tools/Time'
 
+// @ts-ignore
+import { mix, toRGBPercent } from '@tools/colorUtils'
+
 export default class SkyCreator {
     time: Time
     scene: Object3D
@@ -46,7 +49,7 @@ export default class SkyCreator {
 
         // @ts-ignore
         // this.pmremGenerator = new PMREMGenerator(App.renderer)
-        
+
         // @ts-ignore
         // ;(this.scene as Scene).environment = this.pmremGenerator.fromScene(this.sky).texture
 
@@ -75,9 +78,9 @@ export default class SkyCreator {
         this.skyMaterial.uniforms.uSecondColorBottom.value = secondColors[1]
         this.skyMaterial.uniforms.uPercentage.value = percentage
 
-        const fogColor1 = this.mix(this.toRGB(firstColors[0]), this.toRGB(firstColors[1]), 0.5)
-        const fogColor2 = this.mix(this.toRGB(secondColors[0]), this.toRGB(secondColors[1]), 0.5)
-        const fogColor = this.mix(fogColor1, fogColor2, percentage, true)
+        const fogColor1 = mix(toRGBPercent(firstColors[0]), toRGBPercent(firstColors[1]), 0.5)
+        const fogColor2 = mix(toRGBPercent(secondColors[0]), toRGBPercent(secondColors[1]), 0.5)
+        const fogColor = mix(fogColor1, fogColor2, percentage, true)
 
         this.globalScene.fog = new FogExp2(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`, 0.03)
         this.globalScene.fog.color = new Color(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`)
@@ -87,19 +90,5 @@ export default class SkyCreator {
         this.time.on('tick', () => {
             this.skyMaterial.uniforms.uTime.value += 0.0005
         })
-    }
-
-    mix(color1, color2, percentage, to255?) {
-        return color1.map((val, i) => {
-            const color = val * (1 - percentage) + color2[i] * percentage
-            return to255 ? Math.round(color * 255) : color
-        })
-    }
-
-    toRGB(color) {
-        const r = ((color / 256 / 256) % 256) / 255.
-        const g = ((color / 256) % 256) / 255.
-        const b = ((color) % 256) / 255.
-        return [r, g, b]
     }
 }

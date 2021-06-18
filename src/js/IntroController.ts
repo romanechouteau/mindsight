@@ -60,7 +60,7 @@ export default class IntroController {
         this.leftWorker = new Worker(new URL('./Workers/IntroControllerWorker.js', import.meta.url), { type: 'module' })
         // @ts-ignore
         this.rightWorker = new Worker(new URL('./Workers/IntroControllerWorker.js', import.meta.url), { type: 'module' })
-        
+
         this.bindHtml()
 
         this.timeouts = {
