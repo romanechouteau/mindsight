@@ -58,9 +58,10 @@ export default class App extends Component {
   // @ts-ignore
   pointerCursor: PointerCursor
   intro: IntroController
-  bloomPass: UnrealBloomPass
-  bloomComposer: EffectComposer
   finalComposer: EffectComposer
+  globalBloomPass: UnrealBloomPass
+  selectiveBloomPass: UnrealBloomPass
+  selectiveBloomComposer: EffectComposer
   constructor(options) {
     super({
       store
@@ -130,7 +131,7 @@ export default class App extends Component {
         stats.begin()
         this.scene.traverse(this.darkenNonBloomed.bind(this))
         this.renderer.setClearColor(0x000000, 1.)
-        this.bloomComposer.render()
+        this.selectiveBloomComposer.render()
         this.renderer.setClearColor(0xF4C5B5, 1.)
         this.scene.traverse(this.restoreMaterial.bind(this))
         this.finalComposer.render()
@@ -162,18 +163,18 @@ export default class App extends Component {
     const renderScene = new RenderPass(this.scene, this.camera.camera)
 
     // BLOOM COMPOSER
-    this.bloomComposer = new EffectComposer(this.renderer)
+    this.selectiveBloomComposer = new EffectComposer(this.renderer)
 
-    this.bloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
-    this.bloomPass.threshold = 0
-    this.bloomPass.strength = 1.5
-    this.bloomPass.radius = 0.1
+    this.selectiveBloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
+    this.selectiveBloomPass.threshold = 0
+    this.selectiveBloomPass.strength = 1.5
+    this.selectiveBloomPass.radius = 0.1
 
     const gammaCorrection = new ShaderPass(GammaCorrectionShader)
 
-    this.bloomComposer.addPass(renderScene)
-    this.bloomComposer.addPass(this.bloomPass)
-    this.bloomComposer.addPass(gammaCorrection)
+    this.selectiveBloomComposer.addPass(renderScene)
+    this.selectiveBloomComposer.addPass(this.selectiveBloomPass)
+    this.selectiveBloomComposer.addPass(gammaCorrection)
 
     // FINAL COMPOSER
     const finalPass = new ShaderPass(
@@ -183,7 +184,7 @@ export default class App extends Component {
             value: null
           },
           bloomTexture: {
-            value: this.bloomComposer.renderTarget2.texture
+            value: this.selectiveBloomComposer.renderTarget2.texture
           }
         },
         vertexShader: bloomVertShader,
@@ -193,26 +194,50 @@ export default class App extends Component {
     )
     finalPass.needsSwap = true
 
+    this.globalBloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
+    this.globalBloomPass.threshold = 0.8
+    this.globalBloomPass.strength = 0.15
+    this.globalBloomPass.radius = 1
+
     this.finalComposer = new EffectComposer(this.renderer)
     this.finalComposer.addPass(renderScene)
+    this.finalComposer.addPass(this.globalBloomPass)
     this.finalComposer.addPass(finalPass)
 
     // debug
     if (this.debug) {
-      const folder = this.debug.addFolder('Bloom')
+      const folder = this.debug.addFolder('Selective Bloom')
       folder.open()
       folder
-        .add(this.bloomPass, 'threshold')
-        .step(0.1)
+        .add(this.selectiveBloomPass, 'threshold')
+        .step(0.01)
         .min(0)
         .max(1)
         .name('Threshold')
-      folder.add(this.bloomPass, 'strength')
+      folder.add(this.selectiveBloomPass, 'strength')
         .step(0.01)
         .min(0)
         .max(3)
         .name('Strength')
-      folder.add(this.bloomPass, 'radius')
+      folder.add(this.selectiveBloomPass, 'radius')
+        .step(0.01)
+        .min(0)
+        .max(1)
+        .name('Radius')
+      const folder2 = this.debug.addFolder('Global Bloom')
+      folder2.open()
+      folder2
+        .add(this.globalBloomPass, 'threshold')
+        .step(0.01)
+        .min(0)
+        .max(1)
+        .name('Threshold')
+      folder2.add(this.globalBloomPass, 'strength')
+        .step(0.01)
+        .min(0)
+        .max(3)
+        .name('Strength')
+      folder2.add(this.globalBloomPass, 'radius')
         .step(0.01)
         .min(0)
         .max(1)
