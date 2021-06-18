@@ -102,7 +102,7 @@ export default class Camera {
     this.camera.position.z = 180
 
     gsap.to(this.camera.position, {
-      duration: 1.5,
+      duration: 2,
       y: defaultY,
       z: defaultZ,
       ease: 'power3.out'
