@@ -18,7 +18,9 @@ import Camera from '../Camera'
 
 // @ts-ignore
 import environmentsSrc from '../../models/ground.gltf'
+// @ts-ignore
 import plaineBeachTexture from '../../images/textures/beach/Plaine_Surface_Color.jpg'
+// @ts-ignore
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'

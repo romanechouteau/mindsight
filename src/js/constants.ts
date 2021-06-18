@@ -100,7 +100,7 @@ export const GRASS_COLOR = {
 export const ENVIRONMENT_INDICES = {
     [ENVIRONMENTS.BEACH]: 0,
     [ENVIRONMENTS.MEADOW]: 1,
-} 
+}
 export const HOLD_DURATION = 60
 
 export const HOLD_DELAY = 10
@@ -115,14 +115,22 @@ export const DEFAULT_FOG_FAR = 50
 
 // dynamic import is impossible with snowpack
 // TODO: try with require.context plugin
+// @ts-ignore
 import bPlaine from '@textures/beach/Plaine_Surface_Color.jpg'
+// @ts-ignore
 import bColline from '@textures/beach/Colline_Surface_Color.jpg'
+// @ts-ignore
 import bVallee from '@textures/beach/Vallee_Surface_Color.jpg'
+// @ts-ignore
 import bMontagnes from '@textures/beach/Montagnes_Surface_Color.jpg'
 
+// @ts-ignore
 import mPlaine from '@textures/meadow/PlaineSurface_Color.jpg'
+// @ts-ignore
 import mColline from '@textures/meadow/CollinesSurface_Color.jpg'
+// @ts-ignore
 import mVallee from '@textures/meadow/ValleeSurface_Color.jpg'
+// @ts-ignore
 import mMontagnes from '@textures/meadow/MontagnesSurface_Color.jpg'
 
 export const ENVIRONMENTS_COLOR_MAPS = {
