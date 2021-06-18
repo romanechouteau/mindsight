@@ -15,7 +15,7 @@ import { throttle } from 'lodash'
 import store from '../../../Store'
 // @ts-ignore
 import Time from '@tools/Time'
-
+// @ts-ignore
 import bPlaine from '@textures/beach/Plaine_Surface_Color.jpg'
 
 // @ts-ignore
