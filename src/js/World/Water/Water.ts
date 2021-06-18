@@ -50,9 +50,15 @@ export default class Water {
             }
         )
         this.waterMesh.rotation.x = -Math.PI/2
-        // this.waterMesh.position.y -= 50
+        this.waterMesh.position.y -= 30
         this.container.add(this.waterMesh)
         this.waterMesh.material.uniforms[ 'size' ].value = 10.
+        this.waterMesh.material.transparent = true
+        
+        this.waterMesh.material.polygonOffset = true
+        this.waterMesh.material.polygonOffsetFactor = -1.0
+        this.waterMesh.material.polygonOffsetUnits = -4.0
+        this.waterMesh.material.needsUpdate = true
 
         this.time.on('tick', () => {
             this.waterMesh.material.uniforms[ 'time' ].value += 0.005
