@@ -1,6 +1,7 @@
 <div class="intro">
     <div class="bg-wrapper">
         <div class="bg"></div>
+        <div class="fade"></div>
     </div>
     <div class="canvas-full"/>
         <canvas id="full" width="%width-full%" height="%height-full%"></canvas>

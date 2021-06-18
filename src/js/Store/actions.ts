@@ -22,4 +22,7 @@ export default {
     chooseCursor(context, payload) {
         context.commit('chooseCursor', payload)
     },
+    finishIntro(context, payload) {
+        context.commit('finishIntro', payload)
+    }
 }

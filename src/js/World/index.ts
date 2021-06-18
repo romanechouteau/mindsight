@@ -138,7 +138,6 @@ export default class World extends Component {
   }
 
   setEnvironments() {
-    this.camera.moveIntro()
     this.environments = new Environments({
       mouse: this.mouse,
       camera: this.camera,
@@ -186,7 +185,7 @@ export default class World extends Component {
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
       // TODO: remove for prod
-      if (document.querySelector('#eyetrackingManager')) {
+      if (this.eyeTrackingManager === undefined && document.querySelector('#eyetrackingManager')) {
         document.querySelector('#eyetrackingManager').remove()
       }
 
@@ -223,7 +222,8 @@ export default class World extends Component {
   setEyeTrackingManager() {
     this.eyeTrackingManager = new EyeTrackingManager({
       sizes: this.sizes,
-      debug: this.debug
+      debug: this.debug,
+      camera: this.camera
     })
   }
 }

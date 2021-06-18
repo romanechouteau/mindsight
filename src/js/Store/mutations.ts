@@ -8,8 +8,6 @@ export default {
     },
     updateScene(state, payload) {
         state.scene = payload
-        // todo: change this
-        state.isIntro = false
 
         return state
     },
@@ -35,6 +33,11 @@ export default {
     },
     chooseCursor (state, payload) {
         state.cursorMode = payload
+
+        return state
+    },
+    finishIntro (state) {
+        state.isIntro = false
 
         return state
     }

@@ -9,7 +9,7 @@
     align-items: center
     opacity 1
     transition: opacity 0.5s ease
-    will-change: opacity 
+    will-change: opacity
 
     .title
         z-index: 200
@@ -49,6 +49,14 @@
         width: 100%
         background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
         animation: spinning 6s linear infinite
+
+    .fade
+        top: 0vh
+        left: 0vh
+        position: absolute
+        height: 100%
+        width: 100%
+        background-color: rgba(255, 255, 255, 0)
 
     .canvas-full
         overflow: hidden
