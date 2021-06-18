@@ -1,0 +1,7 @@
+<div class="audioWrapper">
+    <canvas id="sine">
+    </canvas>
+    <div class="center sine">
+        <img src="{{microphone}}">
+    </div>
+</div>

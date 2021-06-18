@@ -1,5 +1,3 @@
-import { isUndefined } from 'lodash'
-
 // @ts-ignore
 import Store from '@store/store'
 
@@ -15,7 +13,7 @@ export default class Component {
       store.events.subscribe('stateChange', () => this.render())
     }
 
-    if(!isUndefined(element)) {
+    if(element !== undefined) {
       this.element = element
     }
   }

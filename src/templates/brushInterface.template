@@ -1,0 +1,51 @@
+<div class="paramsGroup bigAndSmallCircles">
+    <div class="inputGroup circleRangeGroup">
+        <div
+            class="circleRange"
+            id="size"
+            data-min="0"
+            data-max="0.5">
+            <div
+                class="rangeThumb"
+                style="top: {{sizePositionTop}}%; left: {{sizePositionLeft}}%;"></div>
+            <div class="brushPreview">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="inputGroup colorRangeGroup">
+        <div
+            class="colorRange"
+            id="color">
+            <canvas id="colorPalette">
+            </canvas>
+            <div
+                class="rangeThumb"
+                style="top: {{brushColorTop}}%; left: {{brushColorLeft}}%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="paramsGroup">
+        <div class="inputGroup">
+            <input
+                type="range"
+                min="1"
+                max="50"
+                step="1"
+                name="particleSize"
+                id="particleSize"
+                value="${particleSize}" />
+        </div>
+        <div class="inputGroup">
+            <input
+                type="range"
+                min="1"
+                max="50"
+                step="1"
+                name="count"
+                id="count"
+                value="${count}" />
+        </div>
+    </div>
+</div>

@@ -48,7 +48,9 @@ export const SKY_COLORS = {
     [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
 }
 
-export const LIST_MOODS = Object.values(MOODS)
+export const LIST_MOODS = [MOODS.JOY, MOODS.FEAR, MOODS.SADNESS, MOODS.ANGER]
+
+export const LIST_MOODS_PALETTE = [MOODS.JOY, MOODS.FEAR, MOODS.SADNESS, MOODS.ANGER]
 
 export const WORLDBUILDER_MAX_VALUE = LIST_MOODS.length * WORLDBUILDER_PRECISION
 
@@ -112,6 +114,21 @@ export const ENVIRONMENTS_BORDERS_MARGIN = 7
 export const START_FOG_FAR = 30
 
 export const DEFAULT_FOG_FAR = 50
+
+export const BRUSH_PALETTE_ANGLES = [
+    Math.PI * 2 / 3,
+    Math.PI * 4 / 3,
+    2 * Math.PI,
+]
+
+export const BRUSH_PALETTE_COLORS = {
+    [MOODS.JOY]: 0xF8CF70,
+    [MOODS.FEAR]: 0x263135,
+    [MOODS.SADNESS]: 0x023A51,
+    [MOODS.ANGER]: 0xDC4A3F,
+}
+
+export const BRUSH_LAST_POSITIONS = 5
 
 // dynamic import is impossible with snowpack
 // TODO: try with require.context plugin
