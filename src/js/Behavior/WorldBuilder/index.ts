@@ -140,7 +140,8 @@ export default class WorldBuilder extends Component {
             this.skyCreator = new SkyCreator({
                 scene: this.scene,
                 globalScene: this.globalScene,
-                time: this.time
+                time: this.time,
+                debug: this.debug
             })
             this.onChange = this.skyCreator.handleChange
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
