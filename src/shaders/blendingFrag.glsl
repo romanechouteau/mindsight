@@ -1,4 +1,4 @@
-precision highp float;
+// precision highp float;
 uniform sampler2D map1;
 uniform sampler2D map2;
 uniform sampler2D map3;
