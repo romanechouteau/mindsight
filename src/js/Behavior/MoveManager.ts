@@ -7,7 +7,7 @@ import Ground from "../World/Ground"
 import Gravity from "./Gravity"
 import { Mouse } from '../Tools/Mouse'
 
-import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN, CURSOR_MODES } from '../constants'
+import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN, CURSOR_MODES, SCENES } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 // @ts-ignore
@@ -20,9 +20,10 @@ import fragmentShader from '@shaders/cursorFrag.glsl'
 
 // @ts-ignore
 import store from '@store/index'
+import Component from "../Lib/Component";
 
 // TODO: set cursor in separate class
-export default class MoveManager {
+export default class MoveManager extends Component {
     raycaster: Raycaster
     mouse: Mouse
     dummy: Object3D
@@ -49,6 +50,7 @@ export default class MoveManager {
     cursorParticlesMaterial: ShaderMaterial
     gravity: Gravity
     constructor({ camera, mouse, ground, canvas, scene, pixelRatio, globalScene, gravity }) {
+        super({ store })
         this.mouse = mouse
         this.camera = camera
         this.canvas = canvas
@@ -107,7 +109,8 @@ export default class MoveManager {
             this.cursorBase.position.set(0, this.groundContainer.position.y, 0)
             this.cursorBase.scale.set(this.groundContainer.scale.x, this.groundContainer.scale.y, this.groundContainer.scale.z)
             this.cursorBase.rotation.set(this.groundContainer.rotation.x, this.groundContainer.rotation.y, this.groundContainer.rotation.z)
-            this.cursorBase.morphTargetInfluences = this.ground.morphTargetInfluences
+            this.cursorBase.morphTargetInfluences = store.state.worldMorphTargetInfluences
+
             this.cursorBase.position.y += 0.02
             this.cursorBase.layers.enable(BLOOM_LAYER)
 
@@ -116,7 +119,6 @@ export default class MoveManager {
 
             // TODO: wait for App mount
             setTimeout(this.setMoveCursor.bind(this), 50)
-
         })()
 
         this.euler = new Euler(0, 0, 0, 'YXZ')
@@ -320,5 +322,9 @@ export default class MoveManager {
     toggleLooking(isLooking: boolean) {
         this.isLooking = isLooking
         this.cursor.visible = !isLooking
+    }
+
+    render = () => {
+        if (store.state.scene === SCENES.PARAMETERS) this.cursorBase.morphTargetInfluences = store.state.worldMorphTargetInfluences
     }
 }

@@ -110,6 +110,8 @@ export default class MapHeighter {
         // debugger
         ;(this.ground.children[0] as Mesh).morphTargetInfluences = valuesCopy
 
+        store.dispatch('updateMapHeight', valuesCopy)
+
         this.applyChange()
 
     }

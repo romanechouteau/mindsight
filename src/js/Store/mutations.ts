@@ -38,5 +38,10 @@ export default {
         state.cursorMode = payload
 
         return state
+    },
+    updateMapHeight(state, payload) {
+        state.worldMorphTargetInfluences = payload
+
+        return state
     }
 }
