@@ -85,7 +85,7 @@ void main() {
     modelPosition = displace(modelPosition, aMorphTargets1, aMorphTargets2, aMorphTargets3);
 
     float delay = (modelPosition.x * 0.05);
-    float displacement = cos(uTime + delay) * (pow(1. - uv.y, 2.) * 0.05);
+    float displacement = cos(uTime + delay) * (pow(position.y * 0.005, 2.) * 0.05);
     modelPosition.x += displacement;
 
 
