@@ -36,7 +36,7 @@ import Component from './Lib/Component'
 import bloomVertShader from '@shaders/bloomVert.glsl'
 // @ts-ignore
 import bloomFragShader from '@shaders/bloomFrag.glsl'
-import { BLOOM_LAYER } from './constants'
+import { BLOOM_LAYER, SCENES } from './constants'
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -246,7 +246,9 @@ export default class App extends Component {
   render = () => {
     if (store.state.isIntro && this.intro === undefined) {
       this.intro = new IntroController({time: this.time, debug: this.debug})
-    } else if (document.querySelector('#intro')) {
+    } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined) {
+      this.intro.flyLines()
+    } else if (!store.state.isIntro && document.querySelector('#intro')) {      
       this.intro.dispose()
     }
   }

@@ -281,20 +281,33 @@ export default class IntroController {
     }
 
     async initTicker() {
-        await queue(() => {
-            this.revealLine()
-        }, 5000)
-        await queue(() => {
-            this.showHeadphoneAdvice()
-        }, 5000)
-        await queue(() => {
-            // this.flyLines()
-            this.hideHeadphone()
-            this.assembleLines()
-        }, 5000)
-        await queue(() => {
-            this.flyLines()
-        }, 5000)
+        let steps = [
+            () => {
+                this.revealLine()
+            },
+            () => {
+                this.showHeadphoneAdvice()
+            },
+            () => {
+                this.hideHeadphone()
+                this.assembleLines()
+            },
+            () => {
+                this.flyLines()
+            },
+        ], currentIndex = 0
+
+        if (this.debug) {
+            var obj = { next:() => {
+                if (currentIndex < steps.length) steps[currentIndex++]()
+             }}
+            this.debug.add(obj,'next').name('next intro step');
+        } else {
+            // steps.forEach(async step => (await queue(step, 5000)))
+            for (const step of steps) {
+                await queue(step, 5000)
+            }
+        }
     }
 
     dispose() {

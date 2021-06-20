@@ -1,4 +1,7 @@
 export default {
+    skipIntro(state, payload) {
+        state.isIntro = false
+    },
     updateBrushParams(state, payload) {
         const { param, value } = payload
 
@@ -8,8 +11,6 @@ export default {
     },
     updateScene(state, payload) {
         state.scene = payload
-        // todo: change this
-        state.isIntro = false
 
         return state
     },
