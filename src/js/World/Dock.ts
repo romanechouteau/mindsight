@@ -78,16 +78,7 @@ export default class Grass {
         const dockScene = (await loader.loadAsync(BEACH_DOCKS[i].model)).scene
         const dockModel = dockScene.children[0]
 
-        const index = this.positions.findIndex((position, id) => {
-            if (id % 3 !== 0) {
-                return false
-            }
-            const minX = BEACH_DOCKS[i].position.x - 400
-            const maxX = BEACH_DOCKS[i].position.x + 400
-            const minZ = BEACH_DOCKS[i].position.z - 400
-            const maxZ = BEACH_DOCKS[i].position.z + 400
-            return position >= minX && position <= maxX && this.positions[id + 2] >= minZ && this.positions[id + 2] <= maxZ
-        }) / 3
+        const index = BEACH_DOCKS[i].index
 
         const position = new Vector3(...this.getAttributeData(this.positions, index))
         const morphTargetsPositions = this.getAttributeTargetData(this.targetPositions, index)
