@@ -5,12 +5,9 @@ uniform float uGrassScale;
 uniform vec3 uMorphInfluences;
 
 varying vec2 vUv;
-varying float vSpecial;
-varying float vVisible;
 
 attribute float aSpecial;
 attribute vec3 aNormals;
-attribute vec4 aVisible;
 attribute vec3 aMorphTargets1;
 attribute vec3 aMorphTargets2;
 attribute vec3 aMorphTargets3;
@@ -63,16 +60,8 @@ vec3 displaceNormals(vec3 normals, vec3 normalsTarget1, vec3 normalsTarget2, vec
     return normal;
 }
 
-float displaceVisible(float visible, float visibleTarget1, float visibleTarget2, float visibleTarget3) {
-    float restMorphInfluences = 1. - uMorphInfluences.x - uMorphInfluences.y - uMorphInfluences.z;
-
-    return visible * restMorphInfluences + visibleTarget1 * uMorphInfluences.x + visibleTarget2 * uMorphInfluences.y + visibleTarget3 * uMorphInfluences.z;
-}
-
 void main() {
     vUv = uv;
-    vSpecial = aSpecial;
-    vVisible = displaceVisible(aVisible.x, aVisible.y, aVisible.z, aVisible.w);
 
     vec3 pos = position;
     pos.y += 8. * pow(uGrassScale, 2.);
