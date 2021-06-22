@@ -1,4 +1,4 @@
-import { BackSide, Mesh, Object3D, ShaderMaterial, SphereBufferGeometry, Scene, FogExp2, Color } from 'three'
+import { BackSide, Mesh, Object3D, ShaderMaterial, SphereBufferGeometry, Scene, Color } from 'three'
 import { WORLDBUILDER_PRECISION, SKY_COLORS, MOODS, LIST_MOODS, WORLDBUILDER_MAX_VALUE } from '../../../js/constants'
 
 // @ts-ignore
@@ -82,7 +82,6 @@ export default class SkyCreator {
         const fogColor2 = mix(toRGBPercent(secondColors[0]), toRGBPercent(secondColors[1]), 0.5)
         const fogColor = mix(fogColor1, fogColor2, percentage, true)
 
-        this.globalScene.fog = new FogExp2(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`, 0.03)
         this.globalScene.fog.color = new Color(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`)
     }
 
