@@ -154,3 +154,47 @@ export const ENVIRONMENTS_COLOR_MAPS = {
     [ENVIRONMENTS.BEACH]: [ bPlaine, bColline, bVallee, bMontagnes ],
     [ENVIRONMENTS.MEADOW]: [ mPlaine, mColline, mVallee, mMontagnes ],
 }
+
+// @ts-ignore
+import dockRightModel from '@models/dock_right.gltf'
+// @ts-ignore
+import dockRightTexture from '@textures/beach/Dock_Right_Surface_Color.jpg'
+// @ts-ignore
+import dockLeftModel from '@models/dock_left.gltf'
+// @ts-ignore
+import dockLeftTexture from '@textures/beach/Dock_Left_Surface_Color.jpg'
+// @ts-ignore
+import pathRightModel from '@models/path_right.gltf'
+// @ts-ignore
+import pathRightTexture from '@textures/beach/Path_Right_Surface_Color.jpg'
+// @ts-ignore
+import pathLeftModel from '@models/path_left.gltf'
+// @ts-ignore
+import pathLeftTexture from '@textures/beach/Path_Left_Surface_Color.jpg'
+
+export const BEACH_DOCKS = [
+    {
+        model: dockRightModel,
+        texture: dockRightTexture,
+        position: { x: -7637, z: 2906 },
+        scale: 2
+    },
+    {
+        model: dockLeftModel,
+        texture: dockLeftTexture,
+        position: { x: 723, z: -9975 },
+        scale: 2
+    },
+    {
+        model: pathRightModel,
+        texture: pathRightTexture,
+        position: { x: -9975, z: 16423 },
+        scale: 1
+    },
+    {
+        model: pathLeftModel,
+        texture: pathLeftTexture,
+        position: { x: -2586, z: -17212 },
+        scale: 1
+    }
+]
