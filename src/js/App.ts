@@ -1,4 +1,4 @@
-import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, MeshBasicMaterial, FogExp2 } from 'three'
+import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
