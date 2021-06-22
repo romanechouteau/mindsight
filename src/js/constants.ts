@@ -177,24 +177,28 @@ export const BEACH_DOCKS = [
         model: dockRightModel,
         texture: dockRightTexture,
         position: { x: -7637, z: 2906 },
-        scale: 2
+        scale: 2,
+        index: 1086
     },
     {
         model: dockLeftModel,
         texture: dockLeftTexture,
         position: { x: 723, z: -9975 },
-        scale: 2
+        scale: 2,
+        index: 1819
     },
     {
         model: pathRightModel,
         texture: pathRightTexture,
         position: { x: -9975, z: 16423 },
-        scale: 1
+        scale: 1,
+        index: 564
     },
     {
         model: pathLeftModel,
         texture: pathLeftTexture,
         position: { x: -2586, z: -17212 },
-        scale: 1
+        scale: 1,
+        index: 2368
     }
 ]
