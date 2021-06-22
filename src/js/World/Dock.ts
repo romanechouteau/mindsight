@@ -2,8 +2,6 @@ import { Object3D, Mesh, Vector3, ShaderMaterial, UniformsLib, UniformsUtils } f
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 // @ts-ignore
-import dockSrc from '@models/dock.gltf'
-// @ts-ignore
 import vertexShader from '@shaders/dockVert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/dockFrag.glsl'
