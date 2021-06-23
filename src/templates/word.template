@@ -1,0 +1,10 @@
+<div class="wordWrapper">
+    <div class="left"></div>
+    <div class="center">
+        <div class="inputWrapper">
+            <div class="placeholder">Votre émotion en un mot</div>
+            <input type="text" placeholder="Votre émotion en un mot" class="word__input"></input>
+        </div>
+    </div>
+    <div class="right"></div>
+</div>

@@ -62,10 +62,11 @@ export enum SCENES {
     PARAMETERS = 3,
     BRUSH = 4,
     AUDIO = 5,
-    SUMUP = 6
+    WORD = 6,
+    SUMUP = 7
 }
 
-export const LAST_SCENE = SCENES.AUDIO
+export const LAST_SCENE = SCENES.SUMUP
 
 export const EYETRACKING_RADIUS = 0.5
 
