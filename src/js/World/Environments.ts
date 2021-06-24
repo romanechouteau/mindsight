@@ -11,6 +11,7 @@ import envSrc1 from '@models/plane_vierge.glb'
 // @ts-ignore
 import store from '@store/index'
 import Grass from './Grass'
+import Dock from './Dock'
 import Water from './Water/Water'
 
 import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
@@ -82,14 +83,18 @@ export default class Environments {
       const grass = this.setGrass(ground, LIST_ENVIRONMENTS[i], this.environments[i].scale)
 
       let water
+      let dock
       if (i === ENVIRONMENT_INDICES.beach) {
         water = this.setWater(ground.children[0] as Mesh)
+        dock = this.setDock(ground, this.environments[i].scale)
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineBeachTexture),
           morphTargets: true
         })
         // = textureLoader.load(plaineBeachTexture)
       } else {
+        water = new Object3D()
+        dock = new Object3D()
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineMeadowTexture),
           morphTargets: true
@@ -105,7 +110,7 @@ export default class Environments {
 
       // if (i === this.current) this.environments[i].visible = false
 
-      this.environments[i].add(ground, grass, water)
+      this.environments[i].add(ground, grass, water, dock)
     }
 
     this.container.add(...this.environments)
@@ -120,6 +125,15 @@ export default class Environments {
     })
 
     return grass.container
+  }
+  setDock(ground, scale) {
+    const dock = new Dock({
+      time: this.time,
+      scale,
+      ground: ground.children[0],
+    })
+
+    return dock.container
   }
 
   setWater(groundMesh: Mesh) {
