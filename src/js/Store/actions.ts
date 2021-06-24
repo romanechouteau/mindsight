@@ -25,6 +25,9 @@ export default {
     chooseCursor(context, payload) {
         context.commit('chooseCursor', payload)
     },
+    updateMapHeight(context, payload) {
+        context.commit('updateMapHeight', payload)
+    },
     finishIntro(context, payload) {
         context.commit('finishIntro', payload)
     },

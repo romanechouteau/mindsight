@@ -39,6 +39,9 @@ export default {
 
         return state
     },
+    updateMapHeight(state, payload) {
+        state.worldMorphTargetInfluences = payload
+    },
     finishIntro (state) {
         state.isIntro = false
 
