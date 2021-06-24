@@ -2,9 +2,15 @@ import { Object3D, Mesh, InstancedMesh, Matrix4, DynamicDrawUsage, Vector3, Shad
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 // @ts-ignore
-import grassSrc from '@models/grass.gltf'
+import grassBeachSrc from '@models/grass_beach.gltf'
+// @ts-ignore
+import grassMeadowSrc from '@models/grass_meadow.gltf'
 // @ts-ignore
 import vertexShader from '@shaders/grassVert.glsl'
+// @ts-ignore
+import specialGrassVert from '@shaders/specialGrassVert.glsl'
+// @ts-ignore
+import specialGrassFrag from '@shaders/specialGrassFrag.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/grassFrag.glsl'
 
@@ -23,10 +29,11 @@ export default class Grass {
   scale: Vector3
   indexes: number[]
   positions: number[]
-  grassMesh: InstancedMesh
   container: Object3D
+  grassMeshes: InstancedMesh[]
   grassMaterial: ShaderMaterial
   environmentKey: ENVIRONMENTS
+  specialGrassMaterials: ShaderMaterial[]
   constructor(options: { time: any, ground: Mesh, scale: Vector3, environmentKey: ENVIRONMENTS }) {
     const { time, ground, scale, environmentKey } = options
     this.time = time
@@ -41,6 +48,7 @@ export default class Grass {
     this.params = {
         count: 3000
     }
+    this.specialGrassMaterials = []
 
     this.init()
   }
@@ -51,9 +59,10 @@ export default class Grass {
   }
 
   async createGrass() {
+    const grassSrc = this.environmentKey === ENVIRONMENTS.MEADOW ? grassMeadowSrc : grassBeachSrc
     const grassScene = (await loader.loadAsync(grassSrc)).scene
-    const grassModel = grassScene.children[0] as Mesh
-    const grassGeometry = grassModel.geometry.clone()
+    const grassModels = grassScene.children as Mesh[]
+    const grassScale = this.environmentKey === ENVIRONMENTS.MEADOW ? 2 : 5
 
     this.grassMaterial = new ShaderMaterial({
       fog: true,
@@ -69,23 +78,52 @@ export default class Grass {
           uColor2: { value: new Color(GRASS_COLOR[this.environmentKey][1]) },
           uColorSpecial1: { value: new Color(GRASS_COLOR[this.environmentKey][2]) },
           uColorSpecial2: { value: new Color(GRASS_COLOR[this.environmentKey][3]) },
+          uGrassScale: { value: grassScale },
           uMorphInfluences: { value: [0, 0, 0] }
         }
       ]),
       side: DoubleSide
     })
+    const baseSpecialGrassMaterial = new ShaderMaterial({
+      fog: true,
+      vertexShader: specialGrassVert,
+      fragmentShader: specialGrassFrag,
+      uniforms: UniformsUtils.merge([
+        UniformsLib['fog'],
+        {
+          uTime: { value: 0 },
+          uPI: { value: Math.PI },
+          uScale: { value: this.scale },
+          uGrassScale: { value: grassScale },
+          uMorphInfluences: { value: [0, 0, 0] }
+        }
+      ]),
+      transparent: true,
+      side: DoubleSide
+    })
 
-    this.grassMesh = new InstancedMesh(grassGeometry, this.grassMaterial, this.params.count)
+    this.grassMeshes = grassModels.map((model, i) => {
+      if (i !== 0) {
+        const specialMaterial = baseSpecialGrassMaterial.clone()
+        specialMaterial.uniforms.uMap = { value: model.material.map }
+        this.specialGrassMaterials.push(specialMaterial)
+      }
+      const material = i === 0 ? this.grassMaterial : this.specialGrassMaterials[i - 1]
+
+      return new InstancedMesh(model.geometry.clone(), material, this.params.count)
+    })
 
     const defaultTransform = new Matrix4()
-      .multiply(new Matrix4().makeScale(5., 5., 5.))
+      .multiply(new Matrix4().makeScale(grassScale, grassScale, grassScale))
 
-    grassGeometry.applyMatrix4(defaultTransform)
-    this.grassMesh.instanceMatrix.setUsage(DynamicDrawUsage)
+    this.grassMeshes.forEach(mesh => {
+        mesh.geometry.applyMatrix4(defaultTransform)
+        mesh.instanceMatrix.setUsage(DynamicDrawUsage)
+    })
 
     this.setGrass()
 
-    this.container.add(this.grassMesh)
+    this.container.add(...this.grassMeshes)
   }
 
   setGrass () {
@@ -120,7 +158,9 @@ export default class Grass {
       this.dummy.position.copy(position)
       this.dummy.scale.set(randomScale, randomScale, randomScale)
       this.dummy.updateMatrix()
-      this.grassMesh.setMatrixAt(i, this.dummy.matrix)
+      this.grassMeshes.forEach(mesh => {
+        mesh.setMatrixAt(i, this.dummy.matrix)
+      })
 
       const normal = this.getAttributeData(this.ground.geometry.attributes.normal.array, randomIndex)
       const morphTargetsPositions = this.getAttributeTargetData(targetPositions, randomIndex)
@@ -141,36 +181,38 @@ export default class Grass {
       this.indexes.push(randomIndex)
     }
 
-    this.grassMesh.geometry.setAttribute('aSpecial',
-      new InstancedBufferAttribute(new Float32Array(special), 1)
-    )
-    this.grassMesh.geometry.setAttribute('aMorphTargets1',
-      new InstancedBufferAttribute(new Float32Array(morphTargets1), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aMorphTargets2',
-      new InstancedBufferAttribute(new Float32Array(morphTargets2), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aMorphTargets3',
-      new InstancedBufferAttribute(new Float32Array(morphTargets3), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aNormals',
-      new InstancedBufferAttribute(new Float32Array(normals), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aNormalsTarget1',
-      new InstancedBufferAttribute(new Float32Array(normalsTarget1), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aNormalsTarget2',
-      new InstancedBufferAttribute(new Float32Array(normalsTarget2), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aNormalsTarget3',
-      new InstancedBufferAttribute(new Float32Array(normalsTarget3), 3)
-    )
-    this.grassMesh.geometry.setAttribute('aVisible',
-      new InstancedBufferAttribute(new Float32Array(visible), 4)
-    )
-
-    this.grassMesh.instanceMatrix.needsUpdate = true
+    this.grassMeshes.forEach(mesh => {
+      mesh.instanceMatrix.needsUpdate = true
+      mesh.geometry.setAttribute('aSpecial',
+        new InstancedBufferAttribute(new Float32Array(special), 1)
+      )
+      mesh.geometry.setAttribute('aMorphTargets1',
+        new InstancedBufferAttribute(new Float32Array(morphTargets1), 3)
+      )
+      mesh.geometry.setAttribute('aMorphTargets2',
+        new InstancedBufferAttribute(new Float32Array(morphTargets2), 3)
+      )
+      mesh.geometry.setAttribute('aMorphTargets3',
+        new InstancedBufferAttribute(new Float32Array(morphTargets3), 3)
+      )
+      mesh.geometry.setAttribute('aNormals',
+        new InstancedBufferAttribute(new Float32Array(normals), 3)
+      )
+      mesh.geometry.setAttribute('aNormalsTarget1',
+        new InstancedBufferAttribute(new Float32Array(normalsTarget1), 3)
+      )
+      mesh.geometry.setAttribute('aNormalsTarget2',
+        new InstancedBufferAttribute(new Float32Array(normalsTarget2), 3)
+      )
+      mesh.geometry.setAttribute('aNormalsTarget3',
+        new InstancedBufferAttribute(new Float32Array(normalsTarget3), 3)
+      )
+      mesh.geometry.setAttribute('aVisible',
+        new InstancedBufferAttribute(new Float32Array(visible), 4)
+      )
+    });
     this.grassMaterial.uniforms.uMorphInfluences.value = this.ground.morphTargetInfluences
+    this.specialGrassMaterials.forEach(material => material.uniforms.uMorphInfluences.value = this.ground.morphTargetInfluences)
   }
 
   getColor(colors, index) {
@@ -201,6 +243,11 @@ export default class Grass {
     this.time.on('tick', () => {
       this.grassMaterial.uniforms.uTime.value += 0.015
       this.grassMaterial.uniforms.uMorphInfluences.value = this.ground.morphTargetInfluences
+
+      this.specialGrassMaterials.forEach(material => {
+        material.uniforms.uTime.value += 0.015
+        material.uniforms.uMorphInfluences.value = this.ground.morphTargetInfluences
+      });
     })
   }
 }
