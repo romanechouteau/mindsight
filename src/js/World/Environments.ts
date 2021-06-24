@@ -16,7 +16,7 @@ import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } fr
 import Camera from '../Camera'
 
 // @ts-ignore
-import environmentsSrc from '../../models/romabe4.gltf'
+import environmentsSrc from '../../models/ground.gltf'
 // @ts-ignore
 import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.jpg'
 // @ts-ignore
