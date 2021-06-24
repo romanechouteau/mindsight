@@ -2,7 +2,6 @@
 import store from '@store/index'
 // @ts-ignore
 import Component from '@lib/Component'
-
 import { htmlUtils } from '../Tools/utils'
 import { AUDIO_INPUT_MODES, CURSOR_MODES, SCENES } from '../constants'
 // @ts-ignore
@@ -32,7 +31,10 @@ export default class ModeManager extends Component {
             audioInputMode0: `${AUDIO_INPUT_MODES.VOICE}`,
         })
 
+        // bind keys
         document.addEventListener('keyup', this.handleKeyUp.bind(this))
+
+        // listen to ckick
         this.element.querySelectorAll('.cursorMode .mode').forEach((elem) => {
             elem.addEventListener('click', () => this.handleClickCursor(elem))
         })
@@ -48,10 +50,12 @@ export default class ModeManager extends Component {
 
         this.handleModeSelected('.cursorMode', store.state.cursorMode)
 
+        // hide and show buttons
         this.handleModeVisibility(`.mode.${CURSOR_MODES.MOVE}`, this.isMoveScene)
         this.handleModeVisibility(`.mode.${CURSOR_MODES.BRUSH}`, this.isBrushScene)
         this.handleModeVisibility('.audioInputMode', this.isAudioScene)
 
+        // show current selection
         if (this.isAudioScene) {
             this.handleModeSelected('.audioInputMode', store.state.audioInputMode)
         }

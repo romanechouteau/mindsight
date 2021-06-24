@@ -15,7 +15,10 @@ import Component from '@lib/Component'
 import pointTemplate from '../../templates/eyetrackingPoint.template'
 // @ts-ignore
 import { htmlUtils } from '@tools/utils'
-import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT, INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE, SCENES } from '../constants'
+import {
+    EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT,
+    INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE, SCENES
+} from '../constants'
 
 export default class EyeTrackingManager extends Component {
     sizes: any
@@ -36,7 +39,6 @@ export default class EyeTrackingManager extends Component {
     stopped: Boolean
     centerX: number
     centerY: number
-    eyeZoom: any
     element: HTMLElement
     calibrated: boolean
     debugFolder: any
@@ -77,9 +79,10 @@ export default class EyeTrackingManager extends Component {
             this.setDebug()
         }
 
+        // wait before showing eye
         setTimeout(() => {
-            this.element.style.opacity = `1`
-        }, 5000);
+            this.element.style.opacity = '1'
+        }, 5000)
 
         this.setWebGazer()
         this.render()
@@ -115,6 +118,7 @@ export default class EyeTrackingManager extends Component {
         const currentVH = this.currentTranslate * 0.01 * this.sizes.height
         const duration = 0.5
 
+        // move each eye part in gaze direction
         const outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelector('.outerEye'), {
             duration,
@@ -161,6 +165,7 @@ export default class EyeTrackingManager extends Component {
     }
 
     checkInZone(x, y) {
+        // check if gaze is in focus zone
         const isInZone = Math.pow(x, 2) + (Math.pow(y, 2)) < Math.pow(this.params.radius, 2)
 
         if (this.inZone.length < this.params.duration) {
@@ -172,11 +177,13 @@ export default class EyeTrackingManager extends Component {
         this.inZone.shift()
         this.inZone.push(isInZone)
 
+        // get focus percentage
         const percentage = this.inZone.reduce((acc, val) => acc + (val ? 1 : 0), 0) / this.params.duration
         if (this.stopped === false) {
             this.focusProgress(percentage)
         }
 
+        // stop eyetracking if user is focused
         if (percentage > this.params.success) {
             this.stopped = true
             this.stop()
@@ -198,11 +205,13 @@ export default class EyeTrackingManager extends Component {
             elem.addEventListener('click', () => {
                 this.pointsClicks[index] += 1
 
+                // handle click if user hasn't clicked 3 times yet
                 if (this.pointsClicks[index] < 3) {
                     const r = 10 + 2 * this.pointsClicks[index]
                     return elem.setAttribute('r', r.toString())
                 }
 
+                // handle click if user has clicked 3 times
                 elem.classList.add('invisible')
                 this.currentPoint += 1
 
@@ -212,10 +221,12 @@ export default class EyeTrackingManager extends Component {
     }
 
     handleNextPoint() {
+        // end calibration if all points have been clicked
         if (this.currentPoint === this.pointsClicks.length) {
             return this.calibrated = true
         }
 
+        // display next point
         const nextPoint = this.element.querySelector(`.point .pointCircle[data-order="${this.currentPoint}"]`)
         nextPoint.classList.remove('invisible')
         if (this.currentPoint === Math.floor(this.pointsClicks.length / 2) || this.currentPoint === this.pointsClicks.length - 1) {
@@ -251,6 +262,7 @@ export default class EyeTrackingManager extends Component {
                 const index = i % halfPoints
                 const line = Math.floor(i / halfPoints)
 
+                // get point position on ellipse
                 const direction = -1 + (2 * line)
                 const x = (width - 200) * index / (halfPoints - 1) + 100
                 const y = getPointY(x, direction)
@@ -284,6 +296,7 @@ export default class EyeTrackingManager extends Component {
     }
 
     stop() {
+        // stop webgazer
         webgazer.pause()
         this.eyeMovement.cancel()
         const webgazerContainer = document.getElementById('webgazerVideoContainer')
@@ -295,6 +308,7 @@ export default class EyeTrackingManager extends Component {
         this.stopped = true
         store.dispatch('updateScene', SCENES.ENVIRONMENT)
 
+        // scene transition
         gsap.timeline()
             .add('start')
             .to(this.element, {

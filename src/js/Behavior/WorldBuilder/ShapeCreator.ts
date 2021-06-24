@@ -1,4 +1,5 @@
-import { Float32BufferAttribute, Group, Mesh, MeshStandardMaterial, Object3D, Scene, Vector3 } from "three"
+import { Group, Mesh, Object3D } from "three"
+
 // @ts-ignore
 import shape3Src from '@models/testShape1.glb'
 // @ts-ignore
@@ -7,15 +8,14 @@ import shape4Src from '@models/testShape2.glb'
 import shape1Src from '@models/Rond.gltf'
 // @ts-ignore
 import shape2Src from '@models/Triangle.gltf'
-import { modelLoader } from '../../Tools/utils';
-import { SHAPE_NUMBER, WORLDBUILDER_PRECISION } from "../../constants";
+import { modelLoader } from '../../Tools/utils'
+import { SHAPE_NUMBER, WORLDBUILDER_PRECISION } from "../../constants"
 
 interface ShapeCreatorParams {
     scene: Object3D
 }
 
 export default class ShapeCreator {
-
     mainShape: Object3D
     container: Group
     scene: Object3D
@@ -38,13 +38,13 @@ export default class ShapeCreator {
                 modelLoader.loadAsync(shape4Src),
             ]))
             .map(gltf => gltf.scene)
+
         this.mainShape = this.shapes[0]
         const { geometry, material } = (this.mainShape.children as Mesh[]).find(child => child.isMesh)
         // create clones
         for (let i = 0; i < SHAPE_NUMBER; i++) {
             const mesh = new Mesh(geometry, material)
             mesh.position.x = (Math.random() - 0.5) * 15
-            // mesh.position.y = (Math.random() - 0.5) * 5
             mesh.position.z = (Math.random() - 1) * 15
             this.container.add(mesh)
         }

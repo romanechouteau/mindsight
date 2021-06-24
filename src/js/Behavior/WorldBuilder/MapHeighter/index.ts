@@ -7,7 +7,6 @@ import { WORLDBUILDER_PRECISION, ENVIRONMENTS_COLOR_MAPS } from "@/js/constants"
 import store from '../../../Store'
 // @ts-ignore
 import Time from '@tools/Time'
-
 // @ts-ignore
 import blendingVertex from '../../../../shaders/blendingVert.glsl'
 // @ts-ignore
@@ -22,14 +21,9 @@ interface MapHeighterParams {
 export default class MapHeighter {
     ground: Mesh
     time: Time
-    displacementMaps: HTMLImageElement[]
     blendingCanvas: HTMLCanvasElement
-    ctx: CanvasRenderingContext2D
-    worker: Worker
-    throttledBlend: Function
     blendMaterial: ShaderMaterial
     envIndex: string
-    blendParams: { firstMapIndex, firstMapInfluence, secondMapIndex, secondMapInfluence }
     constructor({ ground, time, envIndex }: MapHeighterParams) {
         this.ground = ground
         this.time = time
@@ -40,7 +34,6 @@ export default class MapHeighter {
     }
 
     async init() {
-
         const src = ENVIRONMENTS_COLOR_MAPS[this.envIndex]
         const blendingScene = new Scene()
         const blendingRenderer = new WebGLRenderer()
@@ -72,14 +65,15 @@ export default class MapHeighter {
     applyChange() {
         if (!(((this.ground.children[0] as Mesh).material) instanceof ShaderMaterial)) {
             console.log(this.blendMaterial);
-            
-            ;((this.ground.children[0] as Mesh).material) = this.blendMaterial            
+
+            ;((this.ground.children[0] as Mesh).material) = this.blendMaterial
         }
     }
 
     handleChange(value: number) {
         const values = [0, 0, 0, 0]
 
+        // get morph target influences
         const [ firstMapIndex, secondMapIndex ] = [ Math.floor(value/WORLDBUILDER_PRECISION) % values.length, (Math.floor(value/WORLDBUILDER_PRECISION) + 1) % values.length ]
         const firstMapInfluence = 1 - ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)
         const secondMapInfluence = ((value%WORLDBUILDER_PRECISION)/WORLDBUILDER_PRECISION)

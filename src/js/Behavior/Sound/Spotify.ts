@@ -2,7 +2,6 @@
 import store from '@store/index'
 
 export default class SpotifyManager {
-
     searchTracks: {name: string; uri: string; id: string; artists: any[]}[]
     deviceId: string
     // @ts-ignore

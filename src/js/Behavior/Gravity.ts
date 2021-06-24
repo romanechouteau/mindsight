@@ -1,5 +1,5 @@
-import { Object3D, Raycaster, Vector3 } from "three";
-import Time from "../Tools/Time";
+import { Object3D, Raycaster, Vector3 } from "three"
+import Time from "../Tools/Time"
 
 interface GravityParams {
     // movableObject may be the container of the origin object
@@ -27,6 +27,7 @@ export default class Gravity {
         this.initCollisions()
     }
 
+    // update raycaster position
     updatePositions(gObject: GravityObject) {
         gObject.raycaster.set( new Vector3(
             gObject.object.movableObject.position.x,
@@ -55,6 +56,7 @@ export default class Gravity {
         }
     }
 
+    // set object position on surface without lerping position
     instantCollision(object, originObject) {
         const raycaster = new Raycaster(new Vector3().copy(object.position).add(originObject.position), new Vector3(0, -1, 0))
         const intersects = raycaster.intersectObject(this.ground, true)
@@ -62,7 +64,6 @@ export default class Gravity {
             const { point } = intersects[0]
             object.position.y = point.y
         }
-
     }
 
     initCollisions() {

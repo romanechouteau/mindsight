@@ -1,7 +1,6 @@
 // @ts-ignore
 import store from '@store/index'
 import PointerCursor from '../Tools/PointerCursor'
-
 import { CURSOR_MODES, LAST_SCENE, SCENES } from '../constants'
 
 export default class SceneManager {
@@ -15,6 +14,7 @@ export default class SceneManager {
     }
 
     mouseDown () {
+        // cursor click and hold is blocked if cursor mode is not default and scene is parameters scene or last scene
         if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
             this.pointerCursor.startHold(this.handleNextScene)
         }

@@ -26,6 +26,7 @@ class VoiceManager {
         }
     }
 
+    // get audio stream
     getStream(stream) {
         // @ts-ignore
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)()

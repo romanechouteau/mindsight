@@ -7,7 +7,6 @@ import vertexShader from '@shaders/skyvert.glsl'
 import fragmentShader from '@shaders/skyfrag.glsl'
 // @ts-ignore
 import Time from '@tools/Time'
-
 // @ts-ignore
 import { mix, toRGBPercent } from '@tools/colorUtils'
 
@@ -49,6 +48,7 @@ export default class SkyCreator {
 
         this.scene.add(this.sky)
 
+        // add sky colors to debug
         if (this.debug) {
             this.debug.addColor(SKY_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
             this.debug.addColor(SKY_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
@@ -85,6 +85,7 @@ export default class SkyCreator {
         this.skyMaterial.uniforms.uSecondColorBottom.value = secondColors[1]
         this.skyMaterial.uniforms.uPercentage.value = percentage
 
+        // change fog color to match sky
         const fogColor1 = mix(toRGBPercent(firstColors[0]), toRGBPercent(firstColors[1]), 0.5)
         const fogColor2 = mix(toRGBPercent(secondColors[0]), toRGBPercent(secondColors[1]), 0.5)
         const fogColor = mix(fogColor1, fogColor2, percentage, true)

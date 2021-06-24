@@ -1,7 +1,6 @@
 import { debounce } from 'lodash'
 // @ts-ignore
 import store from '@store/index'
-
 import { htmlUtils } from '../Tools/utils'
 // @ts-ignore
 import template from '../../templates/word.template'
@@ -23,6 +22,7 @@ class WordManager {
     stop() {
         this.started = false
 
+        // get word
         const value = (this.element.querySelector('.word__input') as HTMLInputElement).value
         store.dispatch('registerEmotionWord', value)
 

@@ -1,15 +1,13 @@
 import { debounce } from 'lodash'
+
 // @ts-ignore
 import store from '@store/index'
 // @ts-ignore
 import Component from '@lib/Component'
-
 import VoiceManager from './VoiceManager'
 import Spotify from './Sound/Spotify'
-
 // @ts-ignore
 import microphone from '../../images/microphone.svg'
-
 import { AUDIO_INPUT_MODES } from '../constants'
 import { htmlUtils } from '../Tools/utils'
 // @ts-ignore
@@ -40,6 +38,7 @@ class AudioManager extends Component {
     start() {
         this.started = true
 
+        // default mode is spotify
         store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
         this.spotify = new Spotify()
         this.render()
@@ -63,6 +62,7 @@ class AudioManager extends Component {
             return
         }
 
+        // voice mode
         if (store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE) {
             htmlUtils.renderToDOM(this.element, voiceTemplate, { microphone })
 
@@ -80,6 +80,7 @@ class AudioManager extends Component {
             return
         }
 
+        // spotify mode
         htmlUtils.renderToDOM(this.element, spotifyTemplate, {})
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
             this.spotify.handleSearch((el.target as HTMLInputElement).value)
@@ -106,6 +107,7 @@ class AudioManager extends Component {
 
         this.canvasCtx.beginPath()
 
+        // if input mode is voice get voice data, else get data to draw flat sine
         const min = 128
         const data = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE ? VoiceManager.getAudioData() : [min]
         const size = store.state.audioInputMode === AUDIO_INPUT_MODES.VOICE ? VoiceManager.bufferSize : 1
@@ -114,6 +116,7 @@ class AudioManager extends Component {
         const halfSize = size / 2
         const sliceWidth = ((width - center) / 2) / halfSize
 
+        // draw left sine
         for (var i = 0; i < halfSize; i++) {
             const value = data[i] / min
             const x = sliceWidth * i
@@ -126,6 +129,7 @@ class AudioManager extends Component {
             }
         }
 
+        // draw right sine
         for (var i = Math.ceil(halfSize); i < size; i++) {
             const value = data[i] / min
             const x = sliceWidth * i + center
@@ -138,6 +142,7 @@ class AudioManager extends Component {
             }
         }
 
+        // end sine
         this.canvasCtx.lineTo(width, height / 2)
         this.canvasCtx.stroke()
     }

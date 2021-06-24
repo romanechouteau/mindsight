@@ -2,24 +2,20 @@ import { DoubleSide, Euler, Intersection, Mesh, Object3D, Raycaster, ShaderMater
 import gsap from "gsap/all";
 
 import Camera from '../Camera'
-// TODO: add app in global namespace
 import Gravity from "./Gravity"
 import { Mouse } from '../Tools/Mouse'
-
 import { BLOOM_LAYER, DEFAULT_FOG_FAR, ENVIRONMENTS_BORDERS_MARGIN, CURSOR_MODES, SCENES } from '../constants'
 // @ts-ignore
 import moveCursorVertex from '../../shaders/moveCursorVert.glsl'
 // @ts-ignore
 import moveCursorFragment from '../../shaders/moveCursorFrag.glsl'
-
 // @ts-ignore
 import vertexShader from '@shaders/cursorVert.glsl'
 // @ts-ignore
 import fragmentShader from '@shaders/cursorFrag.glsl'
-
 // @ts-ignore
 import store from '@store/index'
-import Component from "../Lib/Component";
+import Component from "../Lib/Component"
 
 export default class MoveManager extends Component {
     raycaster: Raycaster
@@ -31,7 +27,6 @@ export default class MoveManager extends Component {
     scene: Object3D
     cursor: Points
     globalScene: Scene
-    groundInstance: Ground
     cursorMaterial: ShaderMaterial
     cursorBase: Mesh
     lastIntersection: Intersection
@@ -75,6 +70,7 @@ export default class MoveManager extends Component {
         })
 
         ;(async () => {
+            // set cursor particles
             this.cursorPositions = Array.from(Array(300), () => (Math.random() - 0.5) * 0.8)
             this.cursorGeometry = new BufferGeometry()
             this.cursorGeometry.setAttribute(
@@ -100,6 +96,7 @@ export default class MoveManager extends Component {
             this.cursor.frustumCulled = false
             this.cursor.layers.enable(BLOOM_LAYER)
 
+            // set cursor circles
             this.cursorBase = new Mesh(this.ground.geometry, this.cursorMaterial)
             this.cursorBase.position.set(0, this.groundContainer.position.y, 0)
             this.cursorBase.scale.set(this.groundContainer.scale.x, this.groundContainer.scale.y, this.groundContainer.scale.z)
@@ -136,22 +133,27 @@ export default class MoveManager extends Component {
                 this.cursorMaterial.uniforms.uTime.value += 0.01
                 this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
 
+                // get mouse intersection with ground
                 const cursor = new Vector2(this.mouse.cursor[0], this.mouse.cursor[1])
                 this.raycaster.setFromCamera(cursor, this.camera.camera)
                 const lastPoint = this.lastIntersection
                 this.lastIntersection = this.raycaster.intersectObject(this.ground, true)[0]
 
                 if (this.lastIntersection) {
+                    // move cursor particles to mouse position
                     this.cursor.position.copy(this.lastIntersection.point)
                     this.cursor.position.y += 0.05
 
+                    // move mouse position in cursor circles shader
                     this.cursorMaterial.uniforms.uMouse.value = this.lastIntersection.uv
 
                     this.showCursor()
                 } else {
+                    // hide cursor if mouse doesn't intersect ground
                     this.hideCursor()
                 }
 
+                // get mouse movement direction to set particles direction
                 if (lastPoint && this.lastIntersection) {
                     const oldDirection = this.cursorParticlesMaterial.uniforms.uDirection.value
                     const difference = new Vector2(this.lastIntersection.point.x - lastPoint.point.x, this.lastIntersection.point.z - lastPoint.point.z)
@@ -194,6 +196,7 @@ export default class MoveManager extends Component {
                 const scale = this.groundContainer.scale
                 const borders = this.ground.geometry.boundingBox
 
+                // get user distance from borders
                 const distances = this.getDistances(borders, scale, this.cursor.position)
                 const outAxis = distances.find(distance => distance.min <= ENVIRONMENTS_BORDERS_MARGIN || distance.max <= ENVIRONMENTS_BORDERS_MARGIN)
                 const otherAxis = distances.find(distance => distance !== outAxis)
@@ -206,6 +209,7 @@ export default class MoveManager extends Component {
                 const delay = 0.25
                 const ease = outAxis && otherAxis ? 'Power2.easeIn' : 'Power2.easeInOut'
 
+                // move user to new position
                 gsap.to(this.camera.container.position, {
                     delay,
                     duration,
@@ -220,6 +224,7 @@ export default class MoveManager extends Component {
                     ease
                 })
 
+                // move user to opposite side of the world if they go beyond borders
                 if (outAxis && otherAxis) {
                     gsap.to(this.globalScene.fog, {
                         far: 0.01,
@@ -242,20 +247,26 @@ export default class MoveManager extends Component {
         const factor = { min: 1, max: -1 }
 
         const appear = () => {
+            // get movement direction
             const direction = Math.min(outAxis.min, outAxis.max) === outAxis.min ? 'max' : 'min'
             const otherDirection = Math.min(otherAxis.min, otherAxis.max) === otherAxis.min ? 'max' : 'min'
 
+            // get new positions
             const position = borders[direction][outAxis.axis] * scale[outAxis.axis] + offset[outAxis.axis] + margin[direction]
             const otherPosition = borders[otherDirection][otherAxis.axis] * scale[otherAxis.axis] + offset[otherAxis.axis] + Math.min(otherAxis.min, otherAxis.max) * factor[otherDirection]
 
+            // set camera to movement first positions
             this.camera.container.position[outAxis.axis] = position - translate[outAxis.axis]
             this.camera.container.position[otherAxis.axis] = otherPosition - translate[otherAxis.axis]
+
+            // move camera y to be above ground
             this.dummy.position.y = 100
             this.dummy.position[outAxis.axis] = position
             this.dummy.position[otherAxis.axis] = otherPosition
             this.gravity.instantCollision(this.dummy, this.camera.camera)
             this.camera.container.position.y = this.dummy.position.y
 
+            // move camera to movement next position
             gsap.to(this.camera.container.position, {
                 delay: 0.25,
                 duration,
@@ -266,12 +277,15 @@ export default class MoveManager extends Component {
                     this.isMoving = false
                 }
             })
+
+            // fade back to scene
             gsap.to(fade, {
                 delay: 0.25,
                 duration: 1,
                 opacity: 0,
                 onComplete: () => fade.style.display = 'none'
             })
+            // make fog less close
             gsap.to(this.globalScene.fog, {
                 far: DEFAULT_FOG_FAR,
                 duration: 3,
@@ -280,6 +294,7 @@ export default class MoveManager extends Component {
             })
         }
 
+        // fade to white
         gsap.to(fade, {
             delay: Math.min(this.lastIntersection.distance / 5, 2) - 0.75,
             duration: 1,
@@ -288,6 +303,7 @@ export default class MoveManager extends Component {
         })
     }
 
+    // get distances to borders
     getDistances(borders, scale, position) {
         const distancesX = this.getAxisDistance('x', borders, scale, position)
         const distancesZ = this.getAxisDistance('z', borders, scale, position)
@@ -295,6 +311,7 @@ export default class MoveManager extends Component {
         return [distancesX, distancesZ]
     }
 
+    // get distance to border on axis
     getAxisDistance(axis, borders, scale, position) {
         const minDistance = Math.abs(borders.min[axis] * scale[axis] - position[axis])
         const maxDistance = Math.abs(borders.max[axis] * scale[axis] - position[axis])
@@ -320,6 +337,9 @@ export default class MoveManager extends Component {
     }
 
     render = () => {
-        if (store.state.scene === SCENES.PARAMETERS) this.cursorBase.morphTargetInfluences = store.state.worldMorphTargetInfluences
+        // set morphTargetInfluences for cursor base
+        if (store.state.scene === SCENES.PARAMETERS) {
+            this.cursorBase.morphTargetInfluences = store.state.worldMorphTargetInfluences
+        }
     }
 }

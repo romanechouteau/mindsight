@@ -1,15 +1,15 @@
-import { Object3D, Scene } from 'three';
+import { Object3D, Scene } from 'three'
 import { inRange } from 'lodash'
 import gsap from "gsap/all"
 
 import store from '../../../js/Store'
-import Component from '../../../js/Lib/Component';
+import Component from '../../../js/Lib/Component'
 // @ts-ignore
-import template from '../../../templates/worldBuilder.template';
+import template from '../../../templates/worldBuilder.template'
 import SkyCreator from './SkyCreator'
 import ShapeCreator from './ShapeCreator'
 import PointerCursor from '../../Tools/PointerCursor'
-import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants';
+import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants'
 // @ts-ignore
 import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
@@ -86,7 +86,6 @@ export default class WorldBuilder extends Component {
         const ctx = canvas.getContext('2d')
         const {width, height} = canvas
 
-        const config = { steps: 200, opacity: 1, waveLength: 50, speed: 250, offset: 0, height: 50, width: 0.2 }
         ctx.imageSmoothingEnabled = true;
         const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
         this.time.on('tick.worldBuilder', () => {
@@ -133,9 +132,11 @@ export default class WorldBuilder extends Component {
     }
 
     render = () => {
+        // Worldbuilder shape step
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SHAPE && this.shapeCreator === undefined) {
             this.shapeCreator = new ShapeCreator({scene: this.scene})
             this.onChange = this.shapeCreator.handleChange
+        // Worldbuilder sky step
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY && this.skyCreator === undefined) {
             this.skyCreator = new SkyCreator({
                 scene: this.scene,
@@ -144,6 +145,7 @@ export default class WorldBuilder extends Component {
                 debug: this.debug
             })
             this.onChange = this.skyCreator.handleChange
+        // Worldbuilder ground step
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
             // @ts-ignore
             this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time, envIndex: this.envName })
@@ -198,13 +200,10 @@ export default class WorldBuilder extends Component {
     }
 
     handleNextStep () {
+        // Change scene if step is last step
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
             return store.dispatch('updateScene', store.state.scene + 1)
         }
-        // TODO fix shape and put shape step back
-        // const nextStep = store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND
-        //     ? WORLDBUILDER_STEPS.SHAPE
-        //     : WORLDBUILDER_STEPS.SKY
         const nextStep = WORLDBUILDER_STEPS.SKY
         store.dispatch('updateWorldBuilderStep', nextStep)
     }
