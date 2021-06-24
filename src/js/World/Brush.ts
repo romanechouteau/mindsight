@@ -29,6 +29,7 @@ import fragmentShader from '@shaders/brushfrag.glsl'
 
 import { AUDIO_INPUT_MODES, CURSOR_MODES, BRUSH_PALETTE_ANGLES,
   BRUSH_LAST_POSITIONS, BRUSH_PALETTE_COLORS, LIST_MOODS_PALETTE } from '../constants'
+import SoundManager from '../Behavior/SoundManager'
 
 const configShaderMaterial = {
   depthWrite: false,
@@ -87,6 +88,9 @@ export default class Brush extends Component {
       store,
       element: document.querySelector('.brushInterface')
     })
+
+    SoundManager.state.brushExplanationPromise = SoundManager.play(9)
+    SoundManager.state.brushExplanationPromise.then(() => SoundManager.state.brushExplanationComplete = true)
 
     const { scene, mouse, camera, time, canvas, pixelRatio, debug } = options
 
@@ -278,6 +282,17 @@ export default class Brush extends Component {
           },
         })
         this.brush.material = this.material
+        if (!SoundManager.state.invitedToSkipAfterBrush) {
+          if (SoundManager.state.brushExplanationComplete) {
+            SoundManager.play(11, 5000)
+            SoundManager.state.invitedToSkipAfterBrush = true
+          } else {
+            SoundManager.state.brushExplanationPromise.then(() => {
+              SoundManager.play(11, 5000)
+              SoundManager.state.invitedToSkipAfterBrush = true
+            })
+          }
+        }
       }
     }
     this.mouse.on('up', this.mouseUpListener)

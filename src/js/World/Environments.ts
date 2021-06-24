@@ -23,6 +23,7 @@ import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import { textureLoader } from '../Tools/utils'
+import SoundManager from '../Behavior/SoundManager'
 
 const loader = new GLTFLoader()
 
@@ -40,6 +41,8 @@ export default class Environments {
   current: number
   constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI }) {
     const { time, assets, mouse, camera, debug } = options
+
+    SoundManager.play(4).then(() => SoundManager.play(5))
 
     this.time = time
     this.mouse = mouse

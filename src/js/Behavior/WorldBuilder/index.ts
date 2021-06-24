@@ -15,6 +15,7 @@ import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
 import MapHeighter from './MapHeighter';
 import Environments from '../../World/Environments';
+import SoundManager from '../SoundManager'
 
 interface WorldBuilderParams {
     time: Time,
@@ -65,6 +66,8 @@ export default class WorldBuilder extends Component {
         })
         this.createHtmlControls()
         this.render()
+
+        SoundManager.play(6)
     }
 
     createHtmlControls() {

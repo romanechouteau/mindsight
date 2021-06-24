@@ -19,6 +19,7 @@ import {
     EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT,
     INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE, SCENES
 } from '../constants'
+import SoundManager from "./SoundManager"
 
 export default class EyeTrackingManager extends Component {
     sizes: any
@@ -52,6 +53,8 @@ export default class EyeTrackingManager extends Component {
             store,
             element: document.querySelector('#eyetrackingManager')
         })
+
+        SoundManager.play(3, 4000)
 
         const { sizes, debug, camera } = options
 
