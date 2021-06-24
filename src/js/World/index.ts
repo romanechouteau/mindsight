@@ -11,7 +11,6 @@ import User from './User'
 // @ts-ignore
 import store from '@store/index'
 import Brush from './Brush'
-import Suzanne from './Suzanne'
 import Environments from './Environments'
 import SceneManager from "../Behavior/SceneManager"
 import AudioManager from "../Behavior/AudioManager"
@@ -42,7 +41,6 @@ export default class World extends Component {
   globalScene: Scene
   ambientlight: AmbientLightSource
   light: PointLightSource
-  suzanne: Suzanne
   brush: Brush
   pixelRatio: number
   user: User
@@ -85,7 +83,6 @@ export default class World extends Component {
     this.setAmbientLight()
     this.setPointLight()
     this.setSceneManager()
-    // this.setSuzanne()
     this.setFog()
     this.render()
   }
@@ -94,7 +91,6 @@ export default class World extends Component {
     this.loadModels = this.loadDiv.querySelector('.load')
     this.progress = this.loadDiv.querySelector('.progress')
 
-    // TODO: implement load screen
     this.init()
     this.loadDiv.remove()
   }
@@ -197,7 +193,6 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
-      // TODO: remove for prod
       if (this.eyeTrackingManager === undefined && document.querySelector('#eyetrackingManager')) {
         document.querySelector('#eyetrackingManager').remove()
       }

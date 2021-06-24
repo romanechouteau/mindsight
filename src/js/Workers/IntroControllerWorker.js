@@ -19,10 +19,6 @@ function _drawWave(elapsed) {
     drawWave(ctx, width, height, configs[2], elapsed)
 }
 
-// function _drawWave(ctx, width, height, configs, time) {
-//     drawWave(ctx, width, height, configs[0], time)
-// }
-
 self.addEventListener('message', message => {
     if (message.data.canvas) setCanvas(message.data.canvas)
     if (message.data.configs) setConfigs(message.data.configs)

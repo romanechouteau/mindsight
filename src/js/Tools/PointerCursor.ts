@@ -51,8 +51,6 @@ export default class PointerCursor extends Component {
                 ease: 'circ.out',
                 duration: 0.5
             })
-            // if (this.snapped.x === null) this.cursor.style.left = `${e.clientX - width/2}px`
-            // if (this.snapped.y === null) this.cursor.style.top = `${e.clientY - height/2}px`
         })
     }
 

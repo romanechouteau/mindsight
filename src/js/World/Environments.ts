@@ -89,7 +89,6 @@ export default class Environments {
           map: textureLoader.load(plaineBeachTexture),
           morphTargets: true
         })
-        // = textureLoader.load(plaineBeachTexture)
       } else {
         water = new Object3D()
         dock = new Object3D()
@@ -97,16 +96,12 @@ export default class Environments {
           map: textureLoader.load(plaineMeadowTexture),
           morphTargets: true
         })
-        // = textureLoader.load(plaineMeadowTexture)
       }
 
       this.environments[i].userData.envName = LIST_ENVIRONMENTS[i]
 
-      // Todo: refactor to handle all cases
       this.environments[this.environments.length - 1].visible = false
       this.environments[0].visible = true
-
-      // if (i === this.current) this.environments[i].visible = false
 
       this.environments[i].add(ground, grass, water, dock)
     }
@@ -139,7 +134,6 @@ export default class Environments {
     const size = new Vector3()
     groundMesh.geometry.boundingBox.getSize(size)
     size.multiplyScalar(1 - GROUND_SCALE*3) // seems to fit best like this
-    // debugger
     const water = new Water({ time: this.time, dimensions: { width: size.x, height: size.z }, debug: this.debug})
 
     return water.container

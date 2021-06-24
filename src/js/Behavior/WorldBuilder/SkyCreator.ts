@@ -60,12 +60,6 @@ export default class SkyCreator {
             this.debug.addColor(SKY_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
         }
 
-        // @ts-ignore
-        // this.pmremGenerator = new PMREMGenerator(App.renderer)
-
-        // @ts-ignore
-        // ;(this.scene as Scene).environment = this.pmremGenerator.fromScene(this.sky).texture
-
         this.changeGradient(0)
         this.setMovement()
     }

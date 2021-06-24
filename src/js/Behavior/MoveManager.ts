@@ -3,7 +3,6 @@ import gsap from "gsap/all";
 
 import Camera from '../Camera'
 // TODO: add app in global namespace
-import Ground from "../World/Ground"
 import Gravity from "./Gravity"
 import { Mouse } from '../Tools/Mouse'
 
@@ -22,7 +21,6 @@ import fragmentShader from '@shaders/cursorFrag.glsl'
 import store from '@store/index'
 import Component from "../Lib/Component";
 
-// TODO: set cursor in separate class
 export default class MoveManager extends Component {
     raycaster: Raycaster
     mouse: Mouse
@@ -62,7 +60,6 @@ export default class MoveManager extends Component {
         this.dummy = new Object3D()
 
         this.raycaster = new Raycaster()
-        // this.gravity = new Raycaster()
         this.rotationHelper = new Object3D()
         this.cursorMaterial = new ShaderMaterial({
             vertexShader: moveCursorVertex,
@@ -115,7 +112,7 @@ export default class MoveManager extends Component {
             this.scene.add(this.cursor)
             this.scene.add(this.cursorBase)
 
-            // TODO: wait for App mount
+            // wait for App mount
             setTimeout(this.setMoveCursor.bind(this), 50)
         })()
 

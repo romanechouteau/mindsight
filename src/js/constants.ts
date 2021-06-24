@@ -13,7 +13,6 @@ export enum MOODS {
     ANGER = "anger",
 }
 
-// TODO: faire le découpage de manière dynamique en fonction du nombre d'émotion
 export const moodPositions = {
     [MOODS.JOY]: new Vector3(0, 0, MAX_DISTANCE),
     [MOODS.FEAR]: new Vector3(MAX_DISTANCE, 0, 0),
@@ -132,7 +131,6 @@ export const BRUSH_PALETTE_COLORS = {
 export const BRUSH_LAST_POSITIONS = 5
 
 // dynamic import is impossible with snowpack
-// TODO: try with require.context plugin
 // @ts-ignore
 import bPlaine from '@textures/beach/PlaineSurface_Color.jpg'
 // @ts-ignore
@@ -203,3 +201,10 @@ export const BEACH_DOCKS = [
         index: 2368
     }
 ]
+
+export const INTRO_TIMEOUTS = {
+    fadeTitle: 2000,
+    lineSplit: 2000,
+    linesGoesAway: 5000,
+    linesMoveAfterDisassemble: 1000
+}

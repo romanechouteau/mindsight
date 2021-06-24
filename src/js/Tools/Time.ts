@@ -35,9 +35,7 @@ export default class Time extends EventEmitter {
 
     // delta
     this.delta = current - this.current
-    // elapsed = time between start and now
     this.elapsed = current - this.start
-    // current = current time
     this.current = current
 
     if (this.delta > 60) {

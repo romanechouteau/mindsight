@@ -1,8 +1,4 @@
 module.exports = {
-    // mount: {
-    //     src: "/dist",
-    //     public: "/"
-    // },
     mount: {
 
         public: "/",
@@ -27,23 +23,12 @@ module.exports = {
     plugins: [
         '@snowpack/plugin-typescript',
         'snowpack-plugin-stylus',
-        // '@canarise/snowpack-eslint-plugin',
         ["snowpack-plugin-raw-file-loader", {
           exts: [".frag", ".vert", ".glsl", ".template"]
         }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
         ["@snowpack/plugin-dotenv"],
         "snowpack-plugin-relative-css-urls",
-        // [
-        //     "@marlonmarcello/snowpack-plugin-pug",
-        //     {
-        //       "data": {
-        //         "meta": {
-        //           "title": "My website"
-        //         }
-        //       }
-        //     }
-        //   ],
 
     ],
     packageOptions: {

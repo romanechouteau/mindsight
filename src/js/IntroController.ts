@@ -125,8 +125,6 @@ export default class IntroController {
     }
 
     addWave(worker: Worker, evtNameSpace: string , configs: drawWaveConfig[]) {
-        // const _configs: drawWaveConfig = {}
-
         worker.postMessage({ configs: configs.map(conf => ({ ...conf, _gsap: null })) })
         this.time.on(evtNameSpace, () => {
             worker.postMessage({ action: 'drawWave', elapsed: this.time.elapsed })
@@ -143,7 +141,6 @@ export default class IntroController {
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    // debugger
                     configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
                 }
             })
@@ -153,7 +150,6 @@ export default class IntroController {
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    // debugger
                     configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
                 }
             })
@@ -163,7 +159,6 @@ export default class IntroController {
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
-                    // debugger
                     configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null}))  })
                 }
             })
@@ -211,8 +206,6 @@ export default class IntroController {
     flyLines() {
         ;[{conf: this.leftLineConfigs, worker: this.leftWorker}, {conf: this.rightLineConfigs, worker: this.rightWorker}].forEach(configs => {
             gsap.to(configs.conf[0], {
-                // widthReductor: 1,
-                // inflexionPoint: 0.5,
                 height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
@@ -221,8 +214,6 @@ export default class IntroController {
                 }
             })
             gsap.to(configs.conf[1], {
-                // widthReductor: 1,
-                // inflexionPoint: 0.5,
                 height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
@@ -231,8 +222,6 @@ export default class IntroController {
                 }
             })
             gsap.to(configs.conf[2], {
-                // widthReductor: 1,
-                // inflexionPoint: 0.5,
                 height: 1000,
                 ease: 'power1.inOut',
                 duration: 2,
@@ -242,12 +231,6 @@ export default class IntroController {
             })
         })
 
-        // setTimeout(() => {
-        //     // @ts-ignore
-        //     this.leftCanvas.attributeStyleMap.set('transform', 'translateX(-40vw)')
-        //     // @ts-ignore
-        //     this.rightCanvas.attributeStyleMap.set('transform', 'translateX(40vw)')
-        // }, 1000)
         setTimeout(() => {
             // @ts-ignore
             this.leftCanvas.attributeStyleMap.set('opacity', 0)
@@ -303,7 +286,6 @@ export default class IntroController {
              }}
             this.debug.add(obj,'next').name('next intro step');
         } else {
-            // steps.forEach(async step => (await queue(step, 5000)))
             for (const step of steps) {
                 await queue(step, 5000)
             }

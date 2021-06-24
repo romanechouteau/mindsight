@@ -28,7 +28,6 @@ import IntroController from './IntroController'
 
 import Stats from 'stats.js'
 import Time from './Tools/Time'
-import { createState, State } from './World/State'
 import PointerCursor from './Tools/PointerCursor'
 import Component from './Lib/Component'
 
@@ -77,8 +76,6 @@ export default class App extends Component {
     // this.assets = new Assets()
     this.mouse = new Mouse()
 
-    // ! Only state shall be accessed on global App namespace
-    this.state = createState()
     this.setConfig()
     this.setRenderer()
     this.setCamera()
@@ -290,11 +287,3 @@ export default class App extends Component {
     }
   }
 }
-
-// export interface App {
-
-// }
-
-// export declare namespace App {
-//   state: number
-// }
