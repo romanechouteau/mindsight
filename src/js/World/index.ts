@@ -184,11 +184,10 @@ export default class World extends Component {
 
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
+      this.eyeTrackingManager = null // prevent from being undefined
       setTimeout(() => {
-        if (store.state.scene === SCENES.EYETRACKING) {
-          this.setEyeTrackingManager()
-        }
-      }, 22000);
+        this.setEyeTrackingManager()
+      }, 2000)
     } else if (store.state.scene !== SCENES.EYETRACKING && this.eyeTrackingManager !== undefined && this.eyeTrackingManager.stopped === false) {
       this.eyeTrackingManager.stop()
     }
@@ -210,6 +209,9 @@ export default class World extends Component {
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.setWorldBuilder()
+      if (this.user === undefined) {
+        this.setUser()
+      }
       this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
@@ -219,9 +221,9 @@ export default class World extends Component {
       if (this.brush === undefined) {
         this.setBrush()
       }
-      if (this.user === undefined) {
-        this.setUser()
-      }
+      // if (this.user === undefined) {
+      //   this.setUser()
+      // }
      } else if (store.state.scene !== SCENES.BRUSH && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()
     }

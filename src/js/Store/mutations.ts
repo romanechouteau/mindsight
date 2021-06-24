@@ -1,4 +1,7 @@
 export default {
+    skipIntro(state, payload) {
+        state.isIntro = false
+    },
     updateBrushParams(state, payload) {
         const { param, value } = payload
 

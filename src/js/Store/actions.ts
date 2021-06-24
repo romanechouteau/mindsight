@@ -1,4 +1,7 @@
 export default {
+    skipIntro(context) {
+        context.commit('skipIntro')
+    },
     updateBrushParams(context, payload) {
         context.commit('updateBrushParams', payload)
     },

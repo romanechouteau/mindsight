@@ -17,10 +17,12 @@ export default class SkyCreator {
     globalScene: Scene
     skyMaterial: ShaderMaterial
     sky: Mesh
-    constructor(options: { scene: Object3D, globalScene: Scene, time: Time }) {
-        const { scene, globalScene, time } = options
+    debug: dat.GUI
+    constructor(options: { scene: Object3D, globalScene: Scene, time: Time, debug?: dat.GUI }) {
+        const { scene, globalScene, time, debug } = options
 
         this.time = time
+        this.debug = debug
         this.scene = scene
         this.globalScene = globalScene
         this.handleChange = this.handleChange.bind(this)
@@ -46,6 +48,17 @@ export default class SkyCreator {
         this.sky = new Mesh(skyGeometry, this.skyMaterial)
 
         this.scene.add(this.sky)
+
+        if (this.debug) {
+            this.debug.addColor(SKY_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
+            this.debug.addColor(SKY_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
+            this.debug.addColor(SKY_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
+            this.debug.addColor(SKY_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
+            this.debug.addColor(SKY_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
+            this.debug.addColor(SKY_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
+            this.debug.addColor(SKY_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
+            this.debug.addColor(SKY_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
+        }
 
         // @ts-ignore
         // this.pmremGenerator = new PMREMGenerator(App.renderer)

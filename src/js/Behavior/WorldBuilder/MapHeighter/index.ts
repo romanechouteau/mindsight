@@ -1,4 +1,4 @@
-import { CanvasTexture, Group, Mesh, MeshNormalMaterial, MeshStandardMaterial, PlaneBufferGeometry, Texture, Scene, WebGLRenderer, PerspectiveCamera, RawShaderMaterial, IUniform } from "three"
+import { CanvasTexture, Group, Mesh, MeshNormalMaterial, MeshStandardMaterial, PlaneBufferGeometry, Texture, Scene, WebGLRenderer, PerspectiveCamera, RawShaderMaterial, IUniform, ShaderMaterial } from "three"
 // @ts-ignore
 import collineSrc from '@textures/plage_colline_displacement.png'
 // @ts-ignore
@@ -15,8 +15,6 @@ import { throttle } from 'lodash'
 import store from '../../../Store'
 // @ts-ignore
 import Time from '@tools/Time'
-// @ts-ignore
-import bPlaine from '@textures/beach/Plaine_Surface_Color.jpg'
 
 // @ts-ignore
 import blendingVertex from '../../../../shaders/blendingVert.glsl'
@@ -37,7 +35,7 @@ export default class MapHeighter {
     ctx: CanvasRenderingContext2D
     worker: Worker
     throttledBlend: Function
-    blendMaterial: RawShaderMaterial
+    blendMaterial: ShaderMaterial
     envIndex: string
     blendParams: { firstMapIndex, firstMapInfluence, secondMapIndex, secondMapInfluence }
     constructor({ ground, time, envIndex }: MapHeighterParams) {
@@ -45,6 +43,7 @@ export default class MapHeighter {
         this.time = time
         this.envIndex = envIndex
         this.handleChange = this.handleChange.bind(this)
+        this.applyChange = this.applyChange.bind(this)
         this.init()
     }
 
@@ -60,7 +59,7 @@ export default class MapHeighter {
         // document.querySelector('.heighterDebug').appendChild(blendingRenderer.domElement)
         const geometry = new PlaneBufferGeometry(2, 2, 1, 1)
         const textures = await Promise.all(src.map( _src => (textureLoader.loadAsync(_src))))
-        this.blendMaterial = new RawShaderMaterial({
+        this.blendMaterial = new ShaderMaterial({
             vertexShader: blendingVertex,
             fragmentShader: blendingFragment,
             uniforms: {
@@ -70,6 +69,7 @@ export default class MapHeighter {
                 map3: { type: "t", value: textures[2] } as IUniform,
                 map4: { type: "t", value: textures[3] } as IUniform,
             },
+            morphTargets: true
         })
         // debugger
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )
@@ -83,12 +83,14 @@ export default class MapHeighter {
         // if (!((this.ground.material as MeshStandardMaterial).displacementMap instanceof CanvasTexture)) (this.ground.material as MeshStandardMaterial).displacementMap = new CanvasTexture(this.blendingCanvas)
         // else (this.ground.material as MeshStandardMaterial).displacementMap.needsUpdate = true
 
-        if (!(((this.ground.children[0] as Mesh).material as MeshStandardMaterial)?.map instanceof CanvasTexture)) {
-            ;((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map = new CanvasTexture(this.blendingCanvas)
+        if (!(((this.ground.children[0] as Mesh).material) instanceof ShaderMaterial)) {
+            console.log(this.blendMaterial);
+            
+            ;((this.ground.children[0] as Mesh).material) = this.blendMaterial            
             // ;((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.center = new Vector2(0.5, 0.5)
             // ;((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.rotation = Math.PI*2
         }
-        else ((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.needsUpdate = true
+        // else ((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.needsUpdate = true
     }
 
     handleChange(value: number) {

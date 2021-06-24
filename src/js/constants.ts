@@ -134,13 +134,13 @@ export const BRUSH_LAST_POSITIONS = 5
 // dynamic import is impossible with snowpack
 // TODO: try with require.context plugin
 // @ts-ignore
-import bPlaine from '@textures/beach/Plaine_Surface_Color.jpg'
+import bPlaine from '@textures/beach/PlaineSurface_Color.jpg'
 // @ts-ignore
-import bColline from '@textures/beach/Colline_Surface_Color.jpg'
+import bColline from '@textures/beach/CollinesSurface_Color.jpg'
 // @ts-ignore
-import bVallee from '@textures/beach/Vallee_Surface_Color.jpg'
+import bVallee from '@textures/beach/ValleeSurface_Color.jpg'
 // @ts-ignore
-import bMontagnes from '@textures/beach/Montagnes_Surface_Color.jpg'
+import bMontagnes from '@textures/beach/MontagnesSurface_Color.jpg'
 
 // @ts-ignore
 import mPlaine from '@textures/meadow/PlaineSurface_Color.jpg'
@@ -152,8 +152,8 @@ import mVallee from '@textures/meadow/ValleeSurface_Color.jpg'
 import mMontagnes from '@textures/meadow/MontagnesSurface_Color.jpg'
 
 export const ENVIRONMENTS_COLOR_MAPS = {
-    [ENVIRONMENTS.BEACH]: [ bPlaine, bColline, bVallee, bMontagnes ],
-    [ENVIRONMENTS.MEADOW]: [ mPlaine, mColline, mVallee, mMontagnes ],
+    [ENVIRONMENTS.BEACH]: [ bPlaine, bVallee, bColline, bMontagnes ],
+    [ENVIRONMENTS.MEADOW]: [ mPlaine, mVallee, mColline, mMontagnes ],
 }
 
 // @ts-ignore

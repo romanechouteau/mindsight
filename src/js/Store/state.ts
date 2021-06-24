@@ -8,7 +8,7 @@ export default {
         color: [50, 50]
     },
     emotion: 'joy',
-    scene: 1,
+    scene: 0,
     audioInputMode: AUDIO_INPUT_MODES.NONE,
     spotifyAudioData: {
         sectionIndex: null

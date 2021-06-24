@@ -1,4 +1,4 @@
-import { MeshStandardMaterial, Object3D, Color, Mesh, PlaneBufferGeometry, DoubleSide, MeshBasicMaterial, Vector3, MeshNormalMaterial, FrontSide } from 'three'
+import { Object3D, Mesh, DoubleSide, MeshBasicMaterial, Vector3 } from 'three'
 
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
@@ -7,25 +7,22 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Mouse } from '../Tools/Mouse'
 import Time from '../Tools/Time'
 // @ts-ignore
-import envSrc1 from '@models/plane_vierge.glb'
-// @ts-ignore
 import store from '@store/index'
 import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
-import environmentsSrc from '../../models/ground.gltf'
+import environmentsSrc from '../../models/romabe4.gltf'
 // @ts-ignore
-import plaineBeachTexture from '../../images/textures/beach/Plaine_Surface_Color.jpg'
+import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.jpg'
 // @ts-ignore
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
-import collineSrc from '@textures/plage_colline_displacement.png'
-import { modelLoader, textureLoader } from '../Tools/utils'
+import { textureLoader } from '../Tools/utils'
 
 const loader = new GLTFLoader()
 
@@ -76,6 +73,7 @@ export default class Environments {
       ground.children[0].scale.set(1., 1., 1.)
       ;(ground.children[0] as Mesh).material.side = DoubleSide
       ;(ground.children[0] as Mesh).material.vertexColors = false
+      ;(ground.children[0] as Mesh).morphTargetInfluences[2] = 0 // reset exported mti
 
       this.environments[i].position.y = -2
       this.environments[i].position.z = - i * ENV_DISTANCE
