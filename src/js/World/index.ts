@@ -119,7 +119,8 @@ export default class World extends Component {
       scene: this.container,
       gravity: this.gravity,
       pixelRatio: this.pixelRatio,
-      globalScene: this.globalScene
+      globalScene: this.globalScene,
+      time: this.time
     })
   }
   setBrush() {
@@ -216,9 +217,6 @@ export default class World extends Component {
       if (this.brush === undefined) {
         this.setBrush()
       }
-      // if (this.user === undefined) {
-      //   this.setUser()
-      // }
      } else if (store.state.scene !== SCENES.BRUSH && this.brush !== undefined && this.brush.stopped === false) {
       this.brush.stop()
     }
