@@ -1,17 +1,7 @@
-import { CanvasTexture, Group, Mesh, MeshNormalMaterial, MeshStandardMaterial, PlaneBufferGeometry, Texture, Scene, WebGLRenderer, PerspectiveCamera, RawShaderMaterial, IUniform, ShaderMaterial } from "three"
-// @ts-ignore
-import collineSrc from '@textures/plage_colline_displacement.png'
-// @ts-ignore
-import montagneSrc from '@textures/plage_montages_displacement.png'
-// @ts-ignore
-import plaineSrc from '@textures/plage_plaine_displacement.png'
-// @ts-ignore
-import valleeSrc from '@textures/plage_vallee_displacement.png'
+import { Mesh, PlaneBufferGeometry, Scene, WebGLRenderer, PerspectiveCamera, IUniform, ShaderMaterial } from "three"
 import { textureLoader } from '../../../Tools/utils'
 // @ts-ignore
 import { WORLDBUILDER_PRECISION, ENVIRONMENTS_COLOR_MAPS } from "@/js/constants"
-import Environments from "../../../World/Environments"
-import { throttle } from 'lodash'
 import store from '../../../Store'
 // @ts-ignore
 import Time from '@tools/Time'
@@ -85,8 +75,8 @@ export default class MapHeighter {
 
         if (!(((this.ground.children[0] as Mesh).material) instanceof ShaderMaterial)) {
             console.log(this.blendMaterial);
-            
-            ;((this.ground.children[0] as Mesh).material) = this.blendMaterial            
+
+            ;((this.ground.children[0] as Mesh).material) = this.blendMaterial
             // ;((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.center = new Vector2(0.5, 0.5)
             // ;((this.ground.children[0] as Mesh).material as MeshStandardMaterial).map.rotation = Math.PI*2
         }

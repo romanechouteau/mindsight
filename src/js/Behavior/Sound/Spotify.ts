@@ -1,11 +1,5 @@
-// import { render } from 'pug';
-import { htmlUtils } from '../../Tools/utils'
-// @ts-ignore
-import template from '../../../templates/spotify.template'
 // @ts-ignore
 import store from '@store/index'
-// @ts-ignore
-import search from '../../../images/search.svg'
 
 export default class SpotifyManager {
 
