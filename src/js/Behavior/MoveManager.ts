@@ -16,6 +16,7 @@ import fragmentShader from '@shaders/cursorFrag.glsl'
 // @ts-ignore
 import store from '@store/index'
 import Component from "../Lib/Component"
+import Time from "../Tools/Time";
 
 export default class MoveManager extends Component {
     raycaster: Raycaster
@@ -41,7 +42,8 @@ export default class MoveManager extends Component {
     groundContainer: Mesh
     cursorParticlesMaterial: ShaderMaterial
     gravity: Gravity
-    constructor({ camera, mouse, ground, canvas, scene, pixelRatio, globalScene, gravity }) {
+    time: Time
+    constructor({ camera, mouse, ground, canvas, scene, pixelRatio, globalScene, gravity, time }) {
         super({ store })
         this.mouse = mouse
         this.camera = camera
@@ -52,6 +54,7 @@ export default class MoveManager extends Component {
         this.globalScene = globalScene
         this.groundContainer = ground.container.children[0]
         this.gravity = gravity
+        this.time = time
         this.dummy = new Object3D()
 
         this.raycaster = new Raycaster()
@@ -127,8 +130,7 @@ export default class MoveManager extends Component {
     }
 
     setMoveCursor() {
-        // @ts-ignore
-        App.state.time.on('tick', () => {
+        this.time.on('tick', () => {
             if (store.state.cursorMode === CURSOR_MODES.MOVE) {
                 this.cursorMaterial.uniforms.uTime.value += 0.01
                 this.cursorParticlesMaterial.uniforms.uTime.value += 0.02
