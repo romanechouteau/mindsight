@@ -2,13 +2,12 @@
 import EventEmitter from './EventEmitter'
 
 export default class Time extends EventEmitter {
-
   start: number;
   current: number;
   elapsed: number;
   delta: number;
   ticker?: number;
-  
+
   constructor() {
     // Get parent methods
     super()

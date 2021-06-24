@@ -2,8 +2,6 @@ import { vec2 } from 'gl-matrix'
 import Emitter from 'event-emitter'
 import RAF from './raf'
 
-const _VEC2 = vec2.create()
-
 export class Mouse {
     cursor: vec2
     lastCursor: vec2
@@ -18,7 +16,6 @@ export class Mouse {
     isDown: boolean
     wheelDir: string
     emitter: { on?: Function, off?: Function; emit?: Function; }
-    preventDamping: boolean
     on: Function
     off: Function
     targeted: HTMLElement | null

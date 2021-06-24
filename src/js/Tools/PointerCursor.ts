@@ -40,6 +40,7 @@ export default class PointerCursor extends Component {
     init() {
         const {width, height} = this.element.getBoundingClientRect()
 
+        // set circle strokeDashArray to path lendth
         this.circle = this.element.querySelector('circle')
         this.strokeDashArray = Math.PI * (parseInt(this.circle.getAttribute('r')) * 2)
         this.circle.setAttribute('stroke-dasharray', `${this.strokeDashArray}`)
@@ -75,6 +76,7 @@ export default class PointerCursor extends Component {
 
     startHold (callback) {
         this.time.on('tick.hold', () => {
+            // show holding time on cursor
             if (this.holdTime >= HOLD_DURATION + HOLD_DELAY) {
                 this.holdTime = 0
                 gsap.to(this.circle, {
@@ -87,6 +89,7 @@ export default class PointerCursor extends Component {
 
             this.holdTime += 1
 
+            // wait for delay before holding
             if (this.holdTime >= HOLD_DELAY) {
                 const percent = (this.holdTime - HOLD_DELAY) / HOLD_DURATION
                 this.circle.style.strokeDashoffset = `${(percent) * this.strokeDashArray}`
@@ -104,6 +107,7 @@ export default class PointerCursor extends Component {
     }
 
     renderCursor() {
+        // show cursor only if cursor is in default mode or brush mode
         if (store.state.cursorMode !== CURSOR_MODES.DEFAULT && store.state.cursorMode !== CURSOR_MODES.BRUSH) {
             this.element.classList.add('hidden')
         } else {

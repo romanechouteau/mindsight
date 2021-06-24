@@ -27,6 +27,7 @@ export const easingFunctions = {
     easeInOutQuint: t => t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
   }
 
+  // pseudo random
   export const random = (index) => {
     const number = Math.sin(index * 12.9898 + index * 78.233) * 43758.5453
     return number - Math.floor(number);

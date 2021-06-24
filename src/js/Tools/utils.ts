@@ -5,6 +5,7 @@ export const textureLoader = new TextureLoader()
 export const modelLoader = new GLTFLoader()
 
 export const htmlUtils = {
+    // get text from html tag
     scrapeTagText: (html: string, selector: string) => {
         const parser = new DOMParser()
         const markup = parser.parseFromString(html, "text/html")

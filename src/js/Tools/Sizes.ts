@@ -2,12 +2,12 @@
 import EventEmitter from './EventEmitter'
 
 export default class Sizes extends EventEmitter {
-  viewport: {width?: number, height?: number} 
+  viewport: {width?: number, height?: number}
   sizeViewport: HTMLDivElement
   width: number
   height: number
 
-  constructor() {  
+  constructor() {
 
     // Get parent methods
     super()
