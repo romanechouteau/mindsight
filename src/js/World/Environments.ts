@@ -23,6 +23,7 @@ import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import { textureLoader } from '../Tools/utils'
+import SkyManager from '../Behavior/SkyManager'
 
 const loader = new GLTFLoader()
 
@@ -38,8 +39,9 @@ export default class Environments {
   handleScroll: Function
   debug: dat.GUI
   current: number
-  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI }) {
-    const { time, assets, mouse, camera, debug } = options
+  skyManager: SkyManager
+  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI, skyManager: SkyManager }) {
+    const { time, assets, mouse, camera, debug, skyManager } = options
 
     this.time = time
     this.mouse = mouse
@@ -49,6 +51,7 @@ export default class Environments {
     this.isMoving = false
     this.debug = debug
     this.current = 0
+    this.skyManager = skyManager
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -168,7 +171,7 @@ export default class Environments {
             this.environments[Math.abs(environment - 1)].visible = true
 
             gsap.to(this.container.position, {
-              duration: 0.9,
+              duration: 1.5,
               ease: 'power3.inOut',
               z: - this.environments[environment].position.z,
               onComplete: () => {
@@ -178,6 +181,8 @@ export default class Environments {
                 if (water) water.visible = true
                 }
             })
+            this.skyManager.handleEnvChange(environment)
+
         }
     }, 100, { leading: true, trailing: false, maxWait: 1500 })
 
