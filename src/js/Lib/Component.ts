@@ -9,11 +9,12 @@ export default class Component {
 
     this.render = this.render || function() {}
 
+    // render on state change
     if (store instanceof Store) {
       store.events.subscribe('stateChange', () => this.render())
     }
 
-    if(element !== undefined) {
+    if (element !== undefined) {
       this.element = element
     }
   }

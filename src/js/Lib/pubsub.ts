@@ -6,6 +6,7 @@ export default class PubSub {
       this.events = {}
     }
 
+    // subscribe to changes
     subscribe(event, callback) {
         if(!this.events.hasOwnProperty(event)) {
             this.events[event] = []
@@ -14,6 +15,7 @@ export default class PubSub {
         return this.events[event].push(callback)
     }
 
+    // publish changes
     publish(event, data = {}) {
         if(!this.events.hasOwnProperty(event)) {
           return []
