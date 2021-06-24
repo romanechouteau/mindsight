@@ -41,6 +41,7 @@ export default class Store {
         })
     }
 
+    // dispatch action
     dispatch(actionKey, payload) {
         if (typeof this.actions[actionKey] !== 'function') {
           console.error(`Action "${actionKey} doesn't exist.`)
@@ -58,6 +59,7 @@ export default class Store {
         return true
     }
 
+    // commit mutation
     commit(mutationKey, payload) {
         if(typeof this.mutations[mutationKey] !== 'function') {
           console.log(`Mutation "${mutationKey}" doesn't exist`)
