@@ -54,7 +54,7 @@ export default class EyeTrackingManager extends Component {
             element: document.querySelector('#eyetrackingManager')
         })
 
-        SoundManager.play(3, 4000)
+        SoundManager.playVoice(3, 4000)
 
         const { sizes, debug, camera } = options
 

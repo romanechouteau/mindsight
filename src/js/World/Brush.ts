@@ -89,7 +89,7 @@ export default class Brush extends Component {
       element: document.querySelector('.brushInterface')
     })
 
-    SoundManager.state.brushExplanationPromise = SoundManager.play(9)
+    SoundManager.state.brushExplanationPromise = SoundManager.playVoice(9)
     SoundManager.state.brushExplanationPromise.then(() => SoundManager.state.brushExplanationComplete = true)
 
     const { scene, mouse, camera, time, canvas, pixelRatio, debug } = options
@@ -284,11 +284,11 @@ export default class Brush extends Component {
         this.brush.material = this.material
         if (!SoundManager.state.invitedToSkipAfterBrush) {
           if (SoundManager.state.brushExplanationComplete) {
-            SoundManager.play(11, 5000)
+            SoundManager.playVoice(11, 5000)
             SoundManager.state.invitedToSkipAfterBrush = true
           } else {
             SoundManager.state.brushExplanationPromise.then(() => {
-              SoundManager.play(11, 5000)
+              SoundManager.playVoice(11, 5000)
               SoundManager.state.invitedToSkipAfterBrush = true
             })
           }

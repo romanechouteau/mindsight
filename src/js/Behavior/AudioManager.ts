@@ -39,7 +39,7 @@ class AudioManager extends Component {
     start() {
         this.started = true
 
-        SoundManager.play(12).then(() => SoundManager.play(13))
+        SoundManager.playVoice(12).then(() => SoundManager.playVoice(13))
 
         // default mode is spotify
         store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)

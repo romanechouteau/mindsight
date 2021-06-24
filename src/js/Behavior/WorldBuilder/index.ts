@@ -67,7 +67,7 @@ export default class WorldBuilder extends Component {
         this.createHtmlControls()
         this.render()
 
-        SoundManager.play(6)
+        SoundManager.playVoice(6)
     }
 
     createHtmlControls() {
