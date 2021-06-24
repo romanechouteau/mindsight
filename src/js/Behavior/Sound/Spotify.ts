@@ -98,8 +98,10 @@ export default class SpotifyManager {
             .then(res => res.json())
             .then(res => {
                 this.searchTracks = []
-                for (const track of res.tracks.items) {
-                    this.searchTracks.push(track)
+                for (let i = 0; i < 4; i++) {
+                    if (res.tracks && res.tracks.items[i]) {
+                        this.searchTracks.push(res.tracks.items[i])
+                    }
                 }
                 this.renderTrackList()
             });

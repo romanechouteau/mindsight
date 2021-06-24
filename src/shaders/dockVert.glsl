@@ -1,28 +1,16 @@
-uniform float uPI;
-uniform float uTime;
 uniform vec3 uScale;
-uniform float uGrassScale;
 uniform vec3 uMorphInfluences;
+uniform vec3 uNormals;
+uniform vec3 uMorphTargets1;
+uniform vec3 uMorphTargets2;
+uniform vec3 uMorphTargets3;
+uniform vec3 uNormalsTarget1;
+uniform vec3 uNormalsTarget2;
+uniform vec3 uNormalsTarget3;
 
 varying vec2 vUv;
-varying float vSpecial;
-varying float vVisible;
-
-attribute float aSpecial;
-attribute vec3 aNormals;
-attribute vec4 aVisible;
-attribute vec3 aMorphTargets1;
-attribute vec3 aMorphTargets2;
-attribute vec3 aMorphTargets3;
-attribute vec3 aNormalsTarget1;
-attribute vec3 aNormalsTarget2;
-attribute vec3 aNormalsTarget3;
 
 #include <fog_pars_vertex>
-
-float rand(vec2 co){
-  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-}
 
 mat3 rotateAlign( vec3 v1, vec3 v2)
 {
@@ -63,31 +51,17 @@ vec3 displaceNormals(vec3 normals, vec3 normalsTarget1, vec3 normalsTarget2, vec
     return normal;
 }
 
-float displaceVisible(float visible, float visibleTarget1, float visibleTarget2, float visibleTarget3) {
-    float restMorphInfluences = 1. - uMorphInfluences.x - uMorphInfluences.y - uMorphInfluences.z;
-
-    return visible * restMorphInfluences + visibleTarget1 * uMorphInfluences.x + visibleTarget2 * uMorphInfluences.y + visibleTarget3 * uMorphInfluences.z;
-}
-
 void main() {
     vUv = uv;
-    vSpecial = aSpecial;
-    vVisible = displaceVisible(aVisible.x, aVisible.y, aVisible.z, aVisible.w);
 
     vec3 pos = position;
-    pos.y += 8. * pow(uGrassScale, 2.);
 
-    vec3 normal = displaceNormals(aNormals, aNormalsTarget1, aNormalsTarget2, aNormalsTarget3);
-    mat3 rotateMatrix = rotateAlign(aNormals, normal);
+    vec3 normal = displaceNormals(uNormals, uNormalsTarget1, uNormalsTarget2, uNormalsTarget3);
+    mat3 rotateMatrix = rotateAlign(uNormals, normal);
     pos *= rotateMatrix;
 
-    vec4 modelPosition = modelMatrix * instanceMatrix * vec4(pos, 1.0);
-    modelPosition = displace(modelPosition, aMorphTargets1, aMorphTargets2, aMorphTargets3);
-
-    float delay = (modelPosition.x * 0.05);
-    float displacement = cos(uTime + delay) * (pow(1. - uv.y, 2.) * 0.05);
-    modelPosition.x += displacement;
-
+    vec4 modelPosition = modelMatrix * vec4(pos, 1.0);
+    modelPosition = displace(modelPosition, uMorphTargets1, uMorphTargets2, uMorphTargets3);
 
     vec4 mvPosition = viewMatrix * modelPosition;
 

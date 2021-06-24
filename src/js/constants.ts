@@ -62,10 +62,11 @@ export enum SCENES {
     PARAMETERS = 3,
     BRUSH = 4,
     AUDIO = 5,
-    SUMUP = 6
+    WORD = 6,
+    SUMUP = 7
 }
 
-export const LAST_SCENE = SCENES.AUDIO
+export const LAST_SCENE = SCENES.SUMUP
 
 export const EYETRACKING_RADIUS = 0.5
 
@@ -96,7 +97,7 @@ export const LIST_ENVIRONMENTS = Object.values(ENVIRONMENTS)
 
 export const GRASS_COLOR = {
     [ENVIRONMENTS.BEACH]: [0x736A3E, 0xDBCF8F, 0xA39758, 0xD4CEB0],
-    [ENVIRONMENTS.MEADOW]: [0x2A3B3A, 0x728762, 0x425d5c, 0x869b75]
+    [ENVIRONMENTS.MEADOW]: [0x595622, 0x878234, 0x595622, 0x878234]
 }
 
 export const ENVIRONMENT_INDICES = {
@@ -154,3 +155,51 @@ export const ENVIRONMENTS_COLOR_MAPS = {
     [ENVIRONMENTS.BEACH]: [ bPlaine, bVallee, bColline, bMontagnes ],
     [ENVIRONMENTS.MEADOW]: [ mPlaine, mVallee, mColline, mMontagnes ],
 }
+
+// @ts-ignore
+import dockRightModel from '@models/dock_right.gltf'
+// @ts-ignore
+import dockRightTexture from '@textures/beach/Dock_Right_Surface_Color.jpg'
+// @ts-ignore
+import dockLeftModel from '@models/dock_left.gltf'
+// @ts-ignore
+import dockLeftTexture from '@textures/beach/Dock_Left_Surface_Color.jpg'
+// @ts-ignore
+import pathRightModel from '@models/path_right.gltf'
+// @ts-ignore
+import pathRightTexture from '@textures/beach/Path_Right_Surface_Color.jpg'
+// @ts-ignore
+import pathLeftModel from '@models/path_left.gltf'
+// @ts-ignore
+import pathLeftTexture from '@textures/beach/Path_Left_Surface_Color.jpg'
+
+export const BEACH_DOCKS = [
+    {
+        model: dockRightModel,
+        texture: dockRightTexture,
+        position: { x: -7637, z: 2906 },
+        scale: 2,
+        index: 1086
+    },
+    {
+        model: dockLeftModel,
+        texture: dockLeftTexture,
+        position: { x: 723, z: -9975 },
+        scale: 2,
+        index: 1819
+    },
+    {
+        model: pathRightModel,
+        texture: pathRightTexture,
+        position: { x: -9975, z: 16423 },
+        scale: 1,
+        index: 564
+    },
+    {
+        model: pathLeftModel,
+        texture: pathLeftTexture,
+        position: { x: -2586, z: -17212 },
+        scale: 1,
+        index: 2368
+    }
+]

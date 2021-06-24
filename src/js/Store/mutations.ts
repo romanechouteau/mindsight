@@ -41,6 +41,14 @@ export default {
     },
     updateMapHeight(state, payload) {
         state.worldMorphTargetInfluences = payload
+    },
+    finishIntro (state) {
+        state.isIntro = false
+
+        return state
+    },
+    registerEmotionWord (state, payload) {
+        state.word = payload
 
         return state
     }

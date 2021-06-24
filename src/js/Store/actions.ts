@@ -27,5 +27,11 @@ export default {
     },
     updateMapHeight(context, payload) {
         context.commit('updateMapHeight', payload)
+    },
+    finishIntro(context, payload) {
+        context.commit('finishIntro', payload)
+    },
+    registerEmotionWord(context, payload) {
+        context.commit('registerEmotionWord', payload)
     }
 }

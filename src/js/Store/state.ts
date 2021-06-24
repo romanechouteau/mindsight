@@ -19,5 +19,6 @@ export default {
     environment: 0,
     isIntro: true,
     cursorMode: CURSOR_MODES.DEFAULT,
-    worldMorphTargetInfluences: [0, 0, 0]
+    worldMorphTargetInfluences: [0, 0, 0],
+    word: ''
   };

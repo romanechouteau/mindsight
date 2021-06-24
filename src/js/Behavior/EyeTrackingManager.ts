@@ -4,6 +4,7 @@ import { debounce } from 'lodash'
 
 // @ts-ignore
 import store from '@store/index'
+import Camera from '../Camera'
 // @ts-ignore
 import webgazer from '@tools/WebGazer'
 // @ts-ignore
@@ -19,6 +20,7 @@ import { EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EY
 export default class EyeTrackingManager extends Component {
     sizes: any
     debug: dat.GUI
+    camera: Camera
     points: NodeListOf<Element>
     inZone: boolean[]
     params: {
@@ -43,16 +45,17 @@ export default class EyeTrackingManager extends Component {
     currentPoint: number
     currentTranslate: number
 
-    constructor(options: { sizes: any, debug: dat.GUI }) {
+    constructor(options: { sizes: any, debug: dat.GUI, camera: Camera }) {
         super({
             store,
             element: document.querySelector('#eyetrackingManager')
         })
 
-        const { sizes, debug } = options
+        const { sizes, debug, camera } = options
 
         this.sizes = sizes
         this.debug = debug
+        this.camera = camera
 
         this.inZone = []
         this.stopped = false
@@ -181,10 +184,10 @@ export default class EyeTrackingManager extends Component {
     }
 
     focusProgress(percentage) {
-        const scale = percentage / 0.8 * 50
-        gsap.to(document.querySelector('#background'), {
+        const blur = percentage / this.params.success * 4
+        gsap.to(this.element, {
             duration: 0.1,
-            backgroundColor: `rgb(${200 - scale}, 200, 200)`,
+            filter: `blur(${blur}px)`
         })
     }
 
@@ -290,30 +293,38 @@ export default class EyeTrackingManager extends Component {
 
         this.render = () => {}
         this.stopped = true
-
         store.dispatch('updateScene', SCENES.ENVIRONMENT)
 
-        gsap.to(this.element, {
-            delay: 0.3,
-            duration: 1.3,
-            scaleX: 10,
-            scaleY: 10,
-            opacity: 0,
-            ease: 'power3.inOut',
-            onComplete: () => {
-                htmlUtils.renderToDOM(this.element, '', {})
-                this.element.remove()
-            }
-        })
-        gsap.to(document.querySelector('#intro'), {
-            delay: 0.5,
-            duration: 0.8,
-            opacity: 0,
-            onComplete: function() {
-                // document.querySelector('#intro').remove()
-                // store.dispatch('updateScene', SCENES.ENVIRONMENT)
-            }
-        })
+        gsap.timeline()
+            .add('start')
+            .to(this.element, {
+                delay: 0.3,
+                duration: 1.3,
+                scaleX: 10,
+                scaleY: 10,
+                opacity: 0,
+                ease: 'power3.inOut',
+                onComplete: () => {
+                    htmlUtils.renderToDOM(this.element, '', {})
+                    this.element.remove()
+                }
+            }, 'start')
+            .to(document.querySelector('#intro .fade'), {
+                delay: 0.5,
+                duration: 1.3,
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+                onComplete: () => {
+                    this.camera.moveIntro()
+                }
+            }, 'start')
+            .to(document.querySelector('#intro'), {
+                delay: 0.5,
+                duration: 1,
+                opacity: 0,
+                onComplete: function() {
+                    store.dispatch('finishIntro')
+                }
+            })
     }
 
     setDebug() {
