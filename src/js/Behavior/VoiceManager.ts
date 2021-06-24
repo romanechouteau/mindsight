@@ -21,7 +21,9 @@ class VoiceManager {
 
     stop() {
         this.started = false
-        this.audioContext.close()
+        if (this.audioContext) {
+            this.audioContext.close()
+        }
     }
 
     getStream(stream) {

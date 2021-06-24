@@ -18,5 +18,6 @@ export default {
     },
     environment: 0,
     isIntro: true,
-    cursorMode: CURSOR_MODES.DEFAULT
+    cursorMode: CURSOR_MODES.DEFAULT,
+    word: ''
   };

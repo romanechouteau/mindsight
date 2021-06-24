@@ -25,6 +25,7 @@ import EyeTrackingManager from '../Behavior/EyeTrackingManager'
 import { SCENES, START_FOG_FAR } from '../constants'
 import Gravity from '../Behavior/Gravity'
 import ModeManager from '../Behavior/ModeManager'
+import WordManager from '../Behavior/WordManager'
 
 export default class World extends Component {
   time: Time
@@ -52,6 +53,7 @@ export default class World extends Component {
   eyeTrackingManager: EyeTrackingManager
   gravity: Gravity
   modeManager: ModeManager
+  wordManager: WordManager
   constructor(options) {
     super({
       store
@@ -168,6 +170,18 @@ export default class World extends Component {
     this.modeManager = new ModeManager()
   }
 
+  setEyeTrackingManager() {
+    this.eyeTrackingManager = new EyeTrackingManager({
+      sizes: this.sizes,
+      debug: this.debug,
+      camera: this.camera
+    })
+  }
+
+  setWordManager() {
+    this.wordManager = new WordManager()
+  }
+
   render() {
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       setTimeout(() => {
@@ -217,13 +231,11 @@ export default class World extends Component {
     } else if (store.state.scene !== SCENES.AUDIO && AudioManager.started === true) {
       AudioManager.stop()
     }
-  }
 
-  setEyeTrackingManager() {
-    this.eyeTrackingManager = new EyeTrackingManager({
-      sizes: this.sizes,
-      debug: this.debug,
-      camera: this.camera
-    })
+    if (store.state.scene === SCENES.WORD && this.wordManager === undefined) {
+      this.setWordManager()
+    } else if (store.state.scene !== SCENES.WORD && this.wordManager !== undefined && this.wordManager.started === true) {
+      this.wordManager.stop()
+    }
   }
 }

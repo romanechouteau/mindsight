@@ -24,5 +24,8 @@ export default {
     },
     finishIntro(context, payload) {
         context.commit('finishIntro', payload)
+    },
+    registerEmotionWord(context, payload) {
+        context.commit('registerEmotionWord', payload)
     }
 }

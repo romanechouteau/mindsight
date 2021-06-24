@@ -40,5 +40,10 @@ export default {
         state.isIntro = false
 
         return state
+    },
+    registerEmotionWord (state, payload) {
+        state.word = payload
+
+        return state
     }
 }

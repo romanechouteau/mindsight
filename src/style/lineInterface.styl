@@ -1,0 +1,90 @@
+#wordManager, #audioManager
+    position: absolute
+    bottom: 15vh
+    left: 0
+    width: 100%
+    margin-top: 16px
+    color: white
+
+    .audioWrapper, .wordWrapper
+        height: 10vh
+        width: 100%
+        display: flex
+
+        .left, .right
+            height: 50%
+            flex-grow: 1
+            border-top: 1px solid white
+            filter: drop-shadow(0 0 3px white)
+
+        .center
+            height: 100%
+            display: flex
+            justify-content: center
+            align-items: center
+            padding: 0 48px
+
+            &.sine
+                position: absolute
+                top: 50%
+                left: 50%
+                transform: translate(-50%, -50%)
+
+            img
+                height: 16px
+                width: auto
+                filter: drop-shadow(0 0 3px white)
+
+            .inputWrapper
+                .placeholder, input
+                    font-family: 'Lato', sans-serif
+                    text-transform: uppercase
+                    font-size: 0.7rem
+                    text-align: center
+
+                .placeholder
+                    height: 0
+                    visibility: hidden
+                    padding: 0 8px
+
+                input
+                    width: 100%
+                    background: none
+                    outline: none
+                    border: none
+                    color: white
+                    pointer-events: all
+                    filter: drop-shadow(0 0 3px white)
+
+                    &::placeholder
+                        color: white
+                        opacity: 0.5
+                        filter: none
+
+            .results
+                position: absolute
+                top: 60%
+                font-family: 'Lato', sans-serif
+                text-transform: uppercase
+                font-size: 0.7rem
+                text-align: center
+                padding: 0.5rem 1rem
+                opacity: 0.5
+
+                p
+                    cursor pointer
+
+    .audioWrapper
+        justify-content: center
+        align-items: center
+
+    .wordWrapper, .audioWrapper.spotify
+        justify-content: space-between
+        align-items: flex-end
+
+    .audioWrapper.spotify
+        .player
+            position absolute
+            bottom 10px
+            left 20%
+            right: 20%
