@@ -9,8 +9,6 @@ import Spotify from './Sound/Spotify'
 
 // @ts-ignore
 import microphone from '../../images/microphone.svg'
-// @ts-ignore
-import search from '../../images/search.svg'
 
 import { AUDIO_INPUT_MODES } from '../constants'
 import { htmlUtils } from '../Tools/utils'
@@ -82,7 +80,7 @@ class AudioManager extends Component {
             return
         }
 
-        htmlUtils.renderToDOM(this.element, spotifyTemplate, { search })
+        htmlUtils.renderToDOM(this.element, spotifyTemplate, {})
         document.querySelector('.spotify__input').addEventListener('keyup', el => {
             this.spotify.handleSearch((el.target as HTMLInputElement).value)
         })

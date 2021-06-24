@@ -2,13 +2,13 @@ import gsap from 'gsap/all'
 // @ts-ignore
 import template from '../templates/intro.template'
 // @ts-ignore
-import hpSrc from '../images/casque.svg'
+import hpSrc from '../images/headphones.svg'
 import { drawWave, waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
 import Time from './Tools/Time'
 import { queue } from './Tools/asyncUtils'
 import lottie from 'lottie-web'
 // @ts-ignore
-import logoAnimation from '../images/mindisight_logo_animation.json'
+import logoAnimation from '../images/mindsight_logo_animation.json'
 
 // TODO: replace all magical numbers
 export default class IntroController {

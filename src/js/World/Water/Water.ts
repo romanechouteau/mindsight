@@ -1,7 +1,6 @@
 import { textureLoader } from "../../Tools/utils"
-import { Color, DoubleSide, FrontSide, Mesh, MeshBasicMaterial, Object3D, PlaneBufferGeometry, PMREMGenerator, RepeatWrapping, ShaderMaterial, sRGBEncoding, Vector3 } from "three"
+import { Color, Mesh, Object3D, PlaneBufferGeometry, RepeatWrapping, ShaderMaterial, sRGBEncoding } from "three"
 import Time from "../../Tools/Time"
-// import { WaterMesh } from './WaterMesh2'
 import { Water as WaterMesh } from 'three/examples/jsm/objects/Water'
 // @ts-ignore
 import waterNormalsSrc from '../../../images/textures/beach/waternormals.jpeg'
@@ -53,7 +52,7 @@ export default class Water {
         this.container.add(this.waterMesh)
         this.waterMesh.material.uniforms[ 'size' ].value = 10.
         this.waterMesh.material.transparent = true
-        
+
         this.waterMesh.material.polygonOffset = true
         this.waterMesh.material.polygonOffsetFactor = -1.0
         this.waterMesh.material.polygonOffsetUnits = -4.0
