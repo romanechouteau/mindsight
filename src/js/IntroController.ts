@@ -3,16 +3,14 @@ import gsap from 'gsap/all'
 import template from '../templates/intro.template'
 // @ts-ignore
 import hpSrc from '../images/headphones.svg'
-import { drawWave, waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
+import { waveBaseConfig, drawWaveConfig } from './Tools/canvasUtils'
 import Time from './Tools/Time'
 import { queue } from './Tools/asyncUtils'
 import lottie from 'lottie-web'
 // @ts-ignore
 import logoAnimation from '../images/mindsight_logo_animation.json'
 
-// TODO: replace all magical numbers
 export default class IntroController {
-
     time: Time
     fullCanvas: HTMLCanvasElement
     leftCanvas: HTMLCanvasElement
@@ -30,7 +28,7 @@ export default class IntroController {
     leftWorker: Worker
     configKeys: string[]
 
-    constructor({time, debug}) {
+    constructor({ time, debug }) {
         this.time = time
         this.debug = debug
         this.createHtml()

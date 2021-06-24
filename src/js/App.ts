@@ -7,25 +7,16 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import * as dat from 'dat.gui'
 
 // @ts-ignore
-import Mouse from '@tools/Mouse'
-// @ts-ignore
 import Sizes from '@tools/Sizes'
-// // @ts-ignore
-// import Time from '@tools/Time'
 // @ts-ignore
 import { Mouse } from '@tools/Mouse'
-// @ts-ignore
-// import Assets from '@tools/Loader'
-
 // @ts-ignore
 import Camera from './Camera'
 // @ts-ignore
 import World from '@world/index'
 // @ts-ignore
 import store from '@store/index'
-
 import IntroController from './IntroController'
-
 import Stats from 'stats.js'
 import Time from './Tools/Time'
 import PointerCursor from './Tools/PointerCursor'
@@ -35,6 +26,7 @@ import Component from './Lib/Component'
 import bloomVertShader from '@shaders/bloomVert.glsl'
 // @ts-ignore
 import bloomFragShader from '@shaders/bloomFrag.glsl'
+
 import { BLOOM_LAYER, SCENES } from './constants'
 
 const stats = new Stats()
@@ -52,7 +44,6 @@ export default class App extends Component {
   debug: dat.GUI
   world: any
   mouse: Mouse
-  state: { time: Time }
   bloomLayer: Layers
   // @ts-ignore
   pointerCursor: PointerCursor
@@ -72,8 +63,6 @@ export default class App extends Component {
     // Set up
     this.time = new Time()
     this.sizes = new Sizes()
-    this.mouse = Mouse
-    // this.assets = new Assets()
     this.mouse = new Mouse()
 
     this.setConfig()
@@ -83,13 +72,14 @@ export default class App extends Component {
     this.setPointerCursor()
     this.setWorld()
     this.render()
-
   }
+
   setPointerCursor() {
     this.pointerCursor = new PointerCursor({
       time: this.time
     })
   }
+
   setRenderer() {
     // Set scene
     this.scene = new Scene()
@@ -191,6 +181,7 @@ export default class App extends Component {
     )
     finalPass.needsSwap = true
 
+    // GLOBAL BLOOM
     this.globalBloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
     this.globalBloomPass.threshold = 0.8
     this.globalBloomPass.strength = 0.15
@@ -254,11 +245,11 @@ export default class App extends Component {
       globalScene: this.scene,
       pixelRatio: this.renderer.getPixelRatio(),
       pointerCursor: this.pointerCursor
-    //   assets: this.assets,
     })
     // Add world to scene
     this.scene.add(this.world.container)
   }
+
   setConfig() {
     if (window.location.hash === '#debug') {
       this.debug = new dat.GUI({ width: 450 })
@@ -266,11 +257,12 @@ export default class App extends Component {
   }
 
   render = () => {
+    // render intro
     if (store.state.isIntro && this.intro === undefined) {
       this.intro = new IntroController({time: this.time, debug: this.debug})
     } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined) {
       this.intro.flyLines()
-    } else if (!store.state.isIntro && document.querySelector('#intro')) {      
+    } else if (!store.state.isIntro && document.querySelector('#intro')) {
       this.intro.dispose()
     }
   }

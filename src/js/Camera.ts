@@ -86,6 +86,7 @@ export default class Camera {
       transparent: true,
       opacity: 0
     })
+    // set raycaster plane to face camera
     geometry.applyMatrix4( new Matrix4().makeTranslation(-this.camera.position.x, -this.camera.position.y, -this.camera.position.z + 2) )
     this.raycasterPlane = new Mesh(geometry, material)
     this.raycasterPlane.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z)
@@ -95,6 +96,7 @@ export default class Camera {
     this.container.add(this.raycasterPlane)
   }
 
+  // enter scene animation
   moveIntro() {
     const defaultY = this.camera.position.y
     const defaultZ = this.camera.position.z
