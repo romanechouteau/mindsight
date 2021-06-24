@@ -35,7 +35,6 @@ export default class MoveManager {
     groundInstance: Ground
     cursorMaterial: ShaderMaterial
     cursorBase: Mesh
-    interfaceEmpty: HTMLElement
     lastIntersection: Intersection
     euler: Euler
     prevEuler: Euler
@@ -62,7 +61,6 @@ export default class MoveManager {
 
         this.raycaster = new Raycaster()
         // this.gravity = new Raycaster()
-        this.interfaceEmpty = document.querySelector('.brushInterface')
         this.rotationHelper = new Object3D()
         this.cursorMaterial = new ShaderMaterial({
             vertexShader: moveCursorVertex,
@@ -185,11 +183,11 @@ export default class MoveManager {
     }
 
     handleMove() {
-        if (this.isMoving) return;
         this.mouse.on('click', () => {
+            if (this.isMoving) return;
             if (this.camera.orbitControls.enabled) return;
             if (this.lastIntersection === undefined) return;
-            if (store.state.cursorMode !== CURSOR_MODES.MOVE || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
+            if (store.state.cursorMode !== CURSOR_MODES.MOVE || this.mouse.targeted !== this.canvas) return
             if (this.isLooking)
                 this.toggleLooking(false)
             else {
@@ -310,7 +308,7 @@ export default class MoveManager {
             this.prevEuler = this.euler
         })
         this.mouse.on('drag', ev => {
-            if (this.camera.orbitControls.enabled || store.state.cursorMode !== CURSOR_MODES.MOVE || (this.mouse.targeted !== this.canvas && this.mouse.targeted !== this.interfaceEmpty)) return
+            if (this.camera.orbitControls.enabled || store.state.cursorMode !== CURSOR_MODES.MOVE || this.mouse.targeted !== this.canvas) return
             if (!this.isLooking) this.toggleLooking(true)
             this.euler.y = this.prevEuler.y - (this.mouse.lastCursor[0] - this.mouse.cursor[0])
             this.euler.x = this.prevEuler.x + (this.mouse.lastCursor[1] - this.mouse.cursor[1])
