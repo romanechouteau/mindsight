@@ -7,6 +7,8 @@ uniform vec4 values;
 
 varying vec2 vUv;
 
+#include <fog_pars_fragment>
+
 void main() {
 
     vec3 color = (
@@ -16,4 +18,5 @@ void main() {
         texture2D(map4, vUv).xyz * values.w
     );
     gl_FragColor = vec4(color, 1.);
+    #include <fog_fragment>
 }
