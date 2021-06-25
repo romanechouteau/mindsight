@@ -1,12 +1,17 @@
-// @ts-ignore
-import webgazer from '@tools/WebGazer'
+import gsap from "gsap/all"
+import { debounce } from 'lodash'
+
 // @ts-ignore
 import store from '@store/index'
+// @ts-ignore
+import { random } from '@tools/mathUtils'
 import { htmlUtils } from '../Tools/utils'
 // @ts-ignore
 import template from '../../templates/sumup.template'
+// @ts-ignore
+import particleTemplate from '../../templates/particle.template'
 import Sizes from '../Tools/Sizes'
-import { INNER_EYE_MOVEMENT, MOODS, MOOD_NAMES, OUTER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT } from '../constants'
+import { INNER_EYE_MOVEMENT, MOODS, MOODS_SUMUP_ORDER, MOOD_NAMES, OUTER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, SUMUP_PARTICLES_COUNT } from '../constants'
 import { Mouse } from '../Tools/Mouse'
 import { eyeMovement } from '../Tools/eyeUtils'
 
@@ -15,6 +20,7 @@ export default class SumupManager {
     mouse: Mouse
     element: HTMLElement
     pupilBox: ClientRect
+    eyeMovement: Function
     outerEyeBox: ClientRect
     innerEyeBox: ClientRect
     pupilCenterBox: ClientRect
@@ -24,31 +30,86 @@ export default class SumupManager {
         this.sizes = sizes
         this.mouse = mouse
         this.element = document.querySelector('#sumup')
+        this.eyeMovement = debounce(this.moveEye.bind(this), 5, { leading: true })
 
         this.render()
-        this.moveEye()
+        this.setMovement()
+    }
+
+    setMovement () {
+        this.mouse.on('move', this.eyeMovement)
     }
 
     moveEye () {
-        this.mouse.on('move', () => {
-            const moveX = this.mouse.cursor[0]
-            const moveY = -this.mouse.cursor[1]
-            const duration = 0.5
-            const currentVH = this.sizes.height * 0.01
-            const elemBoxes = {
-                outerEyeBox: this.outerEyeBox,
-                innerEyeBox: this.innerEyeBox,
-                pupilBox: this.pupilBox,
-                pupilCenterBox: this.pupilCenterBox
-            }
-            const elemMovement = {
-                outerEyeMovement: OUTER_EYE_MOVEMENT,
-                innerEyeMovement: INNER_EYE_MOVEMENT,
-                pupilMovement: PUPIL_MOVEMENT,
-                pupilShineMovement: PUPIL_SHINE_MOVEMENT
+        eyeMovement(
+            this.mouse.cursor[0],
+            -this.mouse.cursor[1],
+            this.element,
+            0.5,
+            this.sizes.height * 0.01,
+            {
+            outerEyeBox: this.outerEyeBox,
+            innerEyeBox: this.innerEyeBox,
+            pupilBox: this.pupilBox,
+            pupilCenterBox: this.pupilCenterBox
+            },
+            {
+            outerEyeMovement: OUTER_EYE_MOVEMENT,
+            innerEyeMovement: INNER_EYE_MOVEMENT,
+            pupilMovement: PUPIL_MOVEMENT,
+            pupilShineMovement: PUPIL_SHINE_MOVEMENT
+            },
+            false,
+            true
+        )
+    }
+
+    createParticles (centerX, centerY, innerEyeR, moodsPercents) {
+        let particles = ''
+        let currentMood = 0
+        let percent = moodsPercents[MOODS_SUMUP_ORDER[currentMood]]
+        const step = SUMUP_PARTICLES_COUNT / 100
+
+        for (let i = 0; i < SUMUP_PARTICLES_COUNT; i++) {
+            if (i >= percent * step) {
+                currentMood += 1
+                percent += moodsPercents[MOODS_SUMUP_ORDER[currentMood]]
             }
 
-            eyeMovement(moveX, moveY, this.element, duration, currentVH, elemBoxes, elemMovement, true, true)
+            const randomAngle = random(i * i) * Math.PI * 2
+            const randomDist = random(i * i + 1)
+            const randomSize = random(i)
+            const cos = Math.cos(randomAngle) * randomDist
+            const sin = Math.sin(randomAngle) * randomDist
+            const x = centerX - cos * innerEyeR
+            const y = centerY - sin * innerEyeR
+
+            particles += (htmlUtils.createHTMLFromTemplate(particleTemplate, {
+                x,
+                y,
+                r: 2 + randomSize * 2,
+                mood: MOODS_SUMUP_ORDER[currentMood]
+            }))
+        }
+
+        return particles
+    }
+
+    setHoverListener () {
+        this.element.querySelectorAll('.mood').forEach(elem => {
+            const mood = elem.getAttribute('data-mood')
+            elem.addEventListener('mouseover', () => {
+                gsap.to(`.particle[data-mood="${mood}"]`, {
+                    opacity: 1,
+                    duration: 0.5
+                })
+            })
+            elem.addEventListener('mouseleave', () => {
+                gsap.to(`.particle[data-mood="${mood}"]`, {
+                    opacity: 0.3,
+                    duration: 0.5
+                })
+            })
         })
     }
 
@@ -61,11 +122,19 @@ export default class SumupManager {
         const outerAdd = height > width * 0.7 ? height * 0.5 : height * 0.2
         const outerRX = width * 0.5 + outerAdd
         const outerRY = height * 0.7
+        const innerEyeR = height * 0.6
         const pupilR = height * 0.3
-        const pupilCenterX = Math.cos(-Math.PI / 6) * (pupilR * 1.3) + centerX
-        const pupilCenterY = Math.sin(-Math.PI / 6) * (pupilR * 1.3) + centerY
+        const moodsPercents = {
+            [MOODS.FEAR]: 10,
+            [MOODS.JOY]: 20,
+            [MOODS.SADNESS]: 5,
+            [MOODS.ANGER]: 65
+        }
 
-        htmlUtils.renderToDOM(this.element, template, {
+        const particles = this.createParticles(centerX, centerY, innerEyeR, moodsPercents)
+        const eyeTemplate = htmlUtils.insertHTMLInTemplate(template, particles, 'particles')
+
+        htmlUtils.renderToDOM(this.element, eyeTemplate, {
             word: store.state.word,
             width,
             height,
@@ -74,18 +143,19 @@ export default class SumupManager {
             centerY,
             outerRX,
             outerRY,
-            innerEyeR: height * 0.6,
-            pupilCenterR: height * 0.15,
-            pupilCenterX,
-            pupilCenterY,
-            emotion1: MOOD_NAMES[MOODS.FEAR],
-            emotion2: MOOD_NAMES[MOODS.JOY],
-            emotion3: MOOD_NAMES[MOODS.SADNESS],
-            emotion4: MOOD_NAMES[MOODS.ANGER],
-            emotion1Percent: 45,
-            emotion2Percent: 45,
-            emotion3Percent: 45,
-            emotion4Percent: 45,
+            innerEyeR,
+            mood1: MOODS_SUMUP_ORDER[0],
+            mood2: MOODS_SUMUP_ORDER[1],
+            mood3: MOODS_SUMUP_ORDER[2],
+            mood4: MOODS_SUMUP_ORDER[3],
+            moodName1: MOOD_NAMES[MOODS_SUMUP_ORDER[0]],
+            moodName2: MOOD_NAMES[MOODS_SUMUP_ORDER[1]],
+            moodName3: MOOD_NAMES[MOODS_SUMUP_ORDER[2]],
+            moodName4: MOOD_NAMES[MOODS_SUMUP_ORDER[3]],
+            mood1Percent: moodsPercents[MOODS_SUMUP_ORDER[0]],
+            mood2Percent: moodsPercents[MOODS_SUMUP_ORDER[1]],
+            mood3Percent: moodsPercents[MOODS_SUMUP_ORDER[2]],
+            mood4Percent: moodsPercents[MOODS_SUMUP_ORDER[3]],
         })
 
         // display elements
@@ -96,6 +166,7 @@ export default class SumupManager {
         this.outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
         this.innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
         this.pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
-        this.pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
+
+        this.setHoverListener()
     }
 }
