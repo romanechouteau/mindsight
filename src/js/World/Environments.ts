@@ -104,6 +104,7 @@ export default class Environments {
           morphTargets: true
         })
       }
+      ground.children[0].material.map.flipY = false
 
       this.environments[i].userData.envName = LIST_ENVIRONMENTS[i]
 
