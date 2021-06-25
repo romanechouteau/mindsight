@@ -13,10 +13,12 @@ export default class SceneManager {
         document.addEventListener('mouseup', this.mouseUp.bind(this))
     }
 
-    mouseDown () {
+    mouseDown (event) {
         // cursor click and hold is blocked if cursor mode is not default and scene is parameters scene or last scene
-        if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
-            this.pointerCursor.startHold(this.handleNextScene)
+        if (!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target))) {
+            if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
+                this.pointerCursor.startHold(this.handleNextScene)
+            }
         }
     }
 
