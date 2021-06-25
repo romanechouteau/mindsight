@@ -1,9 +1,10 @@
 @require "intro.styl"
 @require "lineInterface.styl"
 @require "worldBuilder.styl"
-@require "eyetracking.styl"
+@require "eye.styl"
 @require "hud.styl"
 @require "brush.styl"
+@require "sumup.styl"
 
 @font-face {
  font-family: "Displace";
@@ -25,6 +26,7 @@ body, html
         left: 0
         transform: rotate(-90deg)
         transition: opacity 0.5s ease
+        z-index: 10
 
         circle
             filter: drop-shadow( 0 0 3px white)

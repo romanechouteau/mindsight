@@ -26,6 +26,7 @@ import Gravity from '../Behavior/Gravity'
 import ModeManager from '../Behavior/ModeManager'
 import WordManager from '../Behavior/WordManager'
 import SkyManager from '../Behavior/SkyManager'
+import SumupManager from '../Behavior/SumupManager'
 
 export default class World extends Component {
   time: Time
@@ -54,6 +55,7 @@ export default class World extends Component {
   modeManager: ModeManager
   wordManager: WordManager
   skyManager: SkyManager
+  sumupManager: SumupManager
   constructor(options) {
     super({
       store
@@ -189,7 +191,14 @@ export default class World extends Component {
       globalScene: this.globalScene,
       time: this.time,
       debug: this.debug
-  })
+    })
+  }
+
+  setSumupManager() {
+    this.sumupManager = new SumupManager({
+      sizes: this.sizes,
+      mouse: this.mouse
+    })
   }
 
   render() {
@@ -247,6 +256,14 @@ export default class World extends Component {
       this.setWordManager()
     } else if (store.state.scene !== SCENES.WORD && this.wordManager !== undefined && this.wordManager.started === true) {
       this.wordManager.stop()
+    }
+
+    if (store.state.scene >= SCENES.SUMUP && this.modeManager !== undefined) {
+      this.modeManager.stop()
+    }
+
+    if (store.state.scene === SCENES.SUMUP && this.sumupManager === undefined) {
+      this.setSumupManager()
     }
   }
 }
