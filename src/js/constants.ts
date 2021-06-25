@@ -20,6 +20,13 @@ export const MOOD_NAMES = {
     [MOODS.ANGER]: 'rage',
 }
 
+export const MOODS_SUMUP_ORDER = [
+    MOODS.FEAR,
+    MOODS.JOY,
+    MOODS.SADNESS,
+    MOODS.ANGER
+]
+
 export const moodPositions = {
     [MOODS.JOY]: new Vector3(0, 0, MAX_DISTANCE),
     [MOODS.FEAR]: new Vector3(MAX_DISTANCE, 0, 0),
@@ -217,3 +224,5 @@ export const INTRO_TIMEOUTS = {
     linesGoesAway: 5000,
     linesMoveAfterDisassemble: 1000
 }
+
+export const SUMUP_PARTICLES_COUNT = 1000

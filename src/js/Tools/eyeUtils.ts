@@ -23,6 +23,18 @@ export const eyeMovement = (moveX, moveY, element, duration, currentVH, elemBoxe
         })
 
         if (data) {
+            gsap.to(element.querySelectorAll('#maskInnerEye .maskWrapper .innerEyeWhite'), {
+                duration,
+                translateX: `${moveX * innerEyeMovement * innerEyeBox.width * 0.01}px`,
+                translateY: `${currentVH + moveY * innerEyeMovement * innerEyeBox.height * 0.01}px`,
+            })
+
+            gsap.to(element.querySelectorAll('#maskInnerEye .maskWrapper .pupilBlack'), {
+                duration,
+                translateX: `${moveX * pupilMovement * pupilBox.width * 0.01}px`,
+                translateY: `${currentVH + moveY * pupilMovement * pupilBox.height * 0.01}px`,
+            })
+
             gsap.to(element.querySelectorAll('.dataWrapper'), {
                 duration,
                 translateX: `${moveX * pupilMovement * pupilBox.width * 0.01}px`,
