@@ -100,6 +100,9 @@ class SoundManager {
         this.sounds.Musique_Ambiante.volume = 0.05
         this.sounds.vagues_plage.volume = 0.2
         this.sounds.Vent_Herbes.volume = 0.2
+    }
+
+    playMusic() {
         this.sounds.Musique_Ambiante.play()
     }
 
