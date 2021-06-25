@@ -13,6 +13,13 @@ export enum MOODS {
     ANGER = "anger",
 }
 
+export const MOOD_NAMES = {
+    [MOODS.JOY]: 'extase',
+    [MOODS.FEAR]: 'terreur',
+    [MOODS.SADNESS]: 'chagrin',
+    [MOODS.ANGER]: 'rage',
+}
+
 export const moodPositions = {
     [MOODS.JOY]: new Vector3(0, 0, MAX_DISTANCE),
     [MOODS.FEAR]: new Vector3(MAX_DISTANCE, 0, 0),

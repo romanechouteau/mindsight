@@ -37,23 +37,6 @@
         display: none
         z-index: 200
 
-    .bg-wrapper
-        height: 140vw
-        width: 140vw
-        position: absolute
-        top: -80vh
-        left: -30vh
-        animation: rotating 12s linear infinite
-
-    .bg
-        top: 0vh
-        left: 0vh
-        position: absolute
-        height: 100%
-        width: 100%
-        background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
-        animation: spinning 6s linear infinite
-
     .fade
         top: 0vh
         left: 0vh
@@ -90,6 +73,24 @@
             opacity: 1
             width: 50vw
             transition: width 0.5s ease, transform 6s ease, opacity 0.5s ease
+
+#intro, .intro, #sumup
+    .bg-wrapper
+        height: 140vw
+        width: 140vw
+        position: absolute
+        top: -80vh
+        left: -30vh
+        animation: rotating 12s linear infinite
+
+    .bg
+        top: 0vh
+        left: 0vh
+        position: absolute
+        height: 100%
+        width: 100%
+        background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
+        animation: spinning 6s linear infinite
 
 @keyframes spinning {
     0% {

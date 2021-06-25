@@ -1,4 +1,4 @@
-#eyetrackingManager
+#eyetrackingManager, #sumup
     width: 100%
     height: 100%
     position: fixed
@@ -11,9 +11,6 @@
 
     svg
         position: relative
-
-        & > g
-            transform: translateY(25vh)
 
         circle, ellipse
             filter: drop-shadow( 0 0 3px white)
@@ -44,19 +41,14 @@
             width: 0
             height: 0
 
+#eyetrackingManager
+    svg
+        & > g
+            transform: translateY(25vh)
+
         .pointCircle
             fill: white
             cursor: pointer
 
             &.invisible
                 display: none
-
-    .center
-        width: 48px
-        height: 48px
-        background-color: blue
-        cursor: pointer
-        position: absolute
-        top: 50%
-        left: 50%
-        transform: translate(-50%, -50%)
