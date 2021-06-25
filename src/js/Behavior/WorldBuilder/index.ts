@@ -6,7 +6,7 @@ import store from '../../../js/Store'
 import Component from '../../../js/Lib/Component'
 // @ts-ignore
 import template from '../../../templates/worldBuilder.template'
-import SkyCreator from './SkyCreator'
+import SkyManager from '../SkyManager'
 import ShapeCreator from './ShapeCreator'
 import PointerCursor from '../../Tools/PointerCursor'
 import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants'
@@ -21,7 +21,8 @@ interface WorldBuilderParams {
     scene: Object3D,
     globalScene: Scene
     debug?: dat.GUI
-    ground: Environments,
+    ground: Environments
+    skyManager: SkyManager
     pointerCursor: PointerCursor
 }
 
@@ -33,7 +34,7 @@ export default class WorldBuilder extends Component {
     stopped: Boolean
     onChange: Function
     controller: HTMLCanvasElement
-    skyCreator: SkyCreator
+    skyManager: SkyManager
     rangeValue: { value: number }
     globalScene: Scene
     shapeCreator: ShapeCreator
@@ -42,7 +43,7 @@ export default class WorldBuilder extends Component {
     ground: Object3D
     pointerCursor: PointerCursor
     envName: string
-    constructor({ scene, globalScene, time, debug, ground, pointerCursor }: WorldBuilderParams) {
+    constructor({ scene, globalScene, time, debug, ground, pointerCursor, skyManager }: WorldBuilderParams) {
         super({ store })
         this.envName = ground.container.children[0].userData.envName
         this.time = time
@@ -51,6 +52,7 @@ export default class WorldBuilder extends Component {
         this.debug = debug
         this.stopped = false
         this.onChange = () => null
+        this.skyManager = skyManager
         this.rangeValue = { value: 0 } // init
         this.globalScene = globalScene
         this.pointerCursor = pointerCursor
@@ -137,14 +139,8 @@ export default class WorldBuilder extends Component {
             this.shapeCreator = new ShapeCreator({scene: this.scene})
             this.onChange = this.shapeCreator.handleChange
         // Worldbuilder sky step
-        } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY && this.skyCreator === undefined) {
-            this.skyCreator = new SkyCreator({
-                scene: this.scene,
-                globalScene: this.globalScene,
-                time: this.time,
-                debug: this.debug
-            })
-            this.onChange = this.skyCreator.handleChange
+        } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
+            this.onChange = this.skyManager.handleChange
         // Worldbuilder ground step
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
             // @ts-ignore
