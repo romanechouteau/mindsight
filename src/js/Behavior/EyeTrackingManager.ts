@@ -343,7 +343,6 @@ export default class EyeTrackingManager extends Component {
 
     setDebug() {
         this.debugFolder = this.debug.addFolder('Eyetracking')
-        this.debugFolder.open()
         this.debugFolder
             .add(this.params, 'radius')
             .step(0.01)
