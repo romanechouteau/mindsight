@@ -264,6 +264,7 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.SUMUP && this.sumupManager === undefined) {
+      this.container.clear()
       this.setSumupManager()
     }
   }

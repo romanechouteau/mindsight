@@ -39,7 +39,7 @@
                 text-align: center
                 filter: drop-shadow(0 0 3px white)
 
-            .emotions
+            .moods
                 font-family: 'Lato', sans-serif
                 text-transform: uppercase
                 font-size: 0.7rem
@@ -48,9 +48,9 @@
                 justify-content: center
                 align-items: center
 
-                .emotion
+                .mood
                     padding: 0.2rem 0.7rem
-                    opacity: 0.5
+                    opacity: 0.6
                     pointer-events: all
                     cursor: default
                     transition: opacity 0.5s ease, filter 0.5s ease
@@ -60,8 +60,17 @@
                         filter: drop-shadow(0 0 3px white)
 
     svg
-        & > g
+        & > g:not('.particles')
             will-change: transform
 
+        & mask circle
+            will-change: transform
+
+            &.innerEyeWhite
+                fill: white
+                filter: none
+
         .particle
-            fill: red
+            fill: white
+            filter: none
+            opacity: 0.3
