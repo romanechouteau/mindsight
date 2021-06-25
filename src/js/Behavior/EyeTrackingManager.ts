@@ -203,6 +203,7 @@ export default class EyeTrackingManager extends Component {
     handleNextPoint() {
         // end calibration if all points have been clicked
         if (this.currentPoint === this.pointsClicks.length) {
+            SoundManager.playVoice(4)
             return this.calibrated = true
         }
 

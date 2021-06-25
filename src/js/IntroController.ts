@@ -71,11 +71,15 @@ export default class IntroController {
 
         if (this.debug) {
             const wavesFolder = this.debug.addFolder('intro wavesets')
-            ;[this.fullLineConfigs, this.leftLineConfigs, this.rightLineConfigs].forEach((configs, wasetId) => {
+            ;[
+                {conf: this.fullLineConfigs, worker: this.fullWorker}, 
+                {conf: this.leftLineConfigs, worker: this.leftWorker}, 
+                {conf: this.rightLineConfigs, worker: this.rightWorker}
+            ].forEach((configs, wasetId) => {
                 const subfolder = wavesFolder.addFolder(`waveset ${wasetId}`)
-                configs.forEach((conf, waveId) => {
+                configs.conf.forEach((conf, waveId) => {
                     const subsubfolder = subfolder.addFolder(`wave ${waveId}`)
-                    Object.keys(conf).forEach(key => subsubfolder.add(conf, key))
+                    Object.keys(conf).forEach(key => subsubfolder.add(conf, key).onChange(() => configs.worker.postMessage({ configs: configs.conf.map(_conf => ({..._conf, _gsap: null})) }) ))
                 })
             })
             const timeoutsFolder = this.debug.addFolder('intro timeouts')

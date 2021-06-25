@@ -44,7 +44,7 @@ export default class Environments {
   constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI, skyManager: SkyManager }) {
     const { time, assets, mouse, camera, debug, skyManager } = options
 
-    SoundManager.playVoice(4).then(() => SoundManager.playVoice(5))
+    SoundManager.playVoice(5)
 
     this.time = time
     this.mouse = mouse

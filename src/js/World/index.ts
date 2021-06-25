@@ -229,11 +229,11 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
+      this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
       this.setWorldBuilder()
       if (this.user === undefined) {
         this.setUser()
       }
-      this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
     }
