@@ -114,7 +114,7 @@ export default class App extends Component {
       // When tab is not visible (tab is not active or window is minimized), browser stops requesting animation frames. Thus, this does not work
       // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one),
       // which might cause some performance or batteries issues when testing on multiple browsers
-      if (!(this.renderOnBlur?.activated && !document.hasFocus())) {
+      if (!(this.renderOnBlur?.activated && !document.hasFocus()) && store.state.scene > SCENES.EYETRACKING && store.state.scene < SCENES.SUMUP) {
         stats.begin()
         this.scene.traverse(this.darkenNonBloomed.bind(this))
         this.renderer.setClearColor(0x000000, 1.)

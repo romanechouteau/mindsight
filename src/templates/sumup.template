@@ -5,37 +5,31 @@
     <div class="data">
         <div class="title">Votre émotion</div>
         <div class="word">{{word}}</div>
-        <div class="emotions">
-            <div class="emotion {{emotion1}}">{{emotion1}} {{emotion1Percent}}%</div>
-            <div class="emotion {{emotion2}}">{{emotion2}} {{emotion2Percent}}%</div>
-            <div class="emotion {{emotion3}}">{{emotion3}} {{emotion3Percent}}%</div>
-            <div class="emotion {{emotion4}}">{{emotion4}} {{emotion4Percent}}%</div>
+        <div class="moods">
+            <div class="mood" data-mood="{{mood1}}">{{moodName1}} {{mood1Percent}}%</div>
+            <div class="mood" data-mood="{{mood2}}">{{moodName2}} {{mood2Percent}}%</div>
+            <div class="mood" data-mood="{{mood3}}">{{moodName3}} {{mood3Percent}}%</div>
+            <div class="mood" data-mood="{{mood4}}">{{moodName4}} {{mood4Percent}}%</div>
         </div>
     </div>
 </div>
 <svg viewBox="0 0 {{width}} {{height}}" xmlns="http://www.w3.org/2000/svg">
     <defs>
-        <mask id="maskPupil" transformOrigin="center">
+        <mask id="maskInnerEye" transformOrigin="center">
             <g class="maskWrapper">
-                <circle vector-effect="non-scaling-stroke" class="pupilWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
-                <circle cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" class="pupilBlack pupilCenterMask"></circle>
-            </g>
-        </mask>
-        <mask id="maskShine" transformOrigin="center">
-            <g class="maskWrapper">
-                <circle vector-effect="non-scaling-stroke" class="pupilWhite noDrop" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
+                <circle vector-effect="non-scaling-stroke" class="innerEyeWhite" cx="{{centerX}}" cy="{{centerY}}" r="{{innerEyeR}}" />
+                <circle vector-effect="non-scaling-stroke" class="pupilBlack" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}"></circle>
             </g>
         </mask>
     </defs>
+    <g class="particles" mask="url(#maskInnerEye)">
+        {{particles}}
+    </g>
     <g class="innerEye">
         <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" r="{{innerEyeR}}" />
-        {{particles}}
     </g>
     <g class="pupil">
         <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" r="{{pupilR}}" mask="url(#maskPupil)"></circle>
-    </g>
-    <g class="pupilCenter">
-        <circle vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{pupilCenterX}}" cy="{{pupilCenterY}}" r="{{pupilCenterR}}" mask="url(#maskShine)"></circle>
     </g>
     <g class="outerEye">
         <ellipse vector-effect="non-scaling-stroke" class="eyeCircles" cx="{{centerX}}" cy="{{centerY}}" rx="{{outerRX}}" ry="{{outerRY}}"/>
