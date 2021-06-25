@@ -1,4 +1,4 @@
-import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers } from 'three'
+import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, WebGLRenderTarget } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -52,6 +52,7 @@ export default class App extends Component {
   globalBloomPass: UnrealBloomPass
   selectiveBloomPass: UnrealBloomPass
   selectiveBloomComposer: EffectComposer
+  renderTarget: WebGLRenderTarget
   constructor(options) {
     super({
       store
@@ -88,6 +89,9 @@ export default class App extends Component {
     this.bloomLayer = new Layers()
     this.bloomLayer.set(BLOOM_LAYER)
 
+    // render target for further effects
+    this.renderTarget = new WebGLRenderTarget()
+
     // Set renderer
     this.renderer = new WebGLRenderer({
       canvas: this.canvas,
@@ -121,6 +125,10 @@ export default class App extends Component {
         this.selectiveBloomComposer.render()
         this.renderer.setClearColor(0xF4C5B5, 1.)
         this.scene.traverse(this.restoreMaterial.bind(this))
+        
+        this.finalComposer.renderer.setRenderTarget(this.renderTarget)
+        this.finalComposer.render()
+        this.finalComposer.renderer.setRenderTarget(null)
         this.finalComposer.render()
         stats.end()
       }
@@ -257,14 +265,13 @@ export default class App extends Component {
   }
 
   render = () => {
-    // render intro
-    if (store.state.isIntro && this.intro === undefined) {
-      this.intro = new IntroController({time: this.time, debug: this.debug})
-    } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined) {
-      this.intro.flyLines()
-    } else if (!store.state.isIntro && document.querySelector('#intro')) {
-      this.intro.dispose()
-    }
+    // if (store.state.isIntro && this.intro === undefined) {
+    //   this.intro = new IntroController({time: this.time, debug: this.debug})
+    // } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined) {
+    //   this.intro.flyLines()
+    // } else if (!store.state.isIntro && document.querySelector('#intro')) {      
+    //   this.intro.dispose()
+    // }
   }
 
   darkenNonBloomed(obj) {

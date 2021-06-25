@@ -1,4 +1,4 @@
-import { Object3D, Scene } from 'three'
+import { Object3D, Scene, Vector3, Vector2 } from 'three';
 import { inRange } from 'lodash'
 import gsap from "gsap/all"
 
@@ -9,7 +9,7 @@ import template from '../../../templates/worldBuilder.template'
 import SkyCreator from './SkyCreator'
 import ShapeCreator from './ShapeCreator'
 import PointerCursor from '../../Tools/PointerCursor'
-import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants'
+import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR, GROUND_SCALE } from '../../../js/constants';
 // @ts-ignore
 import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
@@ -134,7 +134,12 @@ export default class WorldBuilder extends Component {
     render = () => {
         // Worldbuilder shape step
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SHAPE && this.shapeCreator === undefined) {
-            this.shapeCreator = new ShapeCreator({scene: this.scene})
+            const groundMesh = this.ground.children[0]
+            groundMesh.geometry.computeBoundingBox()
+            const size = new Vector3()
+            groundMesh.geometry.boundingBox.getSize(size)
+            size.multiplyScalar(GROUND_SCALE * 0.05)
+            this.shapeCreator = new ShapeCreator({scene: this.scene, spreadDimensions: new Vector2(size.x, size.z), time: this.time })
             this.onChange = this.shapeCreator.handleChange
         // Worldbuilder sky step
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY && this.skyCreator === undefined) {
@@ -204,7 +209,11 @@ export default class WorldBuilder extends Component {
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SKY) {
             return store.dispatch('updateScene', store.state.scene + 1)
         }
-        const nextStep = WORLDBUILDER_STEPS.SKY
+        // TODO fix shape and put shape step back
+        const nextStep = store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND
+            ? WORLDBUILDER_STEPS.SHAPE
+            : WORLDBUILDER_STEPS.SKY
+        // const nextStep = WORLDBUILDER_STEPS.SKY
         store.dispatch('updateWorldBuilderStep', nextStep)
     }
 }

@@ -46,6 +46,12 @@ export default class EyeTrackingManager extends Component {
     pointsClicks: number[]
     currentPoint: number
     currentTranslate: number
+    eyeElements: {
+        pupil: {el: SVGGElement, dimensions: DOMRect},
+        pupilCenter: {el: SVGGElement, dimensions: DOMRect},
+        innerEye: {el: SVGGElement, dimensions: DOMRect},
+        outerEye: {el: SVGGElement, dimensions: DOMRect},
+    }
 
     constructor(options: { sizes: any, debug: dat.GUI, camera: Camera }) {
         super({
@@ -118,49 +124,44 @@ export default class EyeTrackingManager extends Component {
         const currentVH = this.currentTranslate * 0.01 * this.sizes.height
         const duration = 0.5
 
-        // move each eye part in gaze direction
-        const outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelector('.outerEye'), {
+        gsap.to(this.eyeElements.outerEye.el, {
             duration,
             translateX: `${moveX * this.params.outerEyeMovement}%`,
-            translateY: `${currentVH + moveY * this.params.outerEyeMovement * outerEyeBox.height * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.outerEyeMovement * this.eyeElements.outerEye.dimensions.height * 0.01}px`,
         })
 
-        const innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelector('.innerEye'), {
+        gsap.to(this.eyeElements.innerEye.el, {
             duration,
             translateX: `${moveX * this.params.innerEyeMovement}%`,
-            translateY: `${currentVH + moveY * this.params.innerEyeMovement * innerEyeBox.height * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.innerEyeMovement * this.eyeElements.innerEye.dimensions.height * 0.01}px`,
         })
 
-        const pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelectorAll('.pupil, .maskWrapper .pupilWhite'), {
             duration,
-            translateX: `${moveX * this.params.pupilMovement * pupilBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01}px`,
+            translateX: `${moveX * this.params.pupilMovement * this.eyeElements.pupil.dimensions.width * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.pupilMovement * this.eyeElements.pupil.dimensions.height * 0.01}px`,
         })
         gsap.to(this.element.querySelectorAll('#maskPupil .maskWrapper'), {
             duration,
-            translateX: `${-(moveX * this.params.pupilMovement * pupilBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01)}px`,
+            translateX: `${-(moveX * this.params.pupilMovement * this.eyeElements.pupil.dimensions.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * this.params.pupilMovement * this.eyeElements.pupil.dimensions.height * 0.01)}px`,
         })
 
-        const pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
         gsap.to(this.element.querySelectorAll('#maskShine .maskWrapper'), {
             duration,
-            translateX: `${-(moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01)}px`,
+            translateX: `${-(moveX * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.width * 0.01)}px`,
+            translateY: `${-(currentVH + moveY * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.height * 0.01)}px`,
         })
         gsap.to(this.element.querySelector('.pupilCenterMask'), {
             duration,
-            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
+            translateX: `${moveX * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.width * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.height * 0.01}px`
         })
 
-        gsap.to(this.element.querySelector('.pupilCenter'), {
+        gsap.to(this.eyeElements.pupilCenter.el, {
             duration,
-            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
+            translateX: `${moveX * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.width * 0.01}px`,
+            translateY: `${currentVH + moveY * this.params.pupilShineMovement * this.eyeElements.pupilCenter.dimensions.height * 0.01}px`
         })
     }
 
@@ -288,7 +289,30 @@ export default class EyeTrackingManager extends Component {
             pupilCenterY
         })
 
+        this.bindSVGElements()
+
         this.listenMouseDown()
+    }
+
+    bindSVGElements() {
+        this.eyeElements = {
+            pupil: {
+                el: document.querySelector('.pupil'),
+                dimensions: document.querySelector('.pupil').getBoundingClientRect()
+            },
+            pupilCenter: {
+                el: document.querySelector('.pupilCenter'),
+                dimensions: document.querySelector('.pupilCenter').getBoundingClientRect()
+            },
+            innerEye: {
+                el: document.querySelector('.innerEye'),
+                dimensions: document.querySelector('.innerEye').getBoundingClientRect()
+            },
+            outerEye: {
+                el: document.querySelector('.outerEye'),
+                dimensions: document.querySelector('.outerEye').getBoundingClientRect()
+            },
+        }
     }
 
     getPointYEllipse (x, center, rX, rY, direction) {

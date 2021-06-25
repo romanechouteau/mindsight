@@ -1,3 +1,5 @@
+const glslify = require('snowpack-plugin-glslify')
+
 module.exports = {
     mount: {
 
@@ -23,8 +25,9 @@ module.exports = {
     plugins: [
         '@snowpack/plugin-typescript',
         'snowpack-plugin-stylus',
+        'snowpack-plugin-glslify',
         ["snowpack-plugin-raw-file-loader", {
-          exts: [".frag", ".vert", ".glsl", ".template"]
+          exts: [".frag", ".vert", ".template"]
         }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
         ["@snowpack/plugin-dotenv"],
