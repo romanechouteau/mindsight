@@ -42,8 +42,11 @@
             height: 0
 
 #eyetrackingManager
+    will-change: transform, filter
+
     svg
         & > g
+            will-change: transform
             transform: translateY(25vh)
 
         .pointCircle
