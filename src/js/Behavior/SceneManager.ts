@@ -15,7 +15,7 @@ export default class SceneManager {
 
     mouseDown (event) {
         // cursor click and hold is blocked if cursor mode is not default and scene is parameters scene or last scene
-        if (!document.querySelector('.dg.ac').contains(event.target)) {
+        if (!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target))) {
             if (store.state.cursorMode === CURSOR_MODES.DEFAULT && store.state.scene !== SCENES.PARAMETERS && store.state.scene < LAST_SCENE) {
                 this.pointerCursor.startHold(this.handleNextScene)
             }
