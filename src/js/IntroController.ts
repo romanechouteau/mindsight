@@ -9,6 +9,7 @@ import { queue } from './Tools/asyncUtils'
 import lottie from 'lottie-web'
 // @ts-ignore
 import logoAnimation from '../images/mindsight_logo_animation.json'
+import SoundManager from './Behavior/SoundManager'
 
 export default class IntroController {
     time: Time
@@ -263,11 +264,14 @@ export default class IntroController {
 
     async initTicker() {
         let steps = [
-            () => {
+            async () => {
                 this.revealLine()
             },
             () => {
                 this.showHeadphoneAdvice()
+                setTimeout(() => {
+                    SoundManager.playVoice(1).then(() => SoundManager.playVoice(2))
+                }, 1500);
             },
             () => {
                 this.hideHeadphone()

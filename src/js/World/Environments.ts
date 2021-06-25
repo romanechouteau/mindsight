@@ -23,6 +23,7 @@ import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import { textureLoader } from '../Tools/utils'
+import SoundManager from '../Behavior/SoundManager'
 import SkyManager from '../Behavior/SkyManager'
 
 const loader = new GLTFLoader()
@@ -42,6 +43,8 @@ export default class Environments {
   skyManager: SkyManager
   constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI, skyManager: SkyManager }) {
     const { time, assets, mouse, camera, debug, skyManager } = options
+
+    SoundManager.playVoice(4).then(() => SoundManager.playVoice(5))
 
     this.time = time
     this.mouse = mouse
@@ -82,6 +85,7 @@ export default class Environments {
       this.environments[i].position.z = - i * ENV_DISTANCE
 
       const grass = this.setGrass(ground, LIST_ENVIRONMENTS[i], this.environments[i].scale)
+      SoundManager.play('vagues_plage')
 
       let water
       let dock
@@ -152,6 +156,14 @@ export default class Environments {
             const direction = this.mouse.wheelDir === 'down' ? 1 : -1
             const index = (store.state.environment + direction) % this.environments.length
             const environment = index < 0 ? lastEnvironment : index
+
+            if (environment === ENVIRONMENT_INDICES.meadow) {
+              SoundManager.pause('vagues_plage')
+              SoundManager.play('Vent_Herbes')
+            } else {
+              SoundManager.play('vagues_plage')
+              SoundManager.pause('Vent_Herbes')
+            }
 
             const water = this.environments[environment].getObjectByName('WaterContainer')
             if (water) water.visible = false

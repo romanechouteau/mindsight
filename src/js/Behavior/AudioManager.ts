@@ -14,6 +14,7 @@ import { htmlUtils } from '../Tools/utils'
 import voiceTemplate from '../../templates/voice.template'
 // @ts-ignore
 import spotifyTemplate from '../../templates/spotify.template'
+import SoundManager from './SoundManager'
 
 class AudioManager extends Component {
     canvas: HTMLCanvasElement
@@ -37,6 +38,8 @@ class AudioManager extends Component {
 
     start() {
         this.started = true
+
+        SoundManager.playVoice(12).then(() => SoundManager.playVoice(13))
 
         // default mode is spotify
         store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
