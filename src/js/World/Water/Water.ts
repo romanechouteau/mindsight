@@ -4,6 +4,7 @@ import Time from "../../Tools/Time"
 import { Water as WaterMesh } from 'three/examples/jsm/objects/Water'
 // @ts-ignore
 import waterNormalsSrc from '../../../images/textures/beach/waternormals.jpeg'
+import { WATER_SUN_COLOR, WATER_ALPHA, WATER_COLOR, WATER_SCALE, WATER_SIZE } from "../../constants"
 
 interface WaterParams {
     time: Time
@@ -33,17 +34,17 @@ export default class Water {
                 textureWidth: 512,
                 textureHeight: 512,
                 color: 0x3b82d8,
-                alpha: 1,
+                alpha: WATER_ALPHA,
                 encoding: sRGBEncoding,
                 waterNormals: textureLoader.load( waterNormalsSrc, function ( texture ) {
 
                     texture.wrapS = texture.wrapT = RepeatWrapping;
 
                 } ),
-                sunColor: 0x3b82d8,
-                waterColor: 0x3b82d8,
-                size: 10,
-                distortionScale: 2.0,
+                sunColor: WATER_SUN_COLOR,
+                waterColor: WATER_COLOR,
+                size: WATER_SIZE,
+                distortionScale: WATER_SCALE,
                 fog: false
             }
         )
