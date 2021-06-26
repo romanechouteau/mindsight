@@ -4,7 +4,7 @@ export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]
 
-export const ENV_DISTANCE = 45
+export const ENV_DISTANCE = 36
 
 export enum MOODS {
     JOY = "joy",
@@ -127,7 +127,7 @@ export const GROUND_SCALE = 0.1
 
 export const ENVIRONMENTS_BORDERS_MARGIN = 7
 
-export const START_FOG_FAR = 30
+export const START_FOG_FAR = 25
 
 export const DEFAULT_FOG_FAR = 50
 
