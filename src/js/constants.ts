@@ -102,12 +102,12 @@ export enum ENVIRONMENTS {
 export const LIST_ENVIRONMENTS = Object.values(ENVIRONMENTS)
 
 export const SKY_COLORS = {
-    [MOODS.JOY]: [0xFFD160, 0xFFF7DC],
+    [MOODS.JOY]: [0xE2BE3E, 0xFCF7DC],
     [MOODS.FEAR]: [0x0A1012, 0x343434],
     [MOODS.SADNESS]: [0x596E72, 0xC6C6C7],
     [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
-    [ENVIRONMENTS.BEACH]: [0xFFD160, 0xFFF7DC],
-    [ENVIRONMENTS.MEADOW]: [0x0A1012, 0x343434],
+    [ENVIRONMENTS.BEACH]: [0xF9D593, 0xF9F2E1],
+    [ENVIRONMENTS.MEADOW]: [0xA8EEFF, 0xF5FEFF],
 }
 
 export const GRASS_COLOR = {
@@ -226,3 +226,25 @@ export const INTRO_TIMEOUTS = {
 }
 
 export const SUMUP_PARTICLES_COUNT = 1000
+
+export const BLOOM_THRESHOLD = 0.45
+
+export const BLOOM_STRENGTH = 0.11
+
+export const BLOOM_RADIUS = 0.9
+
+export const SELECTIVE_BLOOM_THRESHOLD = 0
+
+export const SELECTIVE_BLOOM_STRENGTH = 1.5
+
+export const SELECTIVE_BLOOM_RADIUS = 1
+
+export const WATER_ALPHA = 0.5
+
+export const WATER_SIZE = 5.8
+
+export const WATER_SCALE = 10
+
+export const WATER_COLOR = 0xF9EEE2
+
+export const WATER_SUN_COLOR = 0xFFFFFF
