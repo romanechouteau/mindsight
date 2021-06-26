@@ -72,7 +72,7 @@ export default class Water {
 
             const folderWater = this.debug.addFolder('Water')
 
-            folderWater.add(this.waterMesh.position, 'y', -100, 100, 1).name('water height')
+            folderWater.add(this.waterMesh.position, 'y', -1000, 1000, 1).name('water height')
             folderWater.add(waterUniforms.alpha, 'value', 0.1, 1, 0.1).name('alpha')
 
             folderWater.add(waterUniforms.distortionScale, 'value', 0.1, 10, 0.1).name('size')
