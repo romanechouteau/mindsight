@@ -6,6 +6,7 @@ import { htmlUtils } from '../Tools/utils'
 import { AUDIO_INPUT_MODES, CURSOR_MODES, SCENES } from '../constants'
 // @ts-ignore
 import template from '../../templates/HUD.template'
+import SoundManager from './SoundManager'
 
 export default class ModeManager extends Component {
     element: HTMLElement
@@ -81,6 +82,7 @@ export default class ModeManager extends Component {
     handleKeyUp (event) {
         event.preventDefault()
         if ((event.target as HTMLElement).tagName === 'INPUT') return
+        if (store.state.scene === SCENES.PARAMETERS && SoundManager.state.worldBuilderExplanationComplete !== true) return
 
         const key = event.code || event.keyCode
 
@@ -103,6 +105,8 @@ export default class ModeManager extends Component {
     }
 
     handleClickCursor (elem) {
+        if (store.state.scene === SCENES.PARAMETERS && SoundManager.state.worldBuilderExplanationComplete !== true) return
+
         const mode = elem.getAttribute('data-mode') || CURSOR_MODES.DEFAULT
         store.dispatch('chooseCursor', mode)
     }
