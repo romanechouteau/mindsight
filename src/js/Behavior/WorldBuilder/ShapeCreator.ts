@@ -1,4 +1,4 @@
-import { Group, Mesh, Object3D, Vector2, RawShaderMaterial, MeshBasicMaterial, WebGLRenderTarget } from "three"
+import { Group, Mesh, Object3D, Vector2, RawShaderMaterial, ShaderMaterial, MeshBasicMaterial, WebGLRenderTarget, CubeRefractionMapping, CubeCamera, MeshPhongMaterial, RepeatWrapping, RGBFormat, LinearMipmapLinearFilter, WebGLCubeRenderTarget } from "three"
 // @ts-ignore
 import shape3Src from '@models/testShape1.glb'
 // @ts-ignore
@@ -35,18 +35,22 @@ export default class ShapeCreator {
     shapes: Object3D[]
     spreadDimensions: Vector2
     glassMaterial: RawShaderMaterial
+    glassMaterial2: MeshBasicMaterial
+    glassMaterial3: MeshPhongMaterial
     time: Time
+    cubeCamera: CubeCamera
     constructor({ scene, spreadDimensions, time }: ShapeCreatorParams) {
         this.scene = scene
         this.time = time
         this.spreadDimensions = spreadDimensions || new Vector2(15, 15)
         this.handleChange = this.handleChange.bind(this)
 
-        console.log(App);
-        
-        debugger
+        const roughness= textureLoader.load(glassRoughness), noise=textureLoader.load(glassNoise)
 
-        this.glassMaterial = new RawShaderMaterial({
+        roughness.wrapS = roughness.wrapT = RepeatWrapping
+        noise.wrapS = noise.wrapT = RepeatWrapping
+
+        this.glassMaterial = new ShaderMaterial({
             uniforms: {
                 time: {
                     value: 0
@@ -59,16 +63,39 @@ export default class ShapeCreator {
                     value: App.renderTarget.texture
                 },
                 tRoughness: {
-                    value: textureLoader.load(glassRoughness)
+                    value: roughness
                 },
                 tNoise: {
-                    value: textureLoader.load(glassNoise)
+                    value: noise
                 }
             },
-            vertexShader: glsl(glassVertex),
+            vertexShader: glassVertex,
             fragmentShader: glsl(glassFragment),
-            transparent: true
+            transparent: true,
+            morphTargets: true
         })
+
+        // const cubeRenderTarget = new WebGLCubeRenderTarget( 128, { format: RGBFormat, generateMipmaps: true, minFilter: LinearMipmapLinearFilter } );
+        // App.cubeCamera = new CubeCamera( 0.1, 5000, cubeRenderTarget )
+        // App.scene.add( this.cubeCamera )
+        
+        // App.cubeCamera.renderTarget.mapping = CubeRefractionMapping
+
+
+        // this.glassMaterial2 = new MeshBasicMaterial( { 
+        //     color: 0xccccff,
+        //     // @ts-ignore
+        //     envMap: cubeRenderTarget.texture,
+        //     refractionRatio: 0.985, 
+        //     reflectivity: 0.9 
+        //     } )
+
+        // this.glassMaterial3 = new MeshPhongMaterial( { 
+        //     color: 0xffffff, 
+        //     envMap: cubeRenderTarget.texture, 
+        //     refractionRatio: 0.98 
+        // } )
+
         this.init = this.init.bind(this)
         this.init()
     }
@@ -91,7 +118,7 @@ export default class ShapeCreator {
 
         shapeMesh.material = this.glassMaterial
         // shapeMesh.material.uniforms.tRoughness.value = 
-        this.time.on('tick', () => shapeMesh.material.uniforms['time'].value += 0.05)
+        this.time.on('tick', () => shapeMesh.material.uniforms['time'].value += 0.0005)
         
         // create clones
         for (let i = 0; i < SHAPE_NUMBER; i++) {
@@ -101,10 +128,24 @@ export default class ShapeCreator {
             mesh.position.z = (Math.random() - 0.5) * 30
             this.container.add(mesh)
         }
+
         this.container.add(this.mainShape)
         this.scene.add(this.container)
-        this.prepareMorph()
-        this.prepareClonesMorph()
+        
+        // @ts-ignore
+        this.container.children.forEach(child => App.translucentObjects.push(child))
+        // this.time.on('tick', () => {
+        //     this.container.children.forEach(child => {
+        //         child.visible = false
+        //         this.cubeCamera.position.copy( child.position );
+        //         // @ts-ignore
+        //         this.cubeCamera.update( App.renderer, App.scene );
+        //         child.visible = true
+        //     })
+        // })
+
+        // this.prepareMorph()
+        // this.prepareClonesMorph()
     }
 
     prepareMorph(mesh?: Mesh) {
@@ -119,7 +160,9 @@ export default class ShapeCreator {
     }
 
     handleChange(value: number) {
+        
         const shapeMesh = (this.container.getObjectByName('Cube002') as Mesh)
+        console.log(shapeMesh.morphTargetInfluences);
         shapeMesh.morphTargetInfluences[0] = value / (4 * WORLDBUILDER_PRECISION)
     }
 }

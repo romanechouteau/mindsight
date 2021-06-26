@@ -57,9 +57,9 @@ export default class MapHeighter {
         })
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )
 
-        this.time.on('tick', () => {
-            blendingRenderer.render(blendingScene, blendingCamera)
-        })
+        // this.time.on('tick', () => {
+        //     blendingRenderer.render(blendingScene, blendingCamera)
+        // })
     }
 
     applyChange() {

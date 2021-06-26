@@ -1,4 +1,4 @@
-import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, WebGLRenderTarget } from 'three'
+import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, WebGLRenderTarget, Mesh, BoxBufferGeometry, MeshBasicMaterial } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -53,6 +53,7 @@ export default class App extends Component {
   selectiveBloomPass: UnrealBloomPass
   selectiveBloomComposer: EffectComposer
   renderTarget: WebGLRenderTarget
+  translucentObjects: Mesh[]
   constructor(options) {
     super({
       store
@@ -65,6 +66,8 @@ export default class App extends Component {
     this.time = new Time()
     this.sizes = new Sizes()
     this.mouse = new Mouse()
+
+    this.translucentObjects = []
 
     this.setConfig()
     this.setRenderer()
@@ -90,7 +93,7 @@ export default class App extends Component {
     this.bloomLayer.set(BLOOM_LAYER)
 
     // render target for further effects
-    this.renderTarget = new WebGLRenderTarget()
+    this.renderTarget = new WebGLRenderTarget(512, 512)
 
     // Set renderer
     this.renderer = new WebGLRenderer({
@@ -125,11 +128,14 @@ export default class App extends Component {
         this.selectiveBloomComposer.render()
         this.renderer.setClearColor(0xF4C5B5, 1.)
         this.scene.traverse(this.restoreMaterial.bind(this))
-        
-        this.finalComposer.renderer.setRenderTarget(this.renderTarget)
+
+        this.translucentObjects.forEach(obj => obj.visible = false)
+        this.renderer.setRenderTarget(this.renderTarget)
+        this.renderer.render(this.scene, this.camera.camera)
+        this.renderer.setRenderTarget(null)
+        this.translucentObjects.forEach(obj => obj.visible = true)
         this.finalComposer.render()
-        this.finalComposer.renderer.setRenderTarget(null)
-        this.finalComposer.render()
+
         stats.end()
       }
     })
