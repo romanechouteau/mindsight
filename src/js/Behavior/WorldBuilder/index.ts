@@ -71,7 +71,11 @@ export default class WorldBuilder extends Component {
         this.createHtmlControls()
         this.render()
 
-        SoundManager.playVoice(6)
+        SoundManager.state.worldBuilderExplanationPromise = SoundManager.playVoice(6)
+        SoundManager.state.worldBuilderExplanationPromise.then(() => {
+            SoundManager.state.worldBuilderExplanationComplete = true
+            setTimeout(() => store.dispatch('chooseCursor', CURSOR_MODES.DEFAULT), 500)
+        })
     }
 
     createHtmlControls() {
