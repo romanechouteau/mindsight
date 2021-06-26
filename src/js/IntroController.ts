@@ -105,6 +105,7 @@ export default class IntroController {
     }
     
     initXp() {
+        SoundManager.playMusic()
         store.dispatch('beginXp')
         this.initTicker()
         this.initLogoAnimation()
@@ -294,7 +295,6 @@ export default class IntroController {
             },
             () => {
                 this.showHeadphoneAdvice()
-                SoundManager.playMusic()
                 SoundManager.playVoice(1, 1500).then(() => SoundManager.playVoice(2))
             },
             () => {

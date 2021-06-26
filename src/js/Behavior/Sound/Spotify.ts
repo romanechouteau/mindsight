@@ -66,16 +66,42 @@ export default class SpotifyManager {
         this.registerDomNodes()
         this.addScript()
         window.onSpotifyWebPlaybackSDKReady = async () => {
+            let player, success
             const token = await this.getToken()
-            const player = new Spotify.Player({
+            player = new Spotify.Player({
                 name: 'Web Playback SDK Quick Start Player',
-                getOAuthToken: cb => { cb(token); }
+                getOAuthToken: cb => { console.log('token youpi');
+                ; cb(token); }
             });
+            console.log(player);
+            
             this.setListeners(player);
             // Connect to the player!
-            player.connect().then(success => {
-                if (success) console.log('The Web Playback SDK successfully connected to Spotify!');
+            player.connect().then(_success => {
+                if (_success) {
+                    success = true
+                    console.log('The Web Playback SDK successfully connected to Spotify!')
+                }
             })
+            setInterval(async () => {
+                if (player && success) return
+                const token = await this.getToken()
+                player = new Spotify.Player({
+                    name: 'Web Playback SDK Quick Start Player',
+                    getOAuthToken: cb => { console.log('token youpi');
+                    ; cb(token); }
+                });
+                console.log(player);
+                
+                this.setListeners(player);
+                // Connect to the player!
+                player.connect().then(_success => {
+                    if (_success) {
+                        success = true
+                        console.log('The Web Playback SDK successfully connected to Spotify!')
+                    }
+                })
+            }, 4000)
         };
     }
 
@@ -139,6 +165,7 @@ export default class SpotifyManager {
                 },
             })
             .then(res => res.json().then(json => console.log(json)))
+            this.player.setVolume( 0.5 )
             // repeat track
             fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
                 method: 'PUT',
@@ -175,7 +202,9 @@ export default class SpotifyManager {
         const meta = await res.json()
         this.playTracker = window.setInterval(async() => {
             if (this.player.paused) return
-            const { position } = await this.player.getCurrentState()
+            const state= await this.player.getCurrentState()
+            if (!state?.position) return 
+            const { position } = state
             let iterator = 0
             while (position/1000 > meta.sections[iterator].start) {
                 iterator++

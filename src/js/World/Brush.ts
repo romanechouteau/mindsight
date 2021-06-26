@@ -629,7 +629,7 @@ export default class Brush extends Component {
     const { tempo, loudness } = store.state.spotifyAudioData
 
     const PARAMS = {
-      peakSpeed: 4,
+      peakSpeed: 2,
       comebackSpeed: 0.4
     }
 

@@ -102,11 +102,19 @@ class SoundManager {
         this.sounds.Vent_Herbes.volume = 0.2
     }
 
+    stopAllVoices() {
+        const voices = Object.values(this.sounds)
+        for (let i = 0; i < 12; i++) {
+            voices[i].pause()
+        }
+    }
+
     playMusic() {
         this.sounds.Musique_Ambiante.play()
     }
 
     playVoice(id: number, timeout?: number) {
+        this.stopAllVoices()
         this.state.currentIndex = id
         return this.play('voice'+id, timeout)
     }
