@@ -8,7 +8,7 @@ import Time from './Tools/Time'
 import { queue } from './Tools/asyncUtils'
 import lottie from 'lottie-web'
 // @ts-ignore
-import logoAnimation from '../images/mindsight_logo_animation.json'
+import logoAnimation from '../images/MindSight_LogoAnimation.json'
 import SoundManager from './Behavior/SoundManager'
 
 export default class IntroController {
