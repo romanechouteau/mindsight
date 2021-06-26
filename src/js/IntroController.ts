@@ -294,9 +294,8 @@ export default class IntroController {
             },
             () => {
                 this.showHeadphoneAdvice()
-                setTimeout(() => {
-                    SoundManager.playVoice(1).then(() => SoundManager.playVoice(2))
-                }, 1500);
+                SoundManager.playMusic()
+                SoundManager.playVoice(1, 1500).then(() => SoundManager.playVoice(2))
             },
             () => {
                 this.hideHeadphone()
