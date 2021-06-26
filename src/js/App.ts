@@ -259,7 +259,7 @@ export default class App extends Component {
   render = () => {
     // render intro
     if (store.state.isIntro && this.intro === undefined) {
-      this.intro = new IntroController({time: this.time, debug: this.debug})
+      this.intro = new IntroController({time: this.time, pointerCursor: this.pointerCursor, debug: this.debug})
     } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined) {
       this.intro.flyLines()
     } else if (!store.state.isIntro && document.querySelector('#intro')) {
