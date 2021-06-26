@@ -2,6 +2,14 @@
     position absolute
     bottom 15vh
     width 100%
+    visibility: visible
+    opacity: 1
+    transition: opacity 0.8s ease
+
+    &.hidden
+        opacity: 0
+        visibility: hidden
+        transition: opacity 0.5s ease, visibility 0s 0.5s ease
 
     input[type="range"]
         width 100%
