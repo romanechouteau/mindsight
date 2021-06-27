@@ -58,18 +58,18 @@ export default class SkyCreator {
         // add sky colors to debug
         if (this.debug) {
             const folder = this.debug.addFolder('sky colors')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
-            this.debug.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
-            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
-            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
-            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
-            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
+            folder.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
+            folder.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
+            folder.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
+            folder.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
+            folder.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
         }
 
         // set fog to default color
