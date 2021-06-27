@@ -84,7 +84,6 @@ export default class Water {
             folderWater.addColor(palette, 'sunColor').name('waterColor').onChange(val => {
                 waterUniforms.sunColor.value = new Color(val)
             })
-            folderWater.open()
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Mesh, PlaneBufferGeometry, Scene, WebGLRenderer, PerspectiveCamera, IUniform, ShaderMaterial } from "three"
+import { Mesh, PlaneBufferGeometry, Scene, WebGLRenderer, PerspectiveCamera, IUniform, ShaderMaterial, UniformsLib, UniformsUtils } from "three"
 
 import { textureLoader } from '../../../Tools/utils'
 // @ts-ignore
@@ -52,19 +52,23 @@ export default class MapHeighter {
         const textures = await Promise.all(src.map( _src => (textureLoader.loadAsync(_src))))
         
         this.blendMaterial = new ShaderMaterial({
+            fog: true,
             vertexShader: blendingVertex,
             fragmentShader: blendingFragment,
-            uniforms: {
-                values: { type: "fv", value: [1, 0, 0, 0] } as IUniform,
-                map1: { type: "t", value: textures[0] } as IUniform,
-                map2: { type: "t", value: textures[1] } as IUniform,
-                map3: { type: "t", value: textures[2] } as IUniform,
-                map4: { type: "t", value: textures[3] } as IUniform,
-                uFirstColorBottom: { value: this.skyManager.skyMaterial.uniforms.uFirstColorTop.value },
-                uSecondColorBottom: { value: this.skyManager.skyMaterial.uniforms.uSecondColorTop.value },
-                uPercentage: { value: this.skyManager.skyMaterial.uniforms.uPercentage.value },
-                uSkyInfluence: { value: 0.2 }
-            },
+            uniforms: UniformsUtils.merge([
+                UniformsLib['fog'],
+                {                
+                  values: { type: "fv", value: [1, 0, 0, 0] } as IUniform,
+                  map1: { type: "t", value: textures[0] } as IUniform,
+                  map2: { type: "t", value: textures[1] } as IUniform,
+                  map3: { type: "t", value: textures[2] } as IUniform,
+                  map4: { type: "t", value: textures[3] } as IUniform,
+                  uFirstColorBottom: { value: this.skyManager.skyMaterial.uniforms.uFirstColorTop.value },
+                  uSecondColorBottom: { value: this.skyManager.skyMaterial.uniforms.uSecondColorTop.value },
+                  uPercentage: { value: this.skyManager.skyMaterial.uniforms.uPercentage.value },
+                  uSkyInfluence: { value: 0.2 }
+                },
+             ]),
             morphTargets: true
         })
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )

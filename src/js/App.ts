@@ -129,7 +129,6 @@ export default class App extends Component {
     if (this.debug) {
       this.renderOnBlur = { activated: true }
       const folder = this.debug.addFolder('Renderer')
-      folder.open()
       folder
         .add(this.renderOnBlur, 'activated')
         .name('Render on window blur')
@@ -195,7 +194,6 @@ export default class App extends Component {
     // debug
     if (this.debug) {
       const folder = this.debug.addFolder('Selective Bloom')
-      folder.open()
       folder
         .add(this.selectiveBloomPass, 'threshold')
         .step(0.01)
@@ -213,7 +211,6 @@ export default class App extends Component {
         .max(1)
         .name('Radius')
       const folder2 = this.debug.addFolder('Global Bloom')
-      folder2.open()
       folder2
         .add(this.globalBloomPass, 'threshold')
         .step(0.01)

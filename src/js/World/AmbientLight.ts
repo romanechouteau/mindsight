@@ -41,7 +41,6 @@ export default class AmbientLightSource {
   }
   setDebug() {
     this.debugFolder = this.debug.addFolder('Ambient Light')
-    this.debugFolder.open()
     this.debugFolder
       .addColor(this.params, 'color')
       .name('Color')

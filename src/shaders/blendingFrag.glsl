@@ -11,6 +11,8 @@ uniform float uSkyInfluence;
 
 varying vec2 vUv;
 
+#include <fog_pars_fragment>
+
 vec3 toRGB(int color) {
    float r = float((color / 256 / 256) % 256) / 255.;
    float g = float((color / 256) % 256) / 255.;
@@ -34,9 +36,11 @@ void main() {
         texture2D(map4, vUv).xyz * values.w
     );
 
+
     // vec3 colorSmooth = mix(color, vec3(0., 0., 0.), uSkyInfluence);
     vec3 final = color * skyColorSmooth2;
 
     // vec3 final = mix(color, skyColorFinal, 0.2);
     gl_FragColor = vec4(final, 1.);
+    #include <fog_fragment>
 }
