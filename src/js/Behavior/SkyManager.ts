@@ -1,5 +1,5 @@
 import { BackSide, Mesh, Object3D, ShaderMaterial, SphereBufferGeometry, Scene, Color } from 'three'
-import { WORLDBUILDER_PRECISION, SKY_COLORS, MOODS, LIST_MOODS, WORLDBUILDER_MAX_VALUE, ENVIRONMENTS, LIST_ENVIRONMENTS } from '../constants'
+import { WORLDBUILDER_PRECISION, MOODS, WORLDBUILDER_MAX_VALUE, ENVIRONMENTS, SKY_ENV_COLORS, SKY_MOODS_COLORS, LIST_MOODS, LIST_ENVIRONMENTS } from '../constants'
 import gsap from "gsap/all"
 
 // @ts-ignore
@@ -8,8 +8,6 @@ import vertexShader from '@shaders/skyvert.glsl'
 import fragmentShader from '@shaders/skyfrag.glsl'
 // @ts-ignore
 import Time from '@tools/Time'
-// @ts-ignore
-import { mix, toRGBPercent } from '@tools/colorUtils'
 
 export default class SkyCreator {
     time: Time
@@ -19,6 +17,7 @@ export default class SkyCreator {
     sky: Mesh
     debug: dat.GUI
     emitter: EventTarget
+    hasEnvInfluence: Boolean
     constructor(options: { scene: Object3D, globalScene: Scene, time: Time, debug?: dat.GUI }) {
         const { scene, globalScene, time, debug } = options
 
@@ -27,6 +26,7 @@ export default class SkyCreator {
         this.scene = scene
         this.globalScene = globalScene
         this.emitter = new EventTarget()
+        this.hasEnvInfluence = true
         this.handleChange = this.handleChange.bind(this)
 
         this.init()
@@ -39,11 +39,15 @@ export default class SkyCreator {
             fragmentShader,
             uniforms: {
                 uTime: { value: 0. },
-                uFirstColorTop: { value: SKY_COLORS[ENVIRONMENTS.BEACH][0] },
-                uSecondColorTop: { value: SKY_COLORS[ENVIRONMENTS.MEADOW][0] },
-                uFirstColorBottom: { value: SKY_COLORS[ENVIRONMENTS.BEACH][1] },
-                uSecondColorBottom: { value: SKY_COLORS[ENVIRONMENTS.MEADOW][1] },
-                uPercentage: { value: 0. }
+                uSky1: { value: SKY_MOODS_COLORS[MOODS.JOY] },
+                uSky2: { value: SKY_MOODS_COLORS[MOODS.FEAR] },
+                uSky3: { value: SKY_MOODS_COLORS[MOODS.SADNESS] },
+                uSky4: { value: SKY_MOODS_COLORS[MOODS.ANGER] },
+                uEnvSky1: { value: SKY_ENV_COLORS[ENVIRONMENTS.BEACH] },
+                uEnvSky2: { value: SKY_ENV_COLORS[ENVIRONMENTS.MEADOW] },
+                uPercentage: { value: 0. },
+                uEnvInfluence: { value: 1. },
+                uEnvPercentage: { value: 0. },
             },
             side: BackSide
         })
@@ -54,98 +58,85 @@ export default class SkyCreator {
         // add sky colors to debug
         if (this.debug) {
             const folder = this.debug.addFolder('sky colors')
-            folder.addColor(SKY_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
-            folder.addColor(SKY_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
-            folder.addColor(SKY_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
-            folder.addColor(SKY_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
-            folder.addColor(SKY_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
-            folder.addColor(SKY_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
-            folder.addColor(SKY_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
-            folder.addColor(SKY_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
-            folder.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
-            folder.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
-            folder.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
-            folder.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
+            this.debug.addColor(SKY_MOODS_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
+            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
+            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
+            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
+            this.debug.addColor(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
         }
 
         // set fog to default color
-        const fogColor = mix(toRGBPercent(SKY_COLORS[ENVIRONMENTS.BEACH][0]), toRGBPercent(SKY_COLORS[ENVIRONMENTS.BEACH][1]), 0.5, true)
-        this.globalScene.fog.color = new Color(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`)
+        this.globalScene.fog.color = new Color(SKY_ENV_COLORS[ENVIRONMENTS.BEACH][0]).lerp(new Color(SKY_ENV_COLORS[ENVIRONMENTS.BEACH][1]), 0.5)
 
         this.setMovement()
     }
 
     handleChange(input) {
-        const value = input % WORLDBUILDER_MAX_VALUE
-        const step = Math.floor(value / WORLDBUILDER_PRECISION)
-
-        const [firstSky, secondSky] = this.getSkyIndexes(step, LIST_MOODS)
-        const [firstColors, secondColors] = this.getColors(firstSky, secondSky, LIST_MOODS)
-        const percentage = this.getPercentage(value, firstSky)
-
-        this.changeGradient(firstColors, secondColors)
-        this.setNewColors(percentage)
-        this.setFog(firstColors, secondColors, percentage)
+        const percentage = this.getPercentage(input % WORLDBUILDER_MAX_VALUE)
+        this.setPercentage(percentage, 'uPercentage')
+        this.setFog(percentage, SKY_MOODS_COLORS, LIST_MOODS, 1, '')
         this.emitter.dispatchEvent(new Event('changeSky'))
+
+        if (this.hasEnvInfluence) {
+            this.removeEnvInfluence()
+            this.hasEnvInfluence = false
+        }
     }
 
     handleEnvChange(value) {
-        const [firstSky, secondSky] = this.getSkyIndexes(value, LIST_ENVIRONMENTS)
-        const [firstColors, secondColors] = this.getColors(firstSky, secondSky, LIST_ENVIRONMENTS)
-
-        this.changeGradient(firstColors, secondColors)
-        this.lerpNewColors()
-        this.lerpFog(firstColors)
+        this.setPercentage(value, 'uEnvPercentage')
+        this.setFog(value, SKY_ENV_COLORS, LIST_ENVIRONMENTS, 1.5, 'power3.inOut')
     }
 
-    getSkyIndexes (value, list) {
-        return [value % list.length, (value + 1) % list.length]
+    getPercentage (value) {
+        return value / WORLDBUILDER_PRECISION
     }
 
-    getColors(firstSky, secondSky, list) {
-        return [SKY_COLORS[list[firstSky]], SKY_COLORS[list[secondSky]]]
-    }
-
-    getPercentage (value, firstSky) {
-        return (value - firstSky * WORLDBUILDER_PRECISION) / WORLDBUILDER_PRECISION
-    }
-
-    changeGradient(firstColors, secondColors) {
-        this.skyMaterial.uniforms.uFirstColorTop.value = firstColors[0]
-        this.skyMaterial.uniforms.uFirstColorBottom.value = firstColors[1]
-        this.skyMaterial.uniforms.uSecondColorTop.value = secondColors[0]
-        this.skyMaterial.uniforms.uSecondColorBottom.value = secondColors[1]
-    }
-
-    setNewColors (percentage) {
-        this.skyMaterial.uniforms.uPercentage.value = percentage
-    }
-
-    lerpNewColors () {
-        this.skyMaterial.uniforms.uPercentage.value = 1
-        gsap.to(this.skyMaterial.uniforms.uPercentage, {
-            value: 0,
-            duration: 1.5,
-            ease: 'power3.inOut'
+    setPercentage (percentage, uniform) {
+        gsap.to(this.skyMaterial.uniforms[uniform], {
+            value: percentage,
+            duration: 1
         })
     }
 
-    setFog (firstColors, secondColors, percentage) {
-        const fogColor1 = mix(toRGBPercent(firstColors[0]), toRGBPercent(firstColors[1]), 0.5)
-        const fogColor2 = mix(toRGBPercent(secondColors[0]), toRGBPercent(secondColors[1]), 0.5)
-        const fogColor = mix(fogColor1, fogColor2, percentage, true)
-
-        this.globalScene.fog.color = new Color(`rgb(${fogColor[0]}, ${fogColor[1]}, ${fogColor[2]})`)
+    removeEnvInfluence () {
+        gsap.to(this.skyMaterial.uniforms.uEnvInfluence, {
+            value: 0,
+            duration: 1
+        })
     }
 
-    lerpFog (colors) {
-        const fogColor = mix(toRGBPercent(colors[0]), toRGBPercent(colors[1]), 0.5)
+    getWeight (percentage, peak) {
+        return Math.max(1 - Math.abs(peak - percentage), 0)
+    }
+
+    mixFog (percentage, colors, list) {
+        const colorTop = new Color(colors[list[0]][1]).multiplyScalar(this.getWeight(percentage, 0))
+        const colorBottom = new Color(colors[list[0]][0]).multiplyScalar(this.getWeight(percentage, 0))
+        for (let i = 1; i <= list.length; i++) {
+            const index = i % list.length
+            const weight = this.getWeight(percentage, i)
+            colorTop.add(new Color(colors[list[index]][1]).multiplyScalar(weight))
+            colorBottom.add(new Color(colors[list[index]][0]).multiplyScalar(weight))
+        }
+        return colorTop.lerp(colorBottom, 0.5)
+    }
+
+    setFog (percentage, colors, list, duration, ease) {
+        const color = this.mixFog(percentage, colors, list)
         gsap.to(this.globalScene.fog.color, {
-            r: fogColor[0],
-            g: fogColor[1],
-            b: fogColor[2],
-            duration: 1.5,
-            ease: 'power3.inOut'
+            r: color.r,
+            g: color.g,
+            b: color.b,
+            duration,
+            ease
         })
     }
 
