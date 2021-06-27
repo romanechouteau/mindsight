@@ -13,6 +13,13 @@ export enum MOODS {
     ANGER = "anger",
 }
 
+export const MOOD_NAMES = {
+    [MOODS.JOY]: 'extase',
+    [MOODS.FEAR]: 'terreur',
+    [MOODS.SADNESS]: 'chagrin',
+    [MOODS.ANGER]: 'rage',
+}
+
 export const moodPositions = {
     [MOODS.JOY]: new Vector3(0, 0, MAX_DISTANCE),
     [MOODS.FEAR]: new Vector3(MAX_DISTANCE, 0, 0),
@@ -39,13 +46,6 @@ export enum WORLDBUILDER_STEPS {
 }
 
 export const WORLDBUILDER_PRECISION = 3
-
-export const SKY_COLORS = {
-    [MOODS.JOY]: [0xFFD160, 0xFFF7DC],
-    [MOODS.FEAR]: [0x0A1012, 0x343434],
-    [MOODS.SADNESS]: [0x596E72, 0xC6C6C7],
-    [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
-}
 
 export const LIST_MOODS = [MOODS.JOY, MOODS.FEAR, MOODS.SADNESS, MOODS.ANGER]
 
@@ -93,6 +93,15 @@ export enum ENVIRONMENTS {
 }
 
 export const LIST_ENVIRONMENTS = Object.values(ENVIRONMENTS)
+
+export const SKY_COLORS = {
+    [MOODS.JOY]: [0xFFD160, 0xFFF7DC],
+    [MOODS.FEAR]: [0x0A1012, 0x343434],
+    [MOODS.SADNESS]: [0x596E72, 0xC6C6C7],
+    [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
+    [ENVIRONMENTS.BEACH]: [0xFFD160, 0xFFF7DC],
+    [ENVIRONMENTS.MEADOW]: [0x0A1012, 0x343434],
+}
 
 export const GRASS_COLOR = {
     [ENVIRONMENTS.BEACH]: [0x736A3E, 0xDBCF8F, 0xA39758, 0xD4CEB0],

@@ -25,6 +25,8 @@ import { SCENES, START_FOG_FAR } from '../constants'
 import Gravity from '../Behavior/Gravity'
 import ModeManager from '../Behavior/ModeManager'
 import WordManager from '../Behavior/WordManager'
+import SkyManager from '../Behavior/SkyManager'
+import SumupManager from '../Behavior/SumupManager'
 
 export default class World extends Component {
   time: Time
@@ -52,6 +54,8 @@ export default class World extends Component {
   gravity: Gravity
   modeManager: ModeManager
   wordManager: WordManager
+  skyManager: SkyManager
+  sumupManager: SumupManager
   constructor(options) {
     super({
       store
@@ -79,9 +83,8 @@ export default class World extends Component {
     this.setLoader()
   }
   init() {
-    this.setAmbientLight()
-    this.setPointLight()
-    this.setSceneManager()
+    // this.setAmbientLight()
+    // this.setPointLight()
     this.setFog()
     this.render()
   }
@@ -106,7 +109,7 @@ export default class World extends Component {
     this.container.add(this.light.container)
   }
   setFog() {
-    this.globalScene.fog = new Fog(0xF4C5B5, 0.01, START_FOG_FAR)
+    this.globalScene.fog = new Fog(0xFFFFFF, 0.01, START_FOG_FAR)
   }
 
   setUser() {
@@ -140,7 +143,8 @@ export default class World extends Component {
       mouse: this.mouse,
       camera: this.camera,
       time: this.time,
-      debug: this.debug
+      debug: this.debug,
+      skyManager: this.skyManager
     })
     this.container.add(this.environments.container)
   }
@@ -158,7 +162,8 @@ export default class World extends Component {
       time: this.time,
       debug: this.debug,
       ground: this.environments,
-      pointerCursor: this.pointerCursor
+      pointerCursor: this.pointerCursor,
+      skyManager: this.skyManager
     })
   }
 
@@ -178,7 +183,26 @@ export default class World extends Component {
     this.wordManager = new WordManager()
   }
 
+  setSkyManager() {
+    this.skyManager = new SkyManager({
+      scene: this.container,
+      globalScene: this.globalScene,
+      time: this.time,
+      debug: this.debug
+    })
+  }
+
+  setSumupManager() {
+    this.sumupManager = new SumupManager({
+      sizes: this.sizes,
+      mouse: this.mouse
+    })
+  }
+
   render() {
+    if (store.state.begin && this.sceneManager === undefined) {
+      this.setSceneManager()
+    }
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       this.eyeTrackingManager = null // prevent from being undefined
       setTimeout(() => {
@@ -190,6 +214,9 @@ export default class World extends Component {
 
     if (store.state.scene >= SCENES.EYETRACKING && this.modeManager === undefined) {
       this.setModeManager()
+    }
+    if (store.state.scene >= SCENES.EYETRACKING && this.skyManager === undefined) {
+      this.setSkyManager()
     }
 
     if (store.state.scene === SCENES.ENVIRONMENT && this.environments === undefined) {
@@ -203,11 +230,11 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
+      this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
       this.setWorldBuilder()
       if (this.user === undefined) {
         this.setUser()
       }
-      this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
     } else if (store.state.scene !== SCENES.PARAMETERS && this.worldBuilder !== undefined && this.worldBuilder.stopped === false) {
       this.worldBuilder.stop()
     }
@@ -230,6 +257,14 @@ export default class World extends Component {
       this.setWordManager()
     } else if (store.state.scene !== SCENES.WORD && this.wordManager !== undefined && this.wordManager.started === true) {
       this.wordManager.stop()
+    }
+
+    if (store.state.scene >= SCENES.SUMUP && this.modeManager !== undefined) {
+      this.modeManager.stop()
+    }
+
+    if (store.state.scene === SCENES.SUMUP && this.sumupManager === undefined) {
+      this.setSumupManager()
     }
   }
 }

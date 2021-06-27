@@ -1,6 +1,14 @@
+import SoundManager from "../Behavior/SoundManager"
+import { CURSOR_MODES, SCENES } from "../constants"
+// @ts-ignore
+import store from '@store/index'
+
 export default {
     skipIntro(context) {
         context.commit('skipIntro')
+    },
+    beginXp(context) {
+        context.commit('beginXp')
     },
     updateBrushParams(context, payload) {
         context.commit('updateBrushParams', payload)
@@ -23,6 +31,7 @@ export default {
         context.events.publish('updateEnvironment')
     },
     chooseCursor(context, payload) {
+        if (payload === CURSOR_MODES.DEFAULT && store.state.scene === SCENES.PARAMETERS && SoundManager.state.currentIndex < 7) SoundManager.playVoice(7).then(() => SoundManager.playVoice(8))
         context.commit('chooseCursor', payload)
     },
     updateMapHeight(context, payload) {

@@ -48,5 +48,15 @@ export const htmlUtils = {
     },
     insertHTMLInTemplate: (template: string, html: string, name: string) => {
         return template.replace(new RegExp(`\{\{${name}\}\}`, 'gi'), html)
+    },
+}
+
+export const colorUtils = {
+    mixColors:(color1: number, color2: number, percentage: number) => {
+        const color1number = 1 - percentage * 10
+        const color2number = percentage * 10
+    
+        const sum = color1number*color1 + color2number*color2
+        return sum
     }
 }

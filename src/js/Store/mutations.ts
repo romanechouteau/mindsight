@@ -2,6 +2,9 @@ export default {
     skipIntro(state, payload) {
         state.isIntro = false
     },
+    beginXp(state, payload) {
+        state.begin = true
+    },
     updateBrushParams(state, payload) {
         const { param, value } = payload
 

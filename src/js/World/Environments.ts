@@ -1,4 +1,4 @@
-import { Object3D, Mesh, DoubleSide, MeshBasicMaterial, Vector3 } from 'three'
+import { Object3D, Mesh, DoubleSide, MeshBasicMaterial, Vector3 , Color} from 'three'
 
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
@@ -12,7 +12,7 @@ import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_COLORS, MOODS } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
@@ -23,6 +23,9 @@ import plaineBeachTexture from '../../images/textures/beach/PlaineSurface_Color.
 import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Color.jpg'
 // @ts-ignore
 import { textureLoader } from '../Tools/utils'
+import SoundManager from '../Behavior/SoundManager'
+import SkyManager from '../Behavior/SkyManager'
+import { mix, toHexInt, toRGB } from '../Tools/colorUtils'
 
 const loader = new GLTFLoader()
 
@@ -38,8 +41,11 @@ export default class Environments {
   handleScroll: Function
   debug: dat.GUI
   current: number
-  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI }) {
-    const { time, assets, mouse, camera, debug } = options
+  skyManager: SkyManager
+  constructor(options: { time: Time, assets?: any, mouse: Mouse, camera: Camera, debug: dat.GUI, skyManager: SkyManager }) {
+    const { time, assets, mouse, camera, debug, skyManager } = options
+
+    SoundManager.playVoice(5)
 
     this.time = time
     this.mouse = mouse
@@ -49,6 +55,7 @@ export default class Environments {
     this.isMoving = false
     this.debug = debug
     this.current = 0
+    this.skyManager = skyManager
 
     this.container = new Object3D()
     this.container.name = 'Environments'
@@ -79,6 +86,7 @@ export default class Environments {
       this.environments[i].position.z = - i * ENV_DISTANCE
 
       const grass = this.setGrass(ground, LIST_ENVIRONMENTS[i], this.environments[i].scale)
+      SoundManager.play('vagues_plage')
 
       let water
       let dock
@@ -87,6 +95,11 @@ export default class Environments {
         dock = this.setDock(ground, this.environments[i].scale)
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineBeachTexture),
+          color: toHexInt(mix(
+            toRGB(SKY_COLORS[MOODS.JOY][0]),
+            toRGB(0xFFFFFF),
+            0.8,
+          )),
           morphTargets: true
         })
       } else {
@@ -94,9 +107,15 @@ export default class Environments {
         dock = new Object3D()
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineMeadowTexture),
+          color: new Color(toHexInt(mix(
+            toRGB(SKY_COLORS[MOODS.FEAR][0]),
+            toRGB(0xFFFFFF),
+            0.8,
+          ))),
           morphTargets: true
         })
       }
+      ground.children[0].material.map.flipY = false
 
       this.environments[i].userData.envName = LIST_ENVIRONMENTS[i]
 
@@ -150,6 +169,14 @@ export default class Environments {
             const index = (store.state.environment + direction) % this.environments.length
             const environment = index < 0 ? lastEnvironment : index
 
+            if (environment === ENVIRONMENT_INDICES.meadow) {
+              SoundManager.pause('vagues_plage')
+              SoundManager.play('Vent_Herbes')
+            } else {
+              SoundManager.play('vagues_plage')
+              SoundManager.pause('Vent_Herbes')
+            }
+
             const water = this.environments[environment].getObjectByName('WaterContainer')
             if (water) water.visible = false
 
@@ -168,7 +195,7 @@ export default class Environments {
             this.environments[Math.abs(environment - 1)].visible = true
 
             gsap.to(this.container.position, {
-              duration: 0.9,
+              duration: 1.5,
               ease: 'power3.inOut',
               z: - this.environments[environment].position.z,
               onComplete: () => {
@@ -178,6 +205,8 @@ export default class Environments {
                 if (water) water.visible = true
                 }
             })
+            this.skyManager.handleEnvChange(environment)
+
         }
     }, 100, { leading: true, trailing: false, maxWait: 1500 })
 

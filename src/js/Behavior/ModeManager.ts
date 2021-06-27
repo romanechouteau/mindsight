@@ -12,11 +12,14 @@ export default class ModeManager extends Component {
     isMoveScene: Boolean
     isBrushScene: Boolean
     isAudioScene: Boolean
+    handleKeyUpBinded: EventListener
     constructor() {
         super({
             store,
             element: document.querySelector('#HUD')
         })
+
+        this.handleKeyUpBinded = this.handleKeyUp.bind(this)
 
         this.firstRender()
         this.render()
@@ -32,7 +35,7 @@ export default class ModeManager extends Component {
         })
 
         // bind keys
-        document.addEventListener('keyup', this.handleKeyUp.bind(this))
+        document.addEventListener('keyup', this.handleKeyUpBinded)
 
         // listen to ckick
         this.element.querySelectorAll('.cursorMode .mode').forEach((elem) => {
@@ -91,6 +94,7 @@ export default class ModeManager extends Component {
             return store.dispatch('chooseCursor', CURSOR_MODES.BRUSH)
         }
         if ((key === 'Digit9' || key === 57) && this.isAudioScene) {
+            store.dispatch('setSpotifyAudioData', {...store.state.spotifyAudioData});
             return store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
         }
         if ((key === 'Digit0' || key === 48) && this.isAudioScene) {
@@ -105,6 +109,14 @@ export default class ModeManager extends Component {
 
     handleClickAudio (elem) {
         const mode = elem.getAttribute('data-mode') || AUDIO_INPUT_MODES.NONE
+        if (mode === AUDIO_INPUT_MODES.SPOTIFY) store.dispatch('setSpotifyAudioData', {...store.state.spotifyAudioData})
         store.dispatch('chooseAudio', mode)
+    }
+
+    stop () {
+        document.removeEventListener('keyup', this.handleKeyUpBinded)
+
+        this.render = () => {}
+        this.element.innerHTML = ''
     }
 }

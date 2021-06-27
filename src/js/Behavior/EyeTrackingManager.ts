@@ -15,10 +15,13 @@ import Component from '@lib/Component'
 import pointTemplate from '../../templates/eyetrackingPoint.template'
 // @ts-ignore
 import { htmlUtils } from '@tools/utils'
+// @ts-ignore
+import { eyeMovement } from "@tools/eyeUtils"
 import {
     EYETRACKING_RADIUS, EYETRACKING_DURATION, EYETRACKING_SUCCESS, OUTER_EYE_MOVEMENT,
     INNER_EYE_MOVEMENT, PUPIL_MOVEMENT, PUPIL_SHINE_MOVEMENT, EYE_TRACKING_DEBOUNCE, SCENES
 } from '../constants'
+import SoundManager from "./SoundManager"
 
 export default class EyeTrackingManager extends Component {
     sizes: any
@@ -40,11 +43,15 @@ export default class EyeTrackingManager extends Component {
     centerX: number
     centerY: number
     element: HTMLElement
+    pupilBox: ClientRect
     calibrated: boolean
     debugFolder: any
     eyeMovement: any
+    outerEyeBox: ClientRect
+    innerEyeBox: ClientRect
     pointsClicks: number[]
     currentPoint: number
+    pupilCenterBox: ClientRect
     currentTranslate: number
 
     constructor(options: { sizes: any, debug: dat.GUI, camera: Camera }) {
@@ -52,6 +59,8 @@ export default class EyeTrackingManager extends Component {
             store,
             element: document.querySelector('#eyetrackingManager')
         })
+
+        SoundManager.playVoice(3, 4000)
 
         const { sizes, debug, camera } = options
 
@@ -117,51 +126,21 @@ export default class EyeTrackingManager extends Component {
     moveEye(moveX, moveY) {
         const currentVH = this.currentTranslate * 0.01 * this.sizes.height
         const duration = 0.5
+        const elemBoxes = {
+            outerEyeBox: this.outerEyeBox,
+            innerEyeBox: this.innerEyeBox,
+            pupilBox: this.pupilBox,
+            pupilCenterBox: this.pupilCenterBox
+        }
+        const elemMovement = {
+            outerEyeMovement: this.params.outerEyeMovement,
+            innerEyeMovement: this.params.innerEyeMovement,
+            pupilMovement: this.params.pupilMovement,
+            pupilShineMovement: this.params.pupilShineMovement
+        }
 
         // move each eye part in gaze direction
-        const outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelector('.outerEye'), {
-            duration,
-            translateX: `${moveX * this.params.outerEyeMovement}%`,
-            translateY: `${currentVH + moveY * this.params.outerEyeMovement * outerEyeBox.height * 0.01}px`,
-        })
-
-        const innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelector('.innerEye'), {
-            duration,
-            translateX: `${moveX * this.params.innerEyeMovement}%`,
-            translateY: `${currentVH + moveY * this.params.innerEyeMovement * innerEyeBox.height * 0.01}px`,
-        })
-
-        const pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelectorAll('.pupil, .maskWrapper .pupilWhite'), {
-            duration,
-            translateX: `${moveX * this.params.pupilMovement * pupilBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01}px`,
-        })
-        gsap.to(this.element.querySelectorAll('#maskPupil .maskWrapper'), {
-            duration,
-            translateX: `${-(moveX * this.params.pupilMovement * pupilBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * this.params.pupilMovement * pupilBox.height * 0.01)}px`,
-        })
-
-        const pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
-        gsap.to(this.element.querySelectorAll('#maskShine .maskWrapper'), {
-            duration,
-            translateX: `${-(moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01)}px`,
-            translateY: `${-(currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01)}px`,
-        })
-        gsap.to(this.element.querySelector('.pupilCenterMask'), {
-            duration,
-            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
-        })
-
-        gsap.to(this.element.querySelector('.pupilCenter'), {
-            duration,
-            translateX: `${moveX * this.params.pupilShineMovement * pupilCenterBox.width * 0.01}px`,
-            translateY: `${currentVH + moveY * this.params.pupilShineMovement * pupilCenterBox.height * 0.01}px`
-        })
+        eyeMovement(moveX, moveY, this.element, duration, currentVH, elemBoxes, elemMovement, true, false)
     }
 
     checkInZone(x, y) {
@@ -223,6 +202,7 @@ export default class EyeTrackingManager extends Component {
     handleNextPoint() {
         // end calibration if all points have been clicked
         if (this.currentPoint === this.pointsClicks.length) {
+            SoundManager.playVoice(4)
             return this.calibrated = true
         }
 
@@ -287,6 +267,12 @@ export default class EyeTrackingManager extends Component {
             pupilCenterX,
             pupilCenterY
         })
+
+        // get elements sizes
+        this.outerEyeBox = (this.element.querySelector('.outerEye') as HTMLElement).getBoundingClientRect()
+        this.innerEyeBox = (this.element.querySelector('.innerEye') as HTMLElement).getBoundingClientRect()
+        this.pupilBox = (this.element.querySelector('.pupil') as HTMLElement).getBoundingClientRect()
+        this.pupilCenterBox = (this.element.querySelector('.pupilCenter') as HTMLElement).getBoundingClientRect()
 
         this.listenMouseDown()
     }
