@@ -1,0 +1,24 @@
+#routerRoot
+    position absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
+    z-index 2
+    opacity 0
+    pointer-events: none
+
+    // background
+    &::before
+        content: ''
+        z-index 1
+        position absolute
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        background: linear-gradient(rgb(254, 224, 200), rgb(190, 224, 193))
+
+    & > div
+        position relative
+        z-index: 2
