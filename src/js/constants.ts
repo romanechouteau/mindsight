@@ -56,7 +56,7 @@ export const WORLDBUILDER_PRECISION = 3
 
 export const LIST_MOODS = [MOODS.JOY, MOODS.FEAR, MOODS.SADNESS, MOODS.ANGER]
 
-export const LIST_MOODS_PALETTE = [MOODS.JOY, MOODS.FEAR, MOODS.SADNESS, MOODS.ANGER]
+export const LIST_MOODS_PALETTE = [MOODS.FEAR, MOODS.ANGER, MOODS.SADNESS, MOODS.JOY]
 
 export const WORLDBUILDER_MAX_VALUE = LIST_MOODS.length * WORLDBUILDER_PRECISION
 
@@ -135,10 +135,13 @@ export const START_FOG_FAR = 25
 export const DEFAULT_FOG_FAR = 50
 
 export const BRUSH_PALETTE_ANGLES = [
-    Math.PI * 2 / 3,
-    Math.PI * 4 / 3,
-    2 * Math.PI,
+    Math.PI * 5 / 4,
+    Math.PI * 3 / 4,
+    Math.PI * 7 / 4,
+    Math.PI / 4,
 ]
+
+export const BRUSH_PALETTE_RADIUS_MARGIN = 10 * Math.sqrt(2)
 
 export const BRUSH_PALETTE_COLORS = {
     [MOODS.JOY]: 0xF8CF70,
