@@ -90,8 +90,8 @@ export default class WorldBuilder extends Component {
         this.controller.addEventListener('mouseenter', this.mouseEnter.bind(this))
         this.controller.addEventListener('mouseleave', this.mouseLeave.bind(this))
         this.controller.addEventListener('mousemove', this.mouseMove.bind(this))
-        this.controller.addEventListener('mousedown', this.mouseDown.bind(this))
-        this.controller.addEventListener('mouseup', this.mouseUp.bind(this))
+        document.addEventListener('mousedown', this.mouseDown.bind(this))
+        document.addEventListener('mouseup', this.mouseUp.bind(this))
     }
 
     addWaves() {
@@ -181,8 +181,8 @@ export default class WorldBuilder extends Component {
         this.controller.removeEventListener('mouseenter', this.mouseEnter)
         this.controller.removeEventListener('mouseleave', this.mouseLeave)
         this.controller.removeEventListener('mousemove', this.mouseMove)
-        this.controller.removeEventListener('mousedown', this.mouseDown)
-        this.controller.removeEventListener('mouseup', this.mouseUp)
+        document.removeEventListener('mousedown', this.mouseDown)
+        document.removeEventListener('mouseup', this.mouseUp)
         this.pointerCursor.unsnap('y')
 
         this.time.off('tick.worldBuilder')
