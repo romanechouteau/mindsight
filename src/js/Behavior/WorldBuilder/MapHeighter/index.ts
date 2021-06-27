@@ -2,7 +2,7 @@ import { Mesh, PlaneBufferGeometry, Scene, WebGLRenderer, PerspectiveCamera, IUn
 
 import { textureLoader } from '../../../Tools/utils'
 // @ts-ignore
-import { WORLDBUILDER_PRECISION, ENVIRONMENTS_COLOR_MAPS } from "@/js/constants"
+import { WORLDBUILDER_PRECISION, ENVIRONMENTS_COLOR_MAPS, SKY_MOODS_COLORS, SKY_ENV_COLORS, MOODS, ENVIRONMENTS } from "@/js/constants"
 
 import store from '../../../Store'
 // @ts-ignore
@@ -57,15 +57,21 @@ export default class MapHeighter {
             fragmentShader: blendingFragment,
             uniforms: {
                     ...UniformsUtils.merge([ UniformsLib['fog'] ]),
-                      values: { type: "fv", value: [1, 0, 0, 0] } as IUniform,
-                      map1: { value: textures[0] } as IUniform,
-                      map2: { value: textures[1] } as IUniform,
-                      map3: { value: textures[2] } as IUniform,
-                      map4: { value: textures[3] } as IUniform,
-                      uFirstColorBottom: { value: this.skyManager.skyMaterial.uniforms.uFirstColorTop.value },
-                      uSecondColorBottom: { value: this.skyManager.skyMaterial.uniforms.uSecondColorTop.value },
-                      uPercentage: { value: this.skyManager.skyMaterial.uniforms.uPercentage.value },
-                      uSkyInfluence: { value: 0.2 }
+                        values: { type: "fv", value: [1, 0, 0, 0] } as IUniform,
+                        map1: { value: textures[0] } as IUniform,
+                        map2: { value: textures[1] } as IUniform,
+                        map3: { value: textures[2] } as IUniform,
+                        map4: { value: textures[3] } as IUniform,
+                        uSky1: { value: SKY_MOODS_COLORS[MOODS.JOY] },
+                        uSky2: { value: SKY_MOODS_COLORS[MOODS.FEAR] },
+                        uSky3: { value: SKY_MOODS_COLORS[MOODS.SADNESS] },
+                        uSky4: { value: SKY_MOODS_COLORS[MOODS.ANGER] },
+                        uEnvSky1: { value: SKY_ENV_COLORS[ENVIRONMENTS.BEACH] },
+                        uEnvSky2: { value: SKY_ENV_COLORS[ENVIRONMENTS.MEADOW] },
+                        uPercentage: { value: 0. },
+                        uEnvInfluence: { value: 1. },
+                        uEnvPercentage: { value: 0. },
+                        uSkyInfluence: { value: 0.2 }
             },
             morphTargets: true
         })
@@ -77,12 +83,9 @@ export default class MapHeighter {
         }
 
         this.skyManager.emitter.addEventListener('changeSky', () => {
-            console.log('change');
-            console.log(this.skyManager.skyMaterial.uniforms.uFirstColorBottom);
-            
-            this.blendMaterial.uniforms.uFirstColorBottom.value = this.skyManager.skyMaterial.uniforms.uFirstColorTop.value
-            this.blendMaterial.uniforms.uSecondColorBottom.value = this.skyManager.skyMaterial.uniforms.uSecondColorTop.value
             this.blendMaterial.uniforms.uPercentage.value = this.skyManager.skyMaterial.uniforms.uPercentage.value
+            this.blendMaterial.uniforms.uEnvInfluence.value = this.skyManager.skyMaterial.uniforms.uEnvInfluence.value
+            this.blendMaterial.uniforms.uEnvPercentage.value = this.skyManager.skyMaterial.uniforms.uEnvPercentage.value
         })
 
         this.time.on('tick', () => {
