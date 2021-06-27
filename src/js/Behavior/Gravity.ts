@@ -41,7 +41,7 @@ export default class Gravity {
             if (gObject.raycaster.intersectObject(this.ground, true).length && gObject.raycaster.intersectObject(this.ground, true)[0].distance > 0) {
                 const {distance} = gObject.raycaster.intersectObject(this.ground, true)[0]
 
-                if (distance > 0.75) { // fall
+                if (distance > 1.1) { // fall
                     gObject.object.movableObject.position.y -= 0.25
                     this.updatePositions(gObject)
                 } // else, idle
