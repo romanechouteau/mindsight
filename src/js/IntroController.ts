@@ -99,6 +99,7 @@ export default class IntroController {
     }
 
     mouseDown() {
+        // @ts-ignore
         if (!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target))) {
             this.pointerCursor.startHold(this.initXp.bind(this))
         }
