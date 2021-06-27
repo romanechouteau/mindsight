@@ -109,13 +109,16 @@ class SoundManager {
 
         setTimeout(() => {
             // @ts-ignore
-            const folder = App.debug.addFolder('sound volumes')
-            folder.add(this.sounds.Musique_Ambiante, 'volume').name('music volume')
-            folder.add(this.sounds.vagues_plage, 'volume').name('vagues volume')
-            folder.add(this.sounds.Vent_Herbes, 'volume').name('vent volume')
-            folder.add(voiceParams, 'volume').name('voice volume').onChange(val => {
-                this.changeVoiceVolume(val)
-            })
+            if (App.debug) {
+                // @ts-ignore
+                const folder = App.debug.addFolder('sound volumes')
+                folder.add(this.sounds.Musique_Ambiante, 'volume').name('music volume')
+                folder.add(this.sounds.vagues_plage, 'volume').name('vagues volume')
+                folder.add(this.sounds.Vent_Herbes, 'volume').name('vent volume')
+                folder.add(voiceParams, 'volume').name('voice volume').onChange(val => {
+                    this.changeVoiceVolume(val)
+                })
+            }
         }, 50);
     }
 
