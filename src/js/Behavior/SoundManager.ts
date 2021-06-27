@@ -32,7 +32,7 @@ import eyetracking_02 from '../../audio/eyetracking_02.mp3'
 // @ts-ignore
 import eyetracking_03 from '../../audio/eyetracking_03.mp3'
 // @ts-ignore
-import Musique_Ambiante from '../../audio/Musique_Ambiante.mp3'
+import Musique_Ambiante from '../../audio/Musique_AmbianteSmallSmall.mp3'
 // @ts-ignore
 import vagues_plage from '../../audio/vagues_plage.mp3'
 // @ts-ignore
