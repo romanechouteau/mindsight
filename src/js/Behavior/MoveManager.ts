@@ -116,7 +116,8 @@ export default class MoveManager extends Component {
             setTimeout(this.setMoveCursor.bind(this), 50)
         })()
 
-        this.euler = this.camera.camera.rotation
+        this.euler = new Euler(0, 0, 0, 'YXZ')
+        this.euler.setFromQuaternion(this.camera.camera.quaternion)
         this.isLooking = false
         this.isMoving = false
 
