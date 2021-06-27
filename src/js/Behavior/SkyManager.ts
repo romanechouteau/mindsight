@@ -18,6 +18,7 @@ export default class SkyCreator {
     skyMaterial: ShaderMaterial
     sky: Mesh
     debug: dat.GUI
+    emitter: EventTarget
     constructor(options: { scene: Object3D, globalScene: Scene, time: Time, debug?: dat.GUI }) {
         const { scene, globalScene, time, debug } = options
 
@@ -25,6 +26,7 @@ export default class SkyCreator {
         this.debug = debug
         this.scene = scene
         this.globalScene = globalScene
+        this.emitter = new EventTarget()
         this.handleChange = this.handleChange.bind(this)
 
         this.init()
@@ -51,18 +53,19 @@ export default class SkyCreator {
 
         // add sky colors to debug
         if (this.debug) {
-            this.debug.addColor(SKY_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
-            this.debug.addColor(SKY_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
-            this.debug.addColor(SKY_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
-            this.debug.addColor(SKY_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
-            this.debug.addColor(SKY_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
-            this.debug.addColor(SKY_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
-            this.debug.addColor(SKY_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
-            this.debug.addColor(SKY_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
-            this.debug.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
-            this.debug.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
-            this.debug.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
-            this.debug.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
+            const folder = this.debug.addFolder('sky colors')
+            folder.addColor(SKY_COLORS[MOODS.JOY], '0').name('sky color - joy (top)')
+            folder.addColor(SKY_COLORS[MOODS.JOY], '1').name('sky color - joy (bottom)')
+            folder.addColor(SKY_COLORS[MOODS.FEAR], '0').name('sky color - fear (top)')
+            folder.addColor(SKY_COLORS[MOODS.FEAR], '1').name('sky color - fear (bottom)')
+            folder.addColor(SKY_COLORS[MOODS.SADNESS], '0').name('sky color - SADNESS (top)')
+            folder.addColor(SKY_COLORS[MOODS.SADNESS], '1').name('sky color - SADNESS (bottom)')
+            folder.addColor(SKY_COLORS[MOODS.ANGER], '0').name('sky color - ANGER (top)')
+            folder.addColor(SKY_COLORS[MOODS.ANGER], '1').name('sky color - ANGER (bottom)')
+            folder.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '0').name('sky color - BEACH (top)')
+            folder.addColor(SKY_COLORS[ENVIRONMENTS.BEACH], '1').name('sky color - BEACH (bottom)')
+            folder.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '0').name('sky color - MEADOW (top)')
+            folder.addColor(SKY_COLORS[ENVIRONMENTS.MEADOW], '1').name('sky color - MEADOW (bottom)')
         }
 
         // set fog to default color
@@ -83,6 +86,7 @@ export default class SkyCreator {
         this.changeGradient(firstColors, secondColors)
         this.setNewColors(percentage)
         this.setFog(firstColors, secondColors, percentage)
+        this.emitter.dispatchEvent(new Event('changeSky'))
     }
 
     handleEnvChange(value) {

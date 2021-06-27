@@ -11,11 +11,14 @@ import Time from '@tools/Time'
 import blendingVertex from '../../../../shaders/blendingVert.glsl'
 // @ts-ignore
 import blendingFragment from '../../../../shaders/blendingFrag.glsl'
+import SkyManager from '../../../Behavior/SkyManager'
 
 interface MapHeighterParams {
     ground: Mesh
     time: Time
     envIndex: string
+    skyManager: SkyManager
+    debug: dat.GUI
 }
 
 export default class MapHeighter {
@@ -24,10 +27,14 @@ export default class MapHeighter {
     blendingCanvas: HTMLCanvasElement
     blendMaterial: ShaderMaterial
     envIndex: string
-    constructor({ ground, time, envIndex }: MapHeighterParams) {
+    skyManager: SkyManager
+    debug: dat.GUI
+    constructor({ ground, time, envIndex, skyManager, debug }: MapHeighterParams) {
         this.ground = ground
         this.time = time
         this.envIndex = envIndex
+        this.skyManager = skyManager
+        this.debug = debug
         this.handleChange = this.handleChange.bind(this)
         this.applyChange = this.applyChange.bind(this)
         this.init()
@@ -43,6 +50,7 @@ export default class MapHeighter {
         blendingRenderer.setSize(500, 500)
         const geometry = new PlaneBufferGeometry(2, 2, 1, 1)
         const textures = await Promise.all(src.map( _src => (textureLoader.loadAsync(_src))))
+        
         this.blendMaterial = new ShaderMaterial({
             vertexShader: blendingVertex,
             fragmentShader: blendingFragment,
@@ -52,10 +60,28 @@ export default class MapHeighter {
                 map2: { type: "t", value: textures[1] } as IUniform,
                 map3: { type: "t", value: textures[2] } as IUniform,
                 map4: { type: "t", value: textures[3] } as IUniform,
+                uFirstColorBottom: { value: this.skyManager.skyMaterial.uniforms.uFirstColorTop.value },
+                uSecondColorBottom: { value: this.skyManager.skyMaterial.uniforms.uSecondColorTop.value },
+                uPercentage: { value: this.skyManager.skyMaterial.uniforms.uPercentage.value },
+                uSkyInfluence: { value: 0.2 }
             },
             morphTargets: true
         })
         blendingScene.add( new Mesh( geometry, this.blendMaterial ) )
+
+        if (this.debug) {
+            const folder = this.debug.addFolder('map')
+            folder.add(this.blendMaterial.uniforms.uSkyInfluence, 'value')
+        }
+
+        this.skyManager.emitter.addEventListener('changeSky', () => {
+            console.log('change');
+            console.log(this.skyManager.skyMaterial.uniforms.uFirstColorBottom);
+            
+            this.blendMaterial.uniforms.uFirstColorBottom.value = this.skyManager.skyMaterial.uniforms.uFirstColorTop.value
+            this.blendMaterial.uniforms.uSecondColorBottom.value = this.skyManager.skyMaterial.uniforms.uSecondColorTop.value
+            this.blendMaterial.uniforms.uPercentage.value = this.skyManager.skyMaterial.uniforms.uPercentage.value
+        })
 
         this.time.on('tick', () => {
             blendingRenderer.render(blendingScene, blendingCamera)
