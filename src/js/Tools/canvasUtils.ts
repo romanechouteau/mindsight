@@ -16,11 +16,11 @@ export const waveBaseConfig = {
     steps: 200,
     opacity: 1,
     waveLength: 50,
-    speed: 250,
+    speed: 1500,
     offset: 0,
-    height: 50,
-    widthReductor: 3,
-    inflexionPoint: 0.5
+    height: 200,
+    widthReductor: 1.2,
+    inflexionPoint: 0
 }
 
 // draw intro animation waves

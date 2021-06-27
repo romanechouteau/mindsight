@@ -40,20 +40,20 @@ export default class IntroController {
         this.createHtml()
         this.waveHeight = 200
         this.fullLineConfigs = [
-            { ...waveBaseConfig, offset: 2, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 },
-            { ...waveBaseConfig, offset: 3, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 },
-            { ...waveBaseConfig, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400 }
+            { ...waveBaseConfig, steps: 170, waveLength: 40, speed: 2900, offset: 2, height: 400, widthReductor: 0, inflexionPoint: 0.7 },
+            { ...waveBaseConfig, steps: 250, speed: 2410, offset: 3, height: 250, widthReductor: 0, inflexionPoint: 0.8 },
+            { ...waveBaseConfig, steps: 150, waveLength: 60, speed: 3600, height: 500, widthReductor: 0, inflexionPoint: 0.5 }
         ]
 
         this.leftLineConfigs = [
-            { ...waveBaseConfig, offset: 5, widthReductor: 2, height: this.waveHeight, speed: 490, steps: 400, inflexionPoint: 0 },
-            { ...waveBaseConfig, offset: 2, widthReductor: 1.9, height: this.waveHeight, speed: 540, steps: 400 , inflexionPoint: 0},
-            { ...waveBaseConfig, widthReductor: 2.3, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 0 }
+            { ...waveBaseConfig, offset: 2 },
+            { ...waveBaseConfig, speed: 1300, offset: 1, height: 230, widthReductor: 1.4, inflexionPoint: 0.06 },
+            { ...waveBaseConfig, speed: 1900, offset: -1, height: 240, widthReductor: 1.3 }
         ]
         this.rightLineConfigs = [
-            { ...waveBaseConfig, offset: 3, widthReductor: 1.8, height: this.waveHeight, speed: 450, steps: 400, inflexionPoint: 1 },
-            { ...waveBaseConfig, offset: 4, widthReductor: 2, height: this.waveHeight, speed: 500, steps: 400, inflexionPoint: 1 },
-            { ...waveBaseConfig, widthReductor: 2.2, height: this.waveHeight, speed: 550, steps: 400, inflexionPoint: 1 }
+            { ...waveBaseConfig, offset: 5, inflexionPoint: 1 },
+            { ...waveBaseConfig, speed: 1300, offset: 1, height: 230, widthReductor: 1, inflexionPoint: 1.06 },
+            { ...waveBaseConfig, speed: 1900, offset: 3, height: 240, widthReductor: 1.2, inflexionPoint: 0.9 }
         ]
 
         this.configKeys = Object.keys(this.fullLineConfigs[0])
@@ -79,8 +79,8 @@ export default class IntroController {
         if (this.debug) {
             const wavesFolder = this.debug.addFolder('intro wavesets')
             ;[
-                {conf: this.fullLineConfigs, worker: this.fullWorker}, 
-                {conf: this.leftLineConfigs, worker: this.leftWorker}, 
+                {conf: this.fullLineConfigs, worker: this.fullWorker},
+                {conf: this.leftLineConfigs, worker: this.leftWorker},
                 {conf: this.rightLineConfigs, worker: this.rightWorker}
             ].forEach((configs, wasetId) => {
                 const subfolder = wavesFolder.addFolder(`waveset ${wasetId}`)
