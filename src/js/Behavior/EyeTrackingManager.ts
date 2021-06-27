@@ -184,12 +184,14 @@ export default class EyeTrackingManager extends Component {
             elem.addEventListener('click', () => {
                 this.pointsClicks[index] += 1
 
-                return this.animatePoint(elem, this.pointsClicks[index] >= 3)
+                return this.animatePoint(elem, index, this.pointsClicks[index] >= 3)
             })
         })
     }
 
-    animatePoint(elem, hide?) {
+    animatePoint(elem, index, hide?) {
+        SoundManager.stop(`eyetracking_0${this.pointsClicks[index]}`)
+        SoundManager.play(`eyetracking_0${this.pointsClicks[index]}`)
         const circle = hide ? elem.querySelector('.pointCircleOuter') : elem.querySelector('.pointCircleOuter').cloneNode()
         if (!hide) {
             elem.appendChild(circle)
