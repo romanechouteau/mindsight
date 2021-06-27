@@ -119,6 +119,13 @@ class SoundManager {
         }, 50);
     }
 
+    stopAllVoices() {
+        const voices = Object.values(this.sounds)
+        for (let i = 0; i < 12; i++) {
+            voices[i].pause()
+        }
+    }
+
     playMusic() {
         this.sounds.Musique_Ambiante.play()
     }
@@ -131,6 +138,7 @@ class SoundManager {
     }
 
     playVoice(id: number, timeout?: number) {
+        this.stopAllVoices()
         this.state.currentIndex = id
         return this.play('voice'+id, timeout)
     }

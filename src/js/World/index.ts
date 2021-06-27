@@ -84,9 +84,8 @@ export default class World extends Component {
     this.setLoader()
   }
   init() {
-    this.setAmbientLight()
-    this.setPointLight()
-    this.setSceneManager()
+    // this.setAmbientLight()
+    // this.setPointLight()
     this.setFog()
     this.render()
   }
@@ -202,6 +201,9 @@ export default class World extends Component {
   }
 
   render() {
+    if (store.state.begin && this.sceneManager === undefined) {
+      this.setSceneManager()
+    }
     if (store.state.scene === SCENES.EYETRACKING && this.eyeTrackingManager === undefined) {
       this.eyeTrackingManager = null // prevent from being undefined
       setTimeout(() => {

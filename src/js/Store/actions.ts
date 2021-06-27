@@ -7,6 +7,9 @@ export default {
     skipIntro(context) {
         context.commit('skipIntro')
     },
+    beginXp(context) {
+        context.commit('beginXp')
+    },
     updateBrushParams(context, payload) {
         context.commit('updateBrushParams', payload)
     },

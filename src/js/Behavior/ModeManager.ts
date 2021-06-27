@@ -94,6 +94,7 @@ export default class ModeManager extends Component {
             return store.dispatch('chooseCursor', CURSOR_MODES.BRUSH)
         }
         if ((key === 'Digit9' || key === 57) && this.isAudioScene) {
+            store.dispatch('setSpotifyAudioData', {...store.state.spotifyAudioData});
             return store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
         }
         if ((key === 'Digit0' || key === 48) && this.isAudioScene) {
@@ -108,6 +109,7 @@ export default class ModeManager extends Component {
 
     handleClickAudio (elem) {
         const mode = elem.getAttribute('data-mode') || AUDIO_INPUT_MODES.NONE
+        if (mode === AUDIO_INPUT_MODES.SPOTIFY) store.dispatch('setSpotifyAudioData', {...store.state.spotifyAudioData})
         store.dispatch('chooseAudio', mode)
     }
 

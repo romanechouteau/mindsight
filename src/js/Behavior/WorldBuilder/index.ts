@@ -147,7 +147,7 @@ export default class WorldBuilder extends Component {
         // Worldbuilder ground step
         } else if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.GROUND && this.mapHeighter === undefined) {
             // @ts-ignore
-            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time, envIndex: this.envName })
+            this.mapHeighter = new MapHeighter({ ground: this.ground, time: this.time, envIndex: this.envName, skyManager: this.skyManager, debug: this.debug })
             this.onChange = this.mapHeighter.handleChange
         }
     }

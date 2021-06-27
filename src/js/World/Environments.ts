@@ -1,4 +1,4 @@
-import { Object3D, Mesh, DoubleSide, MeshBasicMaterial, Vector3 } from 'three'
+import { Object3D, Mesh, DoubleSide, MeshBasicMaterial, Vector3 , Color} from 'three'
 
 import gsap from 'gsap/all'
 import { debounce } from 'lodash'
@@ -12,7 +12,7 @@ import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_COLORS, MOODS } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
@@ -25,6 +25,7 @@ import plaineMeadowTexture from '../../images/textures/meadow/PlaineSurface_Colo
 import { textureLoader } from '../Tools/utils'
 import SoundManager from '../Behavior/SoundManager'
 import SkyManager from '../Behavior/SkyManager'
+import { mix, toHexInt, toRGB } from '../Tools/colorUtils'
 
 const loader = new GLTFLoader()
 
@@ -94,6 +95,11 @@ export default class Environments {
         dock = this.setDock(ground, this.environments[i].scale)
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineBeachTexture),
+          color: toHexInt(mix(
+            toRGB(SKY_COLORS[MOODS.JOY][0]),
+            toRGB(0xFFFFFF),
+            0.8,
+          )),
           morphTargets: true
         })
       } else {
@@ -101,6 +107,11 @@ export default class Environments {
         dock = new Object3D()
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineMeadowTexture),
+          color: new Color(toHexInt(mix(
+            toRGB(SKY_COLORS[MOODS.FEAR][0]),
+            toRGB(0xFFFFFF),
+            0.8,
+          ))),
           morphTargets: true
         })
       }

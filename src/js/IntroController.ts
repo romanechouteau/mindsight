@@ -10,6 +10,10 @@ import lottie from 'lottie-web'
 // @ts-ignore
 import logoAnimation from '../images/MindSight_LogoAnimation.json'
 import SoundManager from './Behavior/SoundManager'
+import PointerCursor from './Tools/PointerCursor'
+
+// @ts-ignore
+import store from '@store/index'
 
 export default class IntroController {
     time: Time
@@ -28,8 +32,9 @@ export default class IntroController {
     rightWorker: Worker
     leftWorker: Worker
     configKeys: string[]
+    pointerCursor: PointerCursor
 
-    constructor({ time, debug }) {
+    constructor({ time, pointerCursor, debug }) {
         this.time = time
         this.debug = debug
         this.createHtml()
@@ -69,6 +74,8 @@ export default class IntroController {
             linesMoveAfterDisassemble: 1000
         }
 
+        this.pointerCursor = pointerCursor
+
         if (this.debug) {
             const wavesFolder = this.debug.addFolder('intro wavesets')
             ;[
@@ -87,8 +94,23 @@ export default class IntroController {
         }
 
         this.addWave(this.fullWorker, 'tick.introFullCanvas', this.fullLineConfigs)
+        this.mouseDown = this.mouseDown.bind(this)
+        document.addEventListener('mousedown', this.mouseDown)
+    }
+
+    mouseDown() {
+        if (!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target))) {
+            this.pointerCursor.startHold(this.initXp.bind(this))
+        }
+    }
+    
+    initXp() {
+        SoundManager.playMusic()
+        store.dispatch('beginXp')
         this.initTicker()
         this.initLogoAnimation()
+        document.removeEventListener('mousedown', this.mouseDown)
+        this.pointerCursor.stopHold()
     }
 
     initLogoAnimation() {
@@ -273,9 +295,7 @@ export default class IntroController {
             },
             () => {
                 this.showHeadphoneAdvice()
-                setTimeout(() => {
-                    SoundManager.playVoice(1).then(() => SoundManager.playVoice(2))
-                }, 1500);
+                SoundManager.playVoice(1, 1500).then(() => SoundManager.playVoice(2))
             },
             () => {
                 this.hideHeadphone()
