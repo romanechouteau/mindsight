@@ -174,9 +174,8 @@ export default class WorldBuilder extends Component {
     }
 
     stop () {
-        document.querySelector('#worldBuilder').innerHTML = ''
-
         this.render = () => {}
+        document.querySelector('#worldBuilder').remove()
         this.stopped = true
 
         this.controller.removeEventListener('mouseenter', this.mouseEnter)
