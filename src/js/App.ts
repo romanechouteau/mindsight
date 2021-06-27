@@ -1,4 +1,4 @@
-import { Scene, sRGBEncoding, Vector2, WebGLRenderer, ShaderMaterial, Layers, WebGLRenderTarget, Mesh, BoxBufferGeometry, MeshBasicMaterial } from 'three'
+import { Scene, sRGBEncoding, CubeRefractionMapping, Vector2, WebGLRenderer, ShaderMaterial, Layers, WebGLRenderTarget, WebGLCubeRenderTarget, LinearMipmapLinearFilter, Mesh, BoxBufferGeometry, MeshBasicMaterial, CubeCamera, RGBFormat } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -53,6 +53,8 @@ export default class App extends Component {
   selectiveBloomPass: UnrealBloomPass
   selectiveBloomComposer: EffectComposer
   renderTarget: WebGLRenderTarget
+  cubeRenderTarget: WebGLCubeRenderTarget
+  cubeCamera: CubeCamera
   translucentObjects: Mesh[]
   constructor(options) {
     super({
@@ -94,6 +96,20 @@ export default class App extends Component {
 
     // render target for further effects
     this.renderTarget = new WebGLRenderTarget(512, 512)
+    this.cubeRenderTarget = new WebGLCubeRenderTarget(
+      1024,
+      {
+        format: RGBFormat,
+        generateMipmaps: true,
+        minFilter: LinearMipmapLinearFilter
+      }
+    )
+    this.cubeCamera = new CubeCamera(
+      1,
+      100,
+      this.cubeRenderTarget
+    );
+    this.cubeRenderTarget.texture.mapping = CubeRefractionMapping
 
     // Set renderer
     this.renderer = new WebGLRenderer({
@@ -139,6 +155,16 @@ export default class App extends Component {
         stats.end()
       }
     })
+
+    const updateCubeCamera =() => {
+      setTimeout(() => {
+        this.translucentObjects.forEach(obj => obj.visible = false)
+        this.cubeCamera.update(this.renderer, this.scene)
+        this.translucentObjects.forEach(obj => obj.visible = true)
+        requestAnimationFrame(updateCubeCamera)
+      }, 1000 / 12)
+    }
+    // updateCubeCamera()
 
     if (this.debug) {
       this.renderOnBlur = { activated: true }

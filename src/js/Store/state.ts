@@ -17,7 +17,8 @@ export default {
         step: WORLDBUILDER_STEPS.GROUND
     },
     environment: 0,
-    isIntro: true,
+    isIntro: false,
+    begin: true,
     cursorMode: CURSOR_MODES.DEFAULT,
     worldMorphTargetInfluences: [0, 0, 0],
     word: ''

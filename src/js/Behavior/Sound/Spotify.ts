@@ -76,6 +76,25 @@ export default class SpotifyManager {
             player.connect().then(success => {
                 if (success) console.log('The Web Playback SDK successfully connected to Spotify!');
             })
+            // setInterval(async () => {
+                // if (player && success) return
+                // const token = await this.getToken()
+                // player = new Spotify.Player({
+                //     name: 'Web Playback SDK Quick Start Player',
+                //     getOAuthToken: cb => { console.log('token youpi');
+                //     ; cb(token); }
+                // });
+                // console.log(player);
+                
+                // this.setListeners(player);
+                // // Connect to the player!
+                // player.connect().then(_success => {
+                //     if (_success) {
+                //         success = true
+                //         console.log('The Web Playback SDK successfully connected to Spotify!')
+                //     }
+                // })
+            // }, 4000)
         };
     }
 

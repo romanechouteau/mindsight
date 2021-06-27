@@ -1,13 +1,11 @@
-// attribute vec3 position;
-// attribute vec2 uv;
-// attribute vec3 normal;
+attribute vec3 position;
+attribute vec2 uv;
+attribute vec3 normal;
 
-// uniform mat4 projectionMatrix;
-// uniform mat4 viewMatrix;
-// uniform mat4 modelMatrix;
-// uniform vec3 cameraPosition;
-#include <morphtarget_pars_vertex>
-
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec3 cameraPosition;
 
 varying vec3 vPosition;
 varying vec2 vUv;
@@ -15,8 +13,6 @@ varying vec3 vNormal;
 varying float vEdge;
 
 void main(void) {
-   #include <begin_vertex>
-   #include <morphtarget_vertex>
   // coordinate transformation
   vec4 mPosition = modelMatrix * vec4(position, 1.0);
   float angleToCamera = acos(dot(normalize(cameraPosition), (modelMatrix * vec4(normal, 1.0)).xyz));
