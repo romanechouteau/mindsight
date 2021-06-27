@@ -11,5 +11,7 @@ void main() {
    vUv.y = 1. - vUv.y; 
    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed.xyz, 1.);
 
+   vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+   vec4 mvPosition = viewMatrix * modelPosition;
    #include <fog_vertex>
 }
