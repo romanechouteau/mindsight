@@ -84,8 +84,8 @@ export default class World extends Component {
     this.setLoader()
   }
   init() {
-    this.setAmbientLight()
-    this.setPointLight()
+    // this.setAmbientLight()
+    // this.setPointLight()
     this.setFog()
     this.render()
   }

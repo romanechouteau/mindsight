@@ -1,4 +1,6 @@
 import { Object3D, PointLight, Color, DirectionalLight } from 'three'
+import SkyManager from '../Behavior/SkyManager'
+import { mix, toHexInt, toRGB } from '../Tools/colorUtils'
 
 export default class PointLightSource {
   debug: any
@@ -6,15 +8,17 @@ export default class PointLightSource {
   params: { color: number; positionX: number; positionY: number; positionZ: number }
   light: PointLight
   debugFolder: any
+  sky: SkyManager
   constructor(options) {
     // Set options
     this.debug = options.debug
+    this.sky = options.sky
 
     // Set up
     this.container = new Object3D()
     this.container.name = 'Point Light'
     this.params = {
-      color: 0xffffff,
+      color: 0xFFD160,
       positionX: 0,
       positionY: 30,
       positionZ: 5,
@@ -27,7 +31,7 @@ export default class PointLightSource {
     }
   }
   createPointLight() {
-    this.light = new PointLight(this.params.color)
+    this.light = new PointLight(this.params.color, 0.05)
     this.light.castShadow = true
     this.light.position.set(
       this.params.positionX,
@@ -35,6 +39,14 @@ export default class PointLightSource {
       this.params.positionZ
     )
     this.container.add(this.light)
+  }
+  setSky(sky: SkyManager) {
+    this.sky = sky
+    this.light.color = new Color(toHexInt(mix(
+      toRGB(this.sky.skyMaterial.uniforms.uFirstColorTop.value),
+      toRGB(0xFFFFFF),
+      0.9,
+    )))  
   }
   setDebug() {
     // Color debug

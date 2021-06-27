@@ -24,7 +24,8 @@ void main() {
     vec3 skyColor1 = toRGB(uFirstColorBottom);
     vec3 skyColor2 = toRGB(uSecondColorBottom);
     vec3 skyColorMixed = mix(skyColor1, skyColor2, uPercentage);
-    vec3 skyColorSmooth = mix(skyColorMixed, vec3(0., 0., 0.), 1. - uSkyInfluence);
+    // vec3 skyColorSmooth = mix(skyColorMixed, vec3(0., 0., 0.), 1. - uSkyInfluence);
+    vec3 skyColorSmooth2 = mix(skyColorMixed, vec3(1., 1., 1.), 1. - uSkyInfluence);
 
     vec3 color = (
         texture2D(map1, vUv).xyz * values.x + 
@@ -33,8 +34,8 @@ void main() {
         texture2D(map4, vUv).xyz * values.w
     );
 
-    vec3 colorSmooth = mix(color, vec3(0., 0., 0.), uSkyInfluence);
-    vec3 final = colorSmooth + skyColorSmooth;
+    // vec3 colorSmooth = mix(color, vec3(0., 0., 0.), uSkyInfluence);
+    vec3 final = color * skyColorSmooth2;
 
     // vec3 final = mix(color, skyColorFinal, 0.2);
     gl_FragColor = vec4(final, 1.);
