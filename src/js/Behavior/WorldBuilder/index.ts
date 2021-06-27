@@ -128,7 +128,7 @@ export default class WorldBuilder extends Component {
             let y = 0
             // const smoother = x > (sineLimits[1] - config.width/2 ) ? sineLimits[1] - x - sineLimits[0] : x - sineLimits[0]
             if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
-                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
+                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * Math.exp( inflexionPointDistance * config.widthReductor)), 0)
             ctx.lineTo( x/config.steps * width, y * config.height )
         }
         ctx.stroke()

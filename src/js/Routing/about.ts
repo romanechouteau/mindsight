@@ -4,7 +4,7 @@ export default function initAbout() {
     const canvas = (document.querySelector('.about canvas#lines') as HTMLCanvasElement)
     const ctx = canvas.getContext('2d')
     const {width, height} = canvas
-    const config = {...waveBaseConfig, speed: 800, height: 100, opacity: 0.3}
+    const config = {...waveBaseConfig, speed: 800, height: 100, opacity: 0.3, widthReductor: 1}
     const config2 = {...waveBaseConfig,
         steps: 200,
         opacity: 0.2,
@@ -12,7 +12,7 @@ export default function initAbout() {
         speed: 650,
         offset: 10,
         height: 100,
-        widthReductor: 3,
+        widthReductor: 1,
         inflexionPoint: 0.5}
     let start = Date.now()
     let elapsed = 0
