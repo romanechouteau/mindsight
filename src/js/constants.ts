@@ -226,3 +226,10 @@ export const INTRO_TIMEOUTS = {
 }
 
 export const SUMUP_PARTICLES_COUNT = 1000
+
+export const SOUND_VOLUMES = {
+    music: 0.05,
+    voice: 0.5,
+    beach: 0.5,
+    meadow: 0.15
+}
