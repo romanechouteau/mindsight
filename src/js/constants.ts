@@ -4,7 +4,7 @@ export const MAX_DISTANCE = 20
 
 export const ZONES_LIMITS = [MAX_DISTANCE, MAX_DISTANCE/2, MAX_DISTANCE/4]
 
-export const ENV_DISTANCE = 45
+export const ENV_DISTANCE = 36
 
 export enum MOODS {
     JOY = "joy",
@@ -19,6 +19,13 @@ export const MOOD_NAMES = {
     [MOODS.SADNESS]: 'chagrin',
     [MOODS.ANGER]: 'rage',
 }
+
+export const MOODS_SUMUP_ORDER = [
+    MOODS.FEAR,
+    MOODS.JOY,
+    MOODS.SADNESS,
+    MOODS.ANGER
+]
 
 export const moodPositions = {
     [MOODS.JOY]: new Vector3(0, 0, MAX_DISTANCE),
@@ -94,13 +101,16 @@ export enum ENVIRONMENTS {
 
 export const LIST_ENVIRONMENTS = Object.values(ENVIRONMENTS)
 
-export const SKY_COLORS = {
-    [MOODS.JOY]: [0xFFD160, 0xFFF7DC],
+export const SKY_ENV_COLORS = {
+    [ENVIRONMENTS.BEACH]: [0xF9D593, 0xF9F2E1],
+    [ENVIRONMENTS.MEADOW]: [0xA8EEFF, 0xF5FEFF]
+}
+
+export const SKY_MOODS_COLORS = {
+    [MOODS.JOY]: [0xE2BE3E, 0xFCF7DC],
     [MOODS.FEAR]: [0x0A1012, 0x343434],
     [MOODS.SADNESS]: [0x596E72, 0xC6C6C7],
-    [MOODS.ANGER]: [0x621E19, 0xFFC4BF],
-    [ENVIRONMENTS.BEACH]: [0xFFD160, 0xFFF7DC],
-    [ENVIRONMENTS.MEADOW]: [0x0A1012, 0x343434],
+    [MOODS.ANGER]: [0x621E19, 0xFFC4BF]
 }
 
 export const GRASS_COLOR = {
@@ -120,7 +130,7 @@ export const GROUND_SCALE = 0.1
 
 export const ENVIRONMENTS_BORDERS_MARGIN = 7
 
-export const START_FOG_FAR = 30
+export const START_FOG_FAR = 25
 
 export const DEFAULT_FOG_FAR = 50
 
@@ -217,6 +227,30 @@ export const INTRO_TIMEOUTS = {
     linesGoesAway: 5000,
     linesMoveAfterDisassemble: 1000
 }
+
+export const SUMUP_PARTICLES_COUNT = 1000
+
+export const BLOOM_THRESHOLD = 0.45
+
+export const BLOOM_STRENGTH = 0.11
+
+export const BLOOM_RADIUS = 0.9
+
+export const SELECTIVE_BLOOM_THRESHOLD = 0
+
+export const SELECTIVE_BLOOM_STRENGTH = 1.5
+
+export const SELECTIVE_BLOOM_RADIUS = 1
+
+export const WATER_ALPHA = 0.5
+
+export const WATER_SIZE = 5.8
+
+export const WATER_SCALE = 10
+
+export const WATER_COLOR = 0xF9EEE2
+
+export const WATER_SUN_COLOR = 0xFFFFFF
 
 export const SOUND_VOLUMES = {
     music: 0.05,

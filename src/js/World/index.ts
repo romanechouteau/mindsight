@@ -21,7 +21,7 @@ import PointLightSource from './PointLight'
 import AmbientLightSource from './AmbientLight'
 import WorldBuilder from "../Behavior/WorldBuilder"
 import EyeTrackingManager from '../Behavior/EyeTrackingManager'
-import { SCENES, START_FOG_FAR } from '../constants'
+import { CURSOR_MODES, SCENES, START_FOG_FAR } from '../constants'
 import Gravity from '../Behavior/Gravity'
 import ModeManager from '../Behavior/ModeManager'
 import WordManager from '../Behavior/WordManager'
@@ -232,6 +232,8 @@ export default class World extends Component {
     if (store.state.scene === SCENES.PARAMETERS && this.worldBuilder === undefined) {
       this.gravity = new Gravity({ objects: [{originObject: this.camera.camera, movableObject: this.camera.container}], time: this.time, ground: this.environments.container.children[0] })
       this.setWorldBuilder()
+      setTimeout(() => store.dispatch('chooseCursor', CURSOR_MODES.MOVE), 6000)
+
       if (this.user === undefined) {
         this.setUser()
       }
@@ -264,6 +266,7 @@ export default class World extends Component {
     }
 
     if (store.state.scene === SCENES.SUMUP && this.sumupManager === undefined) {
+      this.container.clear()
       this.setSumupManager()
     }
   }

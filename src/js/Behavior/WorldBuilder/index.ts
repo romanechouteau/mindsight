@@ -9,7 +9,7 @@ import template from '../../../templates/worldBuilder.template'
 import SkyManager from '../SkyManager'
 import ShapeCreator from './ShapeCreator'
 import PointerCursor from '../../Tools/PointerCursor'
-import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR } from '../../../js/constants'
+import { WORLDBUILDER_STEPS, WORLDBUILDER_MAX_VALUE, DEFAULT_FOG_FAR, CURSOR_MODES } from '../../../js/constants'
 // @ts-ignore
 import Time from '@tools/Time'
 import { waveBaseConfig } from '../../../js/Tools/canvasUtils';
@@ -28,6 +28,7 @@ interface WorldBuilderParams {
 }
 
 export default class WorldBuilder extends Component {
+    show: Boolean
     time: Time
     scene: Object3D
     range: HTMLInputElement
@@ -48,6 +49,7 @@ export default class WorldBuilder extends Component {
         super({ store })
         this.envName = ground.container.children[0].userData.envName
         this.time = time
+        this.show = false
         this.scene = scene
         this.ground = ground.container.children[0].children[0]
         this.debug = debug
@@ -69,7 +71,13 @@ export default class WorldBuilder extends Component {
         this.createHtmlControls()
         this.render()
 
-        SoundManager.playVoice(6)
+        SoundManager.state.worldBuilderExplanationPromise = SoundManager.playVoice(6)
+        SoundManager.state.worldBuilderExplanationPromise.then(() => {
+            setTimeout(() => {
+                SoundManager.state.worldBuilderExplanationComplete = true
+                store.dispatch('chooseCursor', CURSOR_MODES.DEFAULT), 500
+            })
+        })
     }
 
     createHtmlControls() {
@@ -137,6 +145,16 @@ export default class WorldBuilder extends Component {
     }
 
     render = () => {
+        // hide or show params
+        const element = document.querySelector('#worldBuilder')
+        if (element && store.state.cursorMode === CURSOR_MODES.DEFAULT && this.show === false && SoundManager.state.worldBuilderExplanationComplete === true) {
+            element.classList.remove('hidden')
+            this.show = true
+        } else if (element && store.state.cursorMode !== CURSOR_MODES.DEFAULT && this.show === true) {
+            element.classList.add('hidden')
+            this.show = false
+        }
+
         // Worldbuilder shape step
         if (store.state.worldBuilder.step === WORLDBUILDER_STEPS.SHAPE && this.shapeCreator === undefined) {
             this.shapeCreator = new ShapeCreator({scene: this.scene})

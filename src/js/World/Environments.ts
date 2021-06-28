@@ -12,7 +12,7 @@ import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_COLORS, MOODS } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_ENV_COLORS, MOODS, ENVIRONMENTS } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
@@ -96,7 +96,7 @@ export default class Environments {
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineBeachTexture),
           color: toHexInt(mix(
-            toRGB(SKY_COLORS[MOODS.JOY][0]),
+            toRGB(SKY_ENV_COLORS[ENVIRONMENTS.BEACH][0]),
             toRGB(0xFFFFFF),
             0.8,
           )),
@@ -108,7 +108,7 @@ export default class Environments {
         ground.children[0].material = new MeshBasicMaterial({
           map: textureLoader.load(plaineMeadowTexture),
           color: new Color(toHexInt(mix(
-            toRGB(SKY_COLORS[MOODS.FEAR][0]),
+            toRGB(SKY_ENV_COLORS[ENVIRONMENTS.MEADOW][0]),
             toRGB(0xFFFFFF),
             0.8,
           ))),

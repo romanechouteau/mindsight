@@ -27,7 +27,10 @@ import bloomVertShader from '@shaders/bloomVert.glsl'
 // @ts-ignore
 import bloomFragShader from '@shaders/bloomFrag.glsl'
 
-import { BLOOM_LAYER, SCENES } from './constants'
+import {
+  BLOOM_LAYER, SCENES, BLOOM_THRESHOLD, BLOOM_STRENGTH, BLOOM_RADIUS, SELECTIVE_BLOOM_THRESHOLD,
+  SELECTIVE_BLOOM_STRENGTH, SELECTIVE_BLOOM_RADIUS
+} from './constants'
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -98,7 +101,7 @@ export default class App extends Component {
     this.renderer.outputEncoding = sRGBEncoding
     this.renderer.gammaFactor = 2.2
     // Set background color
-    this.renderer.setClearColor(0xFFFFFF, 1)
+    this.renderer.setClearColor(0x000000, 1.)
     // Set renderer pixel ratio & sizes
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.sizes.viewport.width, this.sizes.viewport.height)
@@ -114,12 +117,10 @@ export default class App extends Component {
       // When tab is not visible (tab is not active or window is minimized), browser stops requesting animation frames. Thus, this does not work
       // if the window is only in the background without focus (for example, if you select another window without minimizing the browser one),
       // which might cause some performance or batteries issues when testing on multiple browsers
-      if (!(this.renderOnBlur?.activated && !document.hasFocus())) {
+      if (!(this.renderOnBlur?.activated && !document.hasFocus()) && store.state.scene > SCENES.EYETRACKING && store.state.scene < SCENES.SUMUP) {
         stats.begin()
         this.scene.traverse(this.darkenNonBloomed.bind(this))
-        this.renderer.setClearColor(0x000000, 1.)
         this.selectiveBloomComposer.render()
-        this.renderer.setClearColor(0xF4C5B5, 1.)
         this.scene.traverse(this.restoreMaterial.bind(this))
         this.finalComposer.render()
         stats.end()
@@ -152,9 +153,9 @@ export default class App extends Component {
     this.selectiveBloomComposer = new EffectComposer(this.renderer)
 
     this.selectiveBloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
-    this.selectiveBloomPass.threshold = 0
-    this.selectiveBloomPass.strength = 1.5
-    this.selectiveBloomPass.radius = 0.1
+    this.selectiveBloomPass.threshold = SELECTIVE_BLOOM_THRESHOLD
+    this.selectiveBloomPass.strength = SELECTIVE_BLOOM_STRENGTH
+    this.selectiveBloomPass.radius = SELECTIVE_BLOOM_RADIUS
 
     const gammaCorrection = new ShaderPass(GammaCorrectionShader)
 
@@ -182,9 +183,9 @@ export default class App extends Component {
 
     // GLOBAL BLOOM
     this.globalBloomPass = new UnrealBloomPass(new Vector2(this.sizes.viewport.width, this.sizes.viewport.height), 1.5, 0.4, 0.85)
-    this.globalBloomPass.threshold = 0.8
-    this.globalBloomPass.strength = 0.15
-    this.globalBloomPass.radius = 1
+    this.globalBloomPass.threshold = BLOOM_THRESHOLD
+    this.globalBloomPass.strength = BLOOM_STRENGTH
+    this.globalBloomPass.radius = BLOOM_RADIUS
 
     this.finalComposer = new EffectComposer(this.renderer)
     this.finalComposer.addPass(renderScene)
