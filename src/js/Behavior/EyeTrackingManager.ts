@@ -91,6 +91,7 @@ export default class EyeTrackingManager extends Component {
         // wait before showing eye
         setTimeout(() => {
             this.element.style.opacity = '1'
+            this.element.style.filter = 'blur(0)'
         }, 5000)
 
         this.setWebGazer()

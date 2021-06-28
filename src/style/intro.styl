@@ -31,11 +31,25 @@
         svg
             filter: drop-shadow(0 0 1.25rem rgba(255,255,255,0.8)) drop-shadow(0 0 31.25rem rgba(255,255,255,0.5));
 
+    .holdText
+        z-index: 200
+        font-family: 'Lato', sans-serif
+        text-transform: uppercase
+        font-size: 1rem
+        text-align: center
+        color: white
+        filter: drop-shadow(0 0 3px white)
+        opacity: 0
+        display: none
+        transition: opacity 1s ease
+
     .headphone
         opacity: 0
-        transition: opacity 0.5s ease
+        transition: opacity 1s ease
         display: none
         z-index: 200
+        height: 3.5rem
+        filter: drop-shadow(0 0 3px white)
 
     .fade
         top: 0vh
@@ -72,7 +86,7 @@
         &:not(#full)
             opacity: 1
             width: 50vw
-            transition: width 0.5s ease, transform 6s ease, opacity 0.5s ease
+            transition: width 1s ease, transform 6s ease, opacity 1s ease
 
 #intro, .intro, #sumup
     .bg-wrapper

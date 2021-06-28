@@ -33,6 +33,9 @@ export default class IntroController {
     leftWorker: Worker
     configKeys: string[]
     pointerCursor: PointerCursor
+    holdText: HTMLElement
+    canGoNext: Boolean
+    hidden: Boolean
 
     constructor({ time, pointerCursor, debug }) {
         this.time = time
@@ -75,6 +78,7 @@ export default class IntroController {
         }
 
         this.pointerCursor = pointerCursor
+        this.hidden = false
 
         if (this.debug) {
             const wavesFolder = this.debug.addFolder('intro wavesets')
@@ -100,18 +104,23 @@ export default class IntroController {
 
     mouseDown() {
         // @ts-ignore
-        if (!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target))) {
+        if ((!document.querySelector('.dg.ac') || (document.querySelector('.dg.ac') && !document.querySelector('.dg.ac').contains(event.target)))
+            && store.state.begin === false) {
             this.pointerCursor.startHold(this.initXp.bind(this))
+        } else if (store.state.begin === true && this.canGoNext === true) {
+            this.pointerCursor.startHold(this.handleNextScene.bind(this))
         }
     }
-    
+
+    mouseUp () {
+        this.pointerCursor.stopHold()
+    }
+
     initXp() {
         SoundManager.playMusic()
         store.dispatch('beginXp')
         this.initTicker()
         this.initLogoAnimation()
-        document.removeEventListener('mousedown', this.mouseDown)
-        this.pointerCursor.stopHold()
     }
 
     initLogoAnimation() {
@@ -148,6 +157,7 @@ export default class IntroController {
         this.rightWorker.postMessage({ canvas: rightOffscreen }, [rightOffscreen])
         this.title = document.querySelector('.title')
         this.headPhoneImage = document.querySelector('.headphone')
+        this.holdText = document.querySelector('.holdText')
     }
 
     addWave(worker: Worker, evtNameSpace: string , configs: drawWaveConfig[]) {
@@ -203,9 +213,9 @@ export default class IntroController {
         this.addWave(this.leftWorker, 'tick.introLeftCanvas', this.leftLineConfigs)
         this.addWave(this.rightWorker, 'tick.introRightCanvas', this.rightLineConfigs)
         // @ts-ignore
-        this.leftCanvas.attributeStyleMap.set('width', CSS.vw(40))
+        this.leftCanvas.attributeStyleMap.set('width', CSS.vw(35))
         // @ts-ignore
-        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(40))
+        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(35))
         this.toggleLineMovement()
     }
 
@@ -225,14 +235,34 @@ export default class IntroController {
                     // @ts-ignore
                     this.headPhoneImage.attributeStyleMap.set('opacity', 1)
                 }, 500);
-            }, 2100)
+            }, 2500)
         }, 500)
     }
 
-    flyLines() {
+    showHoldText() {
+        setTimeout(() => {
+            // @ts-ignore
+            this.holdText.attributeStyleMap.set('display', 'block')
+            setTimeout(() => {
+                // @ts-ignore
+                this.holdText.attributeStyleMap.set('opacity', 1)
+            }, 500)
+        }, 1000)
+    }
+
+    hideHoldText() {
+        // @ts-ignore
+        this.holdText.attributeStyleMap.set('opacity', 0)
+        setTimeout(() => {
+            // @ts-ignore
+            this.holdText.attributeStyleMap.set('display', 'none')
+        }, 500)
+    }
+
+    flatLines() {
         ;[{conf: this.leftLineConfigs, worker: this.leftWorker}, {conf: this.rightLineConfigs, worker: this.rightWorker}].forEach(configs => {
             gsap.to(configs.conf[0], {
-                height: 1000,
+                height: 0,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
@@ -240,7 +270,7 @@ export default class IntroController {
                 }
             })
             gsap.to(configs.conf[1], {
-                height: 1000,
+                height: 0,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
@@ -248,7 +278,7 @@ export default class IntroController {
                 }
             })
             gsap.to(configs.conf[2], {
-                height: 1000,
+                height: 0,
                 ease: 'power1.inOut',
                 duration: 2,
                 onUpdate: () => {
@@ -256,13 +286,6 @@ export default class IntroController {
                 }
             })
         })
-
-        setTimeout(() => {
-            // @ts-ignore
-            this.leftCanvas.attributeStyleMap.set('opacity', 0)
-            // @ts-ignore
-            this.rightCanvas.attributeStyleMap.set('opacity', 0)
-        }, 1500)
     }
 
     assembleLines() {
@@ -272,13 +295,22 @@ export default class IntroController {
         this.rightCanvas.attributeStyleMap.set('width', CSS.vw(50.1))
     }
 
-    hideHeadphone() {
+    splitLines() {
         // @ts-ignore
-        this.headPhoneImage.attributeStyleMap.set('opacity', 0)
+        this.leftCanvas.attributeStyleMap.set('width', CSS.vw(0))
+        // @ts-ignore
+        this.rightCanvas.attributeStyleMap.set('width', CSS.vw(0))
+    }
+
+    hideHeadphone() {
         setTimeout(() => {
             // @ts-ignore
-            this.headPhoneImage.attributeStyleMap.set('display', 'none')
-        }, 500);
+            this.headPhoneImage.attributeStyleMap.set('opacity', 0)
+            setTimeout(() => {
+                // @ts-ignore
+                this.headPhoneImage.attributeStyleMap.set('display', 'none')
+            }, 500)
+        }, 4000)
     }
 
     revealLine() {
@@ -287,6 +319,21 @@ export default class IntroController {
             // @ts-ignore
             canvas.style.width = `100vw`
         }
+    }
+
+    hideLines(callback = () => {}) {
+        this.hidden = true
+        this.hideHoldText()
+        setTimeout(() => {
+            this.assembleLines()
+        }, 500)
+        setTimeout(() => {
+            this.flatLines()
+        }, 1000)
+        setTimeout(() => {
+            this.splitLines()
+            callback()
+        }, 4000)
     }
 
     async initTicker() {
@@ -300,11 +347,11 @@ export default class IntroController {
             },
             () => {
                 this.hideHeadphone()
-                this.assembleLines()
             },
             () => {
-                this.flyLines()
-            },
+                this.showHoldText()
+                this.canGoNext = true
+            }
         ], currentIndex = 0
 
         if (this.debug) {
@@ -317,6 +364,11 @@ export default class IntroController {
                 await queue(step, 5000)
             }
         }
+    }
+
+    handleNextScene() {
+        document.removeEventListener('mousedown', this.mouseDown)
+        this.hideLines(() => store.dispatch('updateScene', store.state.scene + 1))
     }
 
     dispose() {

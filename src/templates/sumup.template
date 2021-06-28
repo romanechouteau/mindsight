@@ -11,6 +11,9 @@
             <div class="mood" data-mood="{{mood3}}">{{moodName3}} {{mood3Percent}}%</div>
             <div class="mood" data-mood="{{mood4}}">{{moodName4}} {{mood4Percent}}%</div>
         </div>
+        <div class="about-link">
+            <a href="#" onclick="onNavClick('/#about'); return false;">Crédits</a>
+        </div>
     </div>
 </div>
 <svg viewBox="0 0 {{width}} {{height}}" xmlns="http://www.w3.org/2000/svg">

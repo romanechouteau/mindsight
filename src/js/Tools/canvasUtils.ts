@@ -45,7 +45,7 @@ export function drawWave(ctx: CanvasRenderingContext2D, width: number, height: n
         const inflexionPointDistance = Math.abs(ip - (x/config.steps))
         let y = 0
         if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
-            y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + elapsed/config.speed + config.offset) * Math.sin(elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
+            y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + elapsed/config.speed + config.offset) * Math.sin(elapsed/config.speed) * Math.max((1 - inflexionPointDistance * Math.exp(inflexionPointDistance * config.widthReductor)), 0)
         ctx.lineTo( x/config.steps * width, y * config.height )
     }
     ctx.stroke()

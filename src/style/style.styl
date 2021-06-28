@@ -5,6 +5,8 @@
 @require "hud.styl"
 @require "brush.styl"
 @require "sumup.styl"
+@require "router.styl"
+@require "about.styl"
 
 @font-face {
  font-family: "Displace";
@@ -24,12 +26,14 @@ body, html
         pointer-events: none
         top 0
         left: 0
+        will-change: transform
         transform: rotate(-90deg)
         transition: opacity 0.5s ease
         z-index: 10
 
         circle
             filter: drop-shadow( 0 0 3px white)
+            will-change: stroke-dashoffset
 
         &.hidden
             opacity: 0
