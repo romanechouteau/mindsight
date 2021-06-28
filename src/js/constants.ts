@@ -256,9 +256,10 @@ export const WATER_COLOR = 0xF9EEE2
 export const WATER_SUN_COLOR = 0xFFFFFF
 
 export const SOUND_VOLUMES = {
-    music: 0.05,
-    voice: 0.5,
-    beach: 0.5,
-    meadow: 0.15
+    music: 0.055,
+    voice: 0.35,
+    beach: 0.2,
+    meadow: 0.05,
+    eyetracking: 0.3
 }
 export const WATER_Y = 155

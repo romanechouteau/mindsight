@@ -103,13 +103,13 @@ class SoundManager {
         this.sounds.Musique_Ambiante.loop = true
         this.sounds.vagues_plage.loop = true
         this.sounds.Vent_Herbes.loop = true
-      
+
         this.sounds.Musique_Ambiante.volume = SOUND_VOLUMES.music
         this.sounds.vagues_plage.volume = SOUND_VOLUMES.beach
         this.sounds.Vent_Herbes.volume = SOUND_VOLUMES.meadow
-        this.sounds.eyetracking_01.volume = 0.3
-        this.sounds.eyetracking_02.volume = 0.3
-        this.sounds.eyetracking_03.volume = 0.3
+        this.sounds.eyetracking_01.volume = SOUND_VOLUMES.eyetracking
+        this.sounds.eyetracking_02.volume = SOUND_VOLUMES.eyetracking
+        this.sounds.eyetracking_03.volume = SOUND_VOLUMES.eyetracking
 
         const voiceParams = {
             volume: SOUND_VOLUMES.voice
@@ -169,9 +169,9 @@ class SoundManager {
     }
 
     fadeOut(id: string, duration = 2) {
-        gsap.to(this.sounds[id], { 
-            volume: 0, 
-            ease: 'none', 
+        gsap.to(this.sounds[id], {
+            volume: 0,
+            ease: 'none',
             duration,
             onComplete: () => this.pause(id)
         })
@@ -180,9 +180,9 @@ class SoundManager {
     fadeIn(id: string, volume = 1, duration = 2) {
         this.sounds[id].volume = 0
         this.play(id)
-        gsap.to(this.sounds[id], { 
-            volume, 
-            ease: 'none', 
+        gsap.to(this.sounds[id], {
+            volume,
+            ease: 'none',
             duration,
         })
     }
