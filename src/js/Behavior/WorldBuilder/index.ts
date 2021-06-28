@@ -45,6 +45,8 @@ export default class WorldBuilder extends Component {
     ground: Object3D
     pointerCursor: PointerCursor
     envName: string
+    handleMouseDown: EventListener
+    handleMouseUp: EventListener
     constructor({ scene, globalScene, time, debug, ground, pointerCursor, skyManager }: WorldBuilderParams) {
         super({ store })
         this.envName = ground.container.children[0].userData.envName
@@ -59,7 +61,11 @@ export default class WorldBuilder extends Component {
         this.rangeValue = { value: 0 } // init
         this.globalScene = globalScene
         this.pointerCursor = pointerCursor
+        this.handleMouseDown = this.mouseDown.bind(this)
+        this.handleMouseUp = this.mouseUp.bind(this)
+
         this.init()
+
     }
 
     init () {
@@ -90,8 +96,8 @@ export default class WorldBuilder extends Component {
         this.controller.addEventListener('mouseenter', this.mouseEnter.bind(this))
         this.controller.addEventListener('mouseleave', this.mouseLeave.bind(this))
         this.controller.addEventListener('mousemove', this.mouseMove.bind(this))
-        document.addEventListener('mousedown', this.mouseDown.bind(this))
-        document.addEventListener('mouseup', this.mouseUp.bind(this))
+        document.addEventListener('mousedown',  this.handleMouseDown)
+        document.addEventListener('mouseup',  this.handleMouseUp)
     }
 
     addWaves() {
@@ -181,8 +187,8 @@ export default class WorldBuilder extends Component {
         this.controller.removeEventListener('mouseenter', this.mouseEnter)
         this.controller.removeEventListener('mouseleave', this.mouseLeave)
         this.controller.removeEventListener('mousemove', this.mouseMove)
-        document.removeEventListener('mousedown', this.mouseDown)
-        document.removeEventListener('mouseup', this.mouseUp)
+        document.removeEventListener('mousedown',  this.handleMouseDown)
+        document.removeEventListener('mouseup',  this.handleMouseUp)
         this.pointerCursor.unsnap('y')
 
         this.time.off('tick.worldBuilder')
@@ -211,11 +217,15 @@ export default class WorldBuilder extends Component {
     }
 
     mouseDown () {
-        this.pointerCursor.startHold(this.handleNextStep)
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT) {
+            this.pointerCursor.startHold(this.handleNextStep)
+        }
     }
 
     mouseUp () {
-        this.pointerCursor.stopHold()
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT) {
+            this.pointerCursor.stopHold()
+        }
     }
 
     handleNextStep () {
