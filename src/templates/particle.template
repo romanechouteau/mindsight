@@ -1,0 +1,6 @@
+<circle
+    cx="{{x}}"
+    cy="{{y}}"
+    r="{{r}}"
+    class="particle"
+    data-mood="{{mood}}" />
