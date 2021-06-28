@@ -1,4 +1,5 @@
 //Declare the variables for home, about & contact html pages
+// @ts-ignore
 import aboutTemplate from '../../templates/pages/about.template'
 import initAbout from './about'
 
@@ -25,7 +26,7 @@ class FrontRouter {
 
         window.onload = () => {
             console.log(window.location);
-            
+
             if (window.location.hash !== '') {
                 this.onNavClick('/' + window.location.hash)
             }
