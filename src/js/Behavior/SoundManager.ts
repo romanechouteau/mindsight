@@ -101,18 +101,18 @@ class SoundManager {
         this.sounds.Musique_Ambiante.loop = true
         this.sounds.vagues_plage.loop = true
         this.sounds.Vent_Herbes.loop = true
-        this.sounds.Musique_Ambiante.volume = 0.05
-        this.sounds.vagues_plage.volume = 0.5
-        this.sounds.Vent_Herbes.volume = 0.15
-        this.sounds.eyetracking_01.volume = 0.6
-        this.sounds.eyetracking_02.volume = 0.6
-        this.sounds.eyetracking_03.volume = 0.6
+        this.sounds.Musique_Ambiante.volume = 0.055
+        this.sounds.vagues_plage.volume = 0.2
+        this.sounds.Vent_Herbes.volume = 0.05
+        this.sounds.eyetracking_01.volume = 0.3
+        this.sounds.eyetracking_02.volume = 0.3
+        this.sounds.eyetracking_03.volume = 0.3
 
         const voiceParams = {
             volume: 0.5
         }
 
-        this.changeVoiceVolume(0.5)
+        this.changeVoiceVolume(0.35)
 
         setTimeout(() => {
             // @ts-ignore
