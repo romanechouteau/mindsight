@@ -1,9 +1,13 @@
-uniform int uFirstColorTop;
-uniform int uSecondColorTop;
-uniform int uFirstColorBottom;
-uniform int uSecondColorBottom;
-uniform float uPercentage;
 uniform float uTime;
+uniform float uPercentage;
+uniform float uEnvInfluence;
+uniform float uEnvPercentage;
+uniform vec2 uEnvSky1;
+uniform vec2 uEnvSky2;
+uniform vec2 uSky1;
+uniform vec2 uSky2;
+uniform vec2 uSky3;
+uniform vec2 uSky4;
 
 varying vec2 vUv;
 
@@ -125,21 +129,38 @@ vec3 toRGB(int color) {
    return vec3(r, g, b);
 }
 
+float getWeight (float percentage, float peak) {
+  return max(1. - abs(peak - percentage), 0.);
+}
+
+vec3 mixSky (float percentage, int color1, int color2, int color3, int color4) {
+  return toRGB(color1) * getWeight(percentage, 0.)
+   + toRGB(color2) * getWeight(percentage, 1.)
+   + toRGB(color3) * getWeight(percentage, 2.)
+   + toRGB(color4) * getWeight(percentage, 3.)
+   + toRGB(color1) * getWeight(percentage, 4.);
+}
+
+vec3 mixSkyEnv (float percentage, int color1, int color2) {
+  return toRGB(color1) * getWeight(percentage, 0.)
+   + toRGB(color2) * getWeight(percentage, 1.);
+}
+
 void main() {
-   vec2 coordinates = gl_FragCoord.xy;
+  vec2 coordinates = gl_FragCoord.xy;
 
-   vec3 colorTop = toRGB(uFirstColorTop);
-   vec3 colorBottom = toRGB(uFirstColorBottom);
-   vec3 colorTop2 = toRGB(uSecondColorTop);
-   vec3 colorBottom2 = toRGB(uSecondColorBottom);
+  vec3 colorTopEnv = mixSkyEnv(uEnvPercentage, int(uEnvSky1.x), int(uEnvSky2.x));
+  vec3 colorBottomEnv = mixSkyEnv(uEnvPercentage, int(uEnvSky1.y), int(uEnvSky2.y));
+  vec3 colorTopBuilder = mixSky(uPercentage, int(uSky1.x), int(uSky2.x), int(uSky3.x), int(uSky4.x));
+  vec3 colorBottomBuilder = mixSky(uPercentage, int(uSky1.y), int(uSky2.y), int(uSky3.y), int(uSky4.y));
 
-   float noise = snoise(vec3(vUv.y * 2., vUv.y + uTime, uTime));
-   float gradientNoise = vUv.y + (noise * 0.3);
+  float noise = snoise(vec3(vUv.y * 2., vUv.y + uTime, uTime));
+  float gradientNoise = vUv.y + (noise * 0.3);
 
-   vec3 firstGradient = mix(colorBottom, colorTop, gradientNoise);
-   vec3 secondGradient = mix(colorBottom2, colorTop2, gradientNoise);
-   vec3 finalColor = mix(firstGradient, secondGradient, uPercentage);
+  vec3 skyEnv = mix(colorBottomEnv, colorTopEnv, gradientNoise);
+  vec3 skyBuilder = mix(colorBottomBuilder, colorTopBuilder, gradientNoise);
+  vec3 finalColor =  mix(skyBuilder, skyEnv, uEnvInfluence);
 
-   finalColor += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));
-   gl_FragColor = vec4(finalColor, 1.);
+  finalColor += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));
+  gl_FragColor = vec4(finalColor, 1.);
 }
