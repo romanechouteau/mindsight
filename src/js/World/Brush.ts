@@ -28,7 +28,7 @@ import fragmentShader from '@shaders/brushfrag.glsl'
 
 
 import { AUDIO_INPUT_MODES, CURSOR_MODES, BRUSH_PALETTE_ANGLES,
-  BRUSH_LAST_POSITIONS, BRUSH_PALETTE_COLORS, LIST_MOODS_PALETTE } from '../constants'
+  BRUSH_LAST_POSITIONS, BRUSH_PALETTE_COLORS, LIST_MOODS_PALETTE, BRUSH_PALETTE_RADIUS_MARGIN } from '../constants'
 import SoundManager from '../Behavior/SoundManager'
 
 const configShaderMaterial = {
@@ -423,20 +423,25 @@ export default class Brush extends Component {
     ctx.beginPath()
     ctx.arc(paletteSize / 2, paletteSize / 2, paletteSize / 2, 0, 2 * Math.PI, false)
 
-    ctx.fillStyle = `rgb(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[0]]).join(',')})`
+    ctx.fillStyle = 'white'
     ctx.fill()
 
+    const radius = paletteSize + BRUSH_PALETTE_RADIUS_MARGIN
     BRUSH_PALETTE_ANGLES.forEach((angle, i) => {
-      const x = (Math.cos(angle) * 0.5 + 0.5) * paletteSize
-      const y = (- Math.sin(angle) * 0.5 + 0.5) * paletteSize
-      const endX = (Math.cos(angle + Math.PI) * 0.5 + 0.5) * paletteSize
-      const endY = (- Math.sin(angle + Math.PI) * 0.5 + 0.5) * paletteSize
-      const grd = ctx.createLinearGradient(x, y, endX, endY)
-      grd.addColorStop(0, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i + 1]]).join(',')}, 1)`)
-      grd.addColorStop(0.45, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i + 1]]).join(',')}, 0)`)
+      const x = (Math.cos(angle) * 0.5 + 0.5) * radius
+      const y = (- Math.sin(angle) * 0.5 + 0.5) * radius
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, radius)
+      grd.addColorStop(0, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i]]).join(',')}, 1)`)
+      grd.addColorStop(0.9, `rgba(${toRGB(BRUSH_PALETTE_COLORS[LIST_MOODS_PALETTE[i]]).join(',')}, 0)`)
       ctx.fillStyle = grd
       ctx.fill()
     })
+
+    const grd = ctx.createRadialGradient(paletteSize / 2, paletteSize / 2, 0, paletteSize / 2, paletteSize / 2, paletteSize)
+    grd.addColorStop(0, 'rgba(255, 255, 255, 0.2)')
+    grd.addColorStop(0.9, 'rgba(255, 255, 255, 0)')
+    ctx.fillStyle = grd
+    ctx.fill()
 
     this.palette = ctx.getImageData(0, 0, paletteSize, paletteSize)
   }
