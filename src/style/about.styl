@@ -1,0 +1,61 @@
+.about
+    width 100%
+    text-align: center
+    color white
+    height: 100vh
+    overflow scroll
+    padding-top: 50px
+    padding-bottom: 80px
+
+    img
+        width 105px
+        margin-bottom: 70px
+
+    p, h3, a
+        text-shadow: white 0 0 4px
+
+    p, a
+        font-family: Lato, sans-serif
+        font-size: 1rem
+        font-weight: bold
+    
+    h3
+        font-family: Displace, Lato, sans-serif
+        font-size: 4.063rem
+        font-weight: normal
+        margin-top: 0
+
+    a
+        padding: 14px 30px
+        font-size: 0.875rem
+        color: white
+        text-decoration: none
+        position relative
+
+        &::before
+            box-shadow: white 0 0 4px
+            content: ''
+            width: 100%
+            position absolute
+            top: 0
+            left 0
+            height: 1px
+            background-color: white
+        &::after
+            box-shadow: white 0 0 4px
+            content: ''
+            width: 100%
+            position absolute
+            top: 100%
+            left 0
+            height: 1px
+            background-color: white
+    canvas
+        width: 200vh
+        height: 100vw
+        transform: rotate(87deg)
+        position fixed
+        top -25vw
+        left -5vh
+        pointer-events: none
+

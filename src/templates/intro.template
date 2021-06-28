@@ -9,5 +9,6 @@
     <canvas id="left" width="%width-left%" height="%height-left%"></canvas>
     <canvas id="right" width="%width-right%" height="%height-right%"></canvas>
     <div class="title"></div>
+    <div class="holdText hidden">Maintenez le clic gauche</div>
     <img class="headphone" src="%hpSrc%" alt="headphone required">
 </div>

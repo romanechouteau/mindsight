@@ -1,0 +1,18 @@
+<div class="about">
+    <img src="gobelins.png" alt="Un projet Gobelins, une école de la CCI de Paris">
+    <p>Designer</p>
+    <h3>Philippe Bois</h3>
+    <p>Développeuse</p>
+    <h3>Romane Chouteau</h3>
+    <p>Designer</p>
+    <h3>Bastien Maillotte</h3>
+    <p>Développeur</p>
+    <h3>Aymeric Arnoult</h3>
+    <p>Voix Off</p>
+    <h3>Anaïs Dudon</h3>
+    <p>Psychopatricien</p>
+    <h3>Patrick Bertiolatti</h3>
+    <a href="#" onclick="onNavClick('/'); return false;">Retour</a>
+    <canvas id="lines" width="3584" height="1846"></canvas>
+</div>
+

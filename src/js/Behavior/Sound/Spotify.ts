@@ -1,5 +1,6 @@
 // @ts-ignore
 import store from '@store/index'
+import SoundManager from '../SoundManager'
 
 export default class SpotifyManager {
     searchTracks: {name: string; uri: string; id: string; artists: any[]}[]
@@ -161,7 +162,16 @@ export default class SpotifyManager {
                 },
             })
             .then(res => res.json().then(json => console.log(json)))
-            this.player.setVolume( 0.5 )
+            this.player.setVolume( 0.25 )
+            // repeat track
+            fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+            })
+            .then(res => res.json().then(json => console.log(json)))
             // repeat track
             fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
                 method: 'PUT',
@@ -172,6 +182,7 @@ export default class SpotifyManager {
             })
             .then(res => res.json().then(json => console.log(json)))
         };
+        SoundManager.fadeOut('Musique_Ambiante')
         play({
             spotify_uri: uri,
         });

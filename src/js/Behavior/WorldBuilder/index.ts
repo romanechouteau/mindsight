@@ -45,6 +45,8 @@ export default class WorldBuilder extends Component {
     ground: Object3D
     pointerCursor: PointerCursor
     envName: string
+    handleMouseDown: EventListener
+    handleMouseUp: EventListener
     constructor({ scene, globalScene, time, debug, ground, pointerCursor, skyManager }: WorldBuilderParams) {
         super({ store })
         this.envName = ground.container.children[0].userData.envName
@@ -59,7 +61,11 @@ export default class WorldBuilder extends Component {
         this.rangeValue = { value: 0 } // init
         this.globalScene = globalScene
         this.pointerCursor = pointerCursor
+        this.handleMouseDown = this.mouseDown.bind(this)
+        this.handleMouseUp = this.mouseUp.bind(this)
+
         this.init()
+
     }
 
     init () {
@@ -90,8 +96,8 @@ export default class WorldBuilder extends Component {
         this.controller.addEventListener('mouseenter', this.mouseEnter.bind(this))
         this.controller.addEventListener('mouseleave', this.mouseLeave.bind(this))
         this.controller.addEventListener('mousemove', this.mouseMove.bind(this))
-        this.controller.addEventListener('mousedown', this.mouseDown.bind(this))
-        this.controller.addEventListener('mouseup', this.mouseUp.bind(this))
+        document.addEventListener('mousedown',  this.handleMouseDown)
+        document.addEventListener('mouseup',  this.handleMouseUp)
     }
 
     addWaves() {
@@ -139,7 +145,7 @@ export default class WorldBuilder extends Component {
             let y = 0
             // const smoother = x > (sineLimits[1] - config.width/2 ) ? sineLimits[1] - x - sineLimits[0] : x - sineLimits[0]
             if (inRange(x/config.steps, sineLimits[0], sineLimits[1]))
-                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * config.widthReductor), 0)
+                y = Math.sin((x - sineLimits[0]) * 1/(sineLimits[1] - sineLimits[0]) * ((Math.PI)/2) / config.waveLength + this.time.elapsed/config.speed + config.offset) * Math.sin(this.time.elapsed/config.speed) * Math.max((1 - inflexionPointDistance * Math.exp( inflexionPointDistance * config.widthReductor)), 0)
             ctx.lineTo( x/config.steps * width, y * config.height )
         }
         ctx.stroke()
@@ -185,8 +191,8 @@ export default class WorldBuilder extends Component {
         this.controller.removeEventListener('mouseenter', this.mouseEnter)
         this.controller.removeEventListener('mouseleave', this.mouseLeave)
         this.controller.removeEventListener('mousemove', this.mouseMove)
-        this.controller.removeEventListener('mousedown', this.mouseDown)
-        this.controller.removeEventListener('mouseup', this.mouseUp)
+        document.removeEventListener('mousedown',  this.handleMouseDown)
+        document.removeEventListener('mouseup',  this.handleMouseUp)
         this.pointerCursor.unsnap('y')
 
         this.time.off('tick.worldBuilder')
@@ -215,11 +221,15 @@ export default class WorldBuilder extends Component {
     }
 
     mouseDown () {
-        this.pointerCursor.startHold(this.handleNextStep)
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT) {
+            this.pointerCursor.startHold(this.handleNextStep)
+        }
     }
 
     mouseUp () {
-        this.pointerCursor.stopHold()
+        if (store.state.cursorMode === CURSOR_MODES.DEFAULT) {
+            this.pointerCursor.stopHold()
+        }
     }
 
     handleNextStep () {
