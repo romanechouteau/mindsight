@@ -12,7 +12,7 @@ import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_ENV_COLORS, MOODS, ENVIRONMENTS } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_ENV_COLORS, MOODS, ENVIRONMENTS, WATER_ALPHA, WATER_Y } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
@@ -202,7 +202,15 @@ export default class Environments {
                 this.isMoving = false
                 store.dispatch('updateEnvironment', environment)
                 this.environments[Math.abs(environment - 1)].visible = false
-                if (water) water.visible = true
+                  if (water) {
+                    water.children[0].position.y = -WATER_Y
+                    water.visible = true
+                    gsap.to(water.children[0].position, {
+                      duration: 1.5,
+                      y: WATER_Y,
+                      ease: 'power3.out'
+                    })
+                  }
                 }
             })
             this.skyManager.handleEnvChange(environment)

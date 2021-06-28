@@ -80,21 +80,13 @@ export default class World extends Component {
       this.debugFolder = this.debug.addFolder('World')
     }
 
-    this.setLoader()
+    this.init()
   }
   init() {
     // this.setAmbientLight()
     // this.setPointLight()
     this.setFog()
     this.render()
-  }
-  setLoader() {
-    this.loadDiv = document.querySelector('.loadScreen')
-    this.loadModels = this.loadDiv.querySelector('.load')
-    this.progress = this.loadDiv.querySelector('.progress')
-
-    this.init()
-    this.loadDiv.remove()
   }
   setAmbientLight() {
     this.ambientlight = new AmbientLightSource({
