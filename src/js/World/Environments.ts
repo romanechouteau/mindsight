@@ -12,7 +12,7 @@ import Grass from './Grass'
 import Dock from './Dock'
 import Water from './Water/Water'
 
-import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_ENV_COLORS, MOODS, ENVIRONMENTS, WATER_ALPHA, WATER_Y } from '../constants'
+import { ENV_DISTANCE, LIST_ENVIRONMENTS, ENVIRONMENT_INDICES, GROUND_SCALE, SKY_ENV_COLORS, ENVIRONMENTS, WATER_Y, SOUND_VOLUMES } from '../constants'
 import Camera from '../Camera'
 
 // @ts-ignore
@@ -152,7 +152,7 @@ export default class Environments {
     groundMesh.geometry.computeBoundingBox()
     const size = new Vector3()
     groundMesh.geometry.boundingBox.getSize(size)
-    size.multiplyScalar(1 - GROUND_SCALE*3) // seems to fit best like this
+    size.multiplyScalar(1 - GROUND_SCALE * 1.2) // seems to fit best like this
     const water = new Water({ time: this.time, dimensions: { width: size.x, height: size.z }, debug: this.debug})
 
     return water.container
@@ -170,11 +170,11 @@ export default class Environments {
             const environment = index < 0 ? lastEnvironment : index
 
             if (environment === ENVIRONMENT_INDICES.meadow) {
-              SoundManager.fadeOut('vagues_plage')
-              SoundManager.fadeIn('Vent_Herbes')
+              SoundManager.fadeOut('vagues_plage', SOUND_VOLUMES.beach)
+              SoundManager.fadeIn('Vent_Herbes', SOUND_VOLUMES.meadow)
             } else {
-              SoundManager.fadeIn('vagues_plage')
-              SoundManager.fadeOut('Vent_Herbes')
+              SoundManager.fadeIn('vagues_plage', SOUND_VOLUMES.beach)
+              SoundManager.fadeOut('Vent_Herbes', SOUND_VOLUMES.meadow)
             }
 
             const water = this.environments[environment].getObjectByName('WaterContainer')

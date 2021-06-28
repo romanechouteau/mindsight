@@ -12,6 +12,7 @@ class FrontRouter {
     scripts: {
         '/': Function
         '/#about': Function
+        '/#debug': Function
     }
     constructor() {
         this.root = document.querySelector('#routerRoot')
@@ -22,12 +23,11 @@ class FrontRouter {
         this.scripts = {
             '/': () => null,
             '/#about': initAbout,
+            '/#debug': () => null
         }
 
         window.onload = () => {
-            console.log(window.location);
-
-            if (window.location.hash !== '') {
+            if (!this.noRouterContent()) {
                 this.onNavClick('/' + window.location.hash)
             }
         }
@@ -36,7 +36,7 @@ class FrontRouter {
          * The Function is invoked when the window.history changes
          */
         window.onpopstate = () => {
-            if (window.location.hash === '') {
+            if (this.noRouterContent()) {
                 this.root.style.opacity = '0'
                 this.root.style.pointerEvents = 'none'
             }
@@ -49,8 +49,12 @@ class FrontRouter {
         }
     }
 
+    noRouterContent() {
+        return window.location.hash === '' || window.location.hash === '#debug'
+    }
+
     onNavClick(pathname) {
-        if (pathname === '/' || pathname === '') {
+        if (pathname === '/' || pathname === '' || pathname === '/#debug') {
             this.root.style.opacity = '0'
             this.root.style.pointerEvents = 'none'
         }
@@ -64,4 +68,4 @@ class FrontRouter {
     }
 }
 
-// export default new FrontRouter()
+export default new FrontRouter()
