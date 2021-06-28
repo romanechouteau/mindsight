@@ -71,11 +71,9 @@ export default class SpotifyManager {
             const token = await this.getToken()
             player = new Spotify.Player({
                 name: 'Web Playback SDK Quick Start Player',
-                getOAuthToken: cb => { console.log('token youpi');
-                ; cb(token); }
+                getOAuthToken: cb => cb(token)
             });
-            console.log(player);
-            
+
             this.setListeners(player);
             // Connect to the player!
             player.connect().then(_success => {
@@ -89,11 +87,9 @@ export default class SpotifyManager {
                 const token = await this.getToken()
                 player = new Spotify.Player({
                     name: 'Web Playback SDK Quick Start Player',
-                    getOAuthToken: cb => { console.log('token youpi');
-                    ; cb(token); }
+                    getOAuthToken: cb => cb(token)
                 });
-                console.log(player);
-                
+
                 this.setListeners(player);
                 // Connect to the player!
                 player.connect().then(_success => {
@@ -214,7 +210,7 @@ export default class SpotifyManager {
         this.playTracker = window.setInterval(async() => {
             if (this.player.paused) return
             const state= await this.player.getCurrentState()
-            if (!state?.position) return 
+            if (!state?.position) return
             const { position } = state
             let iterator = 0
             while (position/1000 > meta.sections[iterator].start) {

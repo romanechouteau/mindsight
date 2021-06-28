@@ -19,6 +19,7 @@ export default class PointerCursor extends Component {
         y?: number
     }
     holdTime: number
+    animation: gsap
     strokeDashArray: number
     constructor(options: { time: Time }) {
         super({
@@ -76,34 +77,77 @@ export default class PointerCursor extends Component {
 
     startHold (callback) {
         this.time.on('tick.hold', () => {
-            // show holding time on cursor
-            if (this.holdTime >= HOLD_DURATION + HOLD_DELAY) {
-                this.holdTime = 0
-                gsap.to(this.circle, {
-                    duration: 0.3,
-                    strokeDashoffset: '0'
-                })
-                this.time.off('tick.hold')
-                return callback()
+            if (this.holdTime < HOLD_DELAY) {
+                return this.holdTime += 1
             }
 
-            this.holdTime += 1
-
-            // wait for delay before holding
-            if (this.holdTime >= HOLD_DELAY) {
-                const percent = (this.holdTime - HOLD_DELAY) / HOLD_DURATION
-                this.circle.style.strokeDashoffset = `${(percent) * this.strokeDashArray}`
-            }
+            this.holdTime = 0
+            this.time.off('tick.hold')
+            return this.animateCursor(callback)
         })
+    }
+
+    animateCursor(callback) {
+        this.animation = gsap.timeline()
+            .to(this.circle, {
+                duration: 0.8,
+                attr: {
+                    r: 20
+                },
+                ease: 'power2.inOut'
+            })
+            .to(this.element.querySelectorAll('.outerCircle'), {
+                duration: 1,
+                opacity: 1,
+                attr: {
+                    r: 20
+                },
+                stagger: 0.45,
+                ease: 'power2.inOut'
+            })
+            .add('end')
+            .to(this.circle, {
+                duration: 0.8,
+                attr: {
+                    r: 30
+                },
+                ease: 'power2.inOut'
+            }, 'end')
+            .to(this.element.querySelectorAll('.outerCircle'), {
+                duration: 0.8,
+                opacity: 0,
+                attr: {
+                    r: 100
+                },
+                ease: 'power2.inOut',
+                onComplete: callback
+            }, 'end')
     }
 
     stopHold () {
         this.holdTime = 0
-        gsap.to(this.circle, {
-            duration: 0.3,
-            strokeDashoffset: '0'
-        })
         this.time.off('tick.hold')
+        if (this.animation) {
+            this.animation.kill()
+            gsap.to(this.circle, {
+                duration: 0.8,
+                attr: {
+                    r: 30
+                },
+                ease: 'power2.inOut'
+            })
+            gsap.to(this.element.querySelectorAll('.outerCircle'), {
+                duration: 0.8,
+                opacity: 0,
+                attr: {
+                    r: 30
+                },
+                ease: 'power2.inOut',
+                onComplete: () => {
+                    this.element.querySelectorAll('.outerCircle').forEach(elem => elem.setAttribute('r', '100'))
+                }
+            })
+        }
     }
 
     renderCursor() {

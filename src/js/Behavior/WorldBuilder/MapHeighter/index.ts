@@ -95,8 +95,6 @@ export default class MapHeighter {
 
     applyChange() {
         if (!(((this.ground.children[0] as Mesh).material) instanceof ShaderMaterial)) {
-            console.log(this.blendMaterial);
-
             ;((this.ground.children[0] as Mesh).material) = this.blendMaterial
         }
     }

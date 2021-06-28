@@ -99,7 +99,9 @@ export default class IntroController {
 
         this.addWave(this.fullWorker, 'tick.introFullCanvas', this.fullLineConfigs)
         this.mouseDown = this.mouseDown.bind(this)
+        this.mouseUp = this.mouseUp.bind(this)
         document.addEventListener('mousedown', this.mouseDown)
+        document.addEventListener('mouseup', this.mouseUp)
     }
 
     mouseDown() {
@@ -112,7 +114,7 @@ export default class IntroController {
         }
     }
 
-    mouseUp () {
+    mouseUp() {
         this.pointerCursor.stopHold()
     }
 
