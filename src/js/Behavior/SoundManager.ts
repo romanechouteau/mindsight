@@ -107,9 +107,9 @@ class SoundManager {
         this.sounds.Musique_Ambiante.volume = SOUND_VOLUMES.music
         this.sounds.vagues_plage.volume = SOUND_VOLUMES.beach
         this.sounds.Vent_Herbes.volume = SOUND_VOLUMES.meadow
-        this.sounds.eyetracking_01.volume = 0.6
-        this.sounds.eyetracking_02.volume = 0.6
-        this.sounds.eyetracking_03.volume = 0.6
+        this.sounds.eyetracking_01.volume = 0.3
+        this.sounds.eyetracking_02.volume = 0.3
+        this.sounds.eyetracking_03.volume = 0.3
 
         const voiceParams = {
             volume: SOUND_VOLUMES.voice

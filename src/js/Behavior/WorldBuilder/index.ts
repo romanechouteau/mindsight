@@ -181,8 +181,12 @@ export default class WorldBuilder extends Component {
 
     stop () {
         this.render = () => {}
-        document.querySelector('#worldBuilder').remove()
         this.stopped = true
+
+        document.querySelector('#worldBuilder').classList.add('hidden')
+        setTimeout(() => {
+            document.querySelector('#worldBuilder').remove()
+        }, 800)
 
         this.controller.removeEventListener('mouseenter', this.mouseEnter)
         this.controller.removeEventListener('mouseleave', this.mouseLeave)
