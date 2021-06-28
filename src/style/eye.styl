@@ -50,9 +50,22 @@
             will-change: transform
             transform: translateY(25vh)
 
-        .pointCircle
-            fill: white
-            cursor: pointer
+        .point
+            opacity: 1
+            visibility: visible
+            transition: opacity 0.5s ease
 
             &.invisible
-                display: none
+                visibility: hidden
+                opacity: 0
+                transition: opacity 0.5s ease, visibility 0s 0.5s ease
+
+            .pointCircle
+                fill: white
+                cursor: pointer
+
+
+        .pointCircleOuter
+            fill: none
+            stroke: white
+            stroke-width: 3px

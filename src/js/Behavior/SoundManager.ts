@@ -103,9 +103,13 @@ class SoundManager {
         this.sounds.Musique_Ambiante.loop = true
         this.sounds.vagues_plage.loop = true
         this.sounds.Vent_Herbes.loop = true
+      
         this.sounds.Musique_Ambiante.volume = SOUND_VOLUMES.music
         this.sounds.vagues_plage.volume = SOUND_VOLUMES.beach
         this.sounds.Vent_Herbes.volume = SOUND_VOLUMES.meadow
+        this.sounds.eyetracking_01.volume = 0.6
+        this.sounds.eyetracking_02.volume = 0.6
+        this.sounds.eyetracking_03.volume = 0.6
 
         const voiceParams = {
             volume: SOUND_VOLUMES.voice
@@ -121,6 +125,9 @@ class SoundManager {
                 folder.add(this.sounds.Musique_Ambiante, 'volume').name('music volume')
                 folder.add(this.sounds.vagues_plage, 'volume').name('vagues volume')
                 folder.add(this.sounds.Vent_Herbes, 'volume').name('vent volume')
+                folder.add(this.sounds.eyetracking_01, 'volume').name('eyetracking volume 1')
+                folder.add(this.sounds.eyetracking_02, 'volume').name('eyetracking volume 2')
+                folder.add(this.sounds.eyetracking_03, 'volume').name('eyetracking volume 3')
                 folder.add(voiceParams, 'volume').name('voice volume').onChange(val => {
                     this.changeVoiceVolume(val)
                 })
@@ -182,6 +189,11 @@ class SoundManager {
 
     pause(id: string) {
         this.sounds[id].pause()
+    }
+
+    stop(id: string) {
+        this.sounds[id].pause()
+        this.sounds[id].currentTime = 0
     }
 }
 

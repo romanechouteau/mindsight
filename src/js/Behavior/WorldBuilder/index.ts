@@ -83,7 +83,7 @@ export default class WorldBuilder extends Component {
     createHtmlControls() {
         let html
         html = template.replace('%width%', window.innerWidth * window.devicePixelRatio)
-        html = html.replace('%height%', window.innerHeight/5 * window.devicePixelRatio)
+        html = html.replace('%height%', window.innerHeight/2 * window.devicePixelRatio)
         document.querySelector('#worldBuilder').innerHTML = html
         this.addWaves()
         this.controller = document.querySelector('#worldBuilder canvas') as HTMLCanvasElement
@@ -100,7 +100,10 @@ export default class WorldBuilder extends Component {
         const {width, height} = canvas
 
         ctx.imageSmoothingEnabled = true;
-        const configs = [ {...waveBaseConfig, opacity: 1}, {...waveBaseConfig, opacity: 0.5, offset: 2, speed: 350, waveLength: 75, height: 40}, {...waveBaseConfig, opacity: 0.5, offset: 3, speed: 450, waveLength: 40 } ]
+        const configs = [
+            { ...waveBaseConfig, steps: 1600, waveLength: 100, speed: 770, height: 90, widthReductor: 4.5, inflexionPoint: 0.2 },
+            { steps: 400, opacity: 0.35, waveLength: 40, speed: 1900, offset: 1, height: 270, widthReductor: 2.9 },
+            { steps: 500, opacity: 0.5, waveLength: 70, speed: 1500, offset: -3, height: 140, widthReductor: 2.4, inflexionPoint: 0.5 } ]
         this.time.on('tick.worldBuilder', () => {
             ctx.clearRect(0, 0, width, height)
             this.drawWave(ctx, width, height, configs[0])
@@ -171,9 +174,8 @@ export default class WorldBuilder extends Component {
     }
 
     stop () {
-        document.querySelector('#worldBuilder').innerHTML = ''
-
         this.render = () => {}
+        document.querySelector('#worldBuilder').remove()
         this.stopped = true
 
         this.controller.removeEventListener('mouseenter', this.mouseEnter)

@@ -178,25 +178,56 @@ export default class EyeTrackingManager extends Component {
     }
 
     listenMouseDown() {
-        this.element.querySelectorAll('.point .pointCircle').forEach((elem: HTMLElement) => {
+        this.element.querySelectorAll('.point').forEach((elem: HTMLElement) => {
             const index = parseInt(elem.getAttribute('data-order'))
 
             elem.addEventListener('click', () => {
                 this.pointsClicks[index] += 1
 
-                // handle click if user hasn't clicked 3 times yet
-                if (this.pointsClicks[index] < 3) {
-                    const r = 10 + 2 * this.pointsClicks[index]
-                    return elem.setAttribute('r', r.toString())
-                }
-
-                // handle click if user has clicked 3 times
-                elem.classList.add('invisible')
-                this.currentPoint += 1
-
-                this.handleNextPoint()
+                return this.animatePoint(elem, index, this.pointsClicks[index] >= 3)
             })
         })
+    }
+
+    animatePoint(elem, index, hide?) {
+        SoundManager.stop(`eyetracking_0${this.pointsClicks[index]}`)
+        SoundManager.play(`eyetracking_0${this.pointsClicks[index]}`)
+        const circle = hide ? elem.querySelector('.pointCircleOuter') : elem.querySelector('.pointCircleOuter').cloneNode()
+        if (!hide) {
+            elem.appendChild(circle)
+        }
+
+        gsap.to(circle, {
+            duration: 0.8,
+            attr: {
+                r: 50
+            },
+            ease: 'power3.out'
+        })
+        gsap.to(circle, {
+            duration: 0.5,
+            delay: 0.3,
+            opacity: 0,
+            onComplete: () => {
+                circle.remove()
+            }
+        })
+
+        if (hide) {
+            gsap.to(elem.querySelector('.pointCircle'), {
+                duration: 0.8,
+                attr: {
+                    r: 0
+                },
+                ease: 'power3.out',
+                onComplete: () => {
+                    elem.classList.add('invisible')
+                    this.currentPoint += 1
+
+                    this.handleNextPoint()
+                }
+            })
+        }
     }
 
     handleNextPoint() {
@@ -207,7 +238,7 @@ export default class EyeTrackingManager extends Component {
         }
 
         // display next point
-        const nextPoint = this.element.querySelector(`.point .pointCircle[data-order="${this.currentPoint}"]`)
+        const nextPoint = this.element.querySelector(`.point[data-order="${this.currentPoint}"]`)
         nextPoint.classList.remove('invisible')
         if (this.currentPoint === Math.floor(this.pointsClicks.length / 2) || this.currentPoint === this.pointsClicks.length - 1) {
             this.currentTranslate = this.currentPoint === this.pointsClicks.length - 1 ? 0 : -25
