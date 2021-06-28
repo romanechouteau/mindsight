@@ -64,4 +64,4 @@ class FrontRouter {
     }
 }
 
-export default new FrontRouter()
+// export default new FrontRouter()

@@ -1,12 +1,12 @@
 import '@style/style.styl'
 // @ts-ignore
 import App from '@js/App'
-import FrontRouter from './Routing/router'
+// import FrontRouter from './Routing/router'
 
 // @ts-ignore
-window.onNavClick = (pathName) => {
-  FrontRouter.onNavClick(pathName)
-}
+// window.onNavClick = (pathName) => {
+//   FrontRouter.onNavClick(pathName)
+// }
 
 // @ts-ignore
 window.App = new App({
