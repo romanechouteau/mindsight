@@ -26,6 +26,37 @@
 
             .about-link
                 pointer-events: all
+                text-align: center
+                margin-top: 40px
+                font-family: 'Lato', sans-serif
+
+                a
+                    padding: 14px 30px
+                    font-size: 0.875rem
+                    color: white
+                    text-decoration: none
+                    text-transform: uppercase
+                    position relative
+                    text-shadow: white 0 0 4px
+
+                    &::before
+                        box-shadow: white 0 0 4px
+                        content: ''
+                        width: 100%
+                        position absolute
+                        top: 0
+                        left 0
+                        height: 1px
+                        background-color: white
+                    &::after
+                        box-shadow: white 0 0 4px
+                        content: ''
+                        width: 100%
+                        position absolute
+                        top: 100%
+                        left 0
+                        height: 1px
+                        background-color: white
 
             .title
                 font-family: 'Lato', sans-serif
