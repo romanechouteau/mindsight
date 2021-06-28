@@ -46,6 +46,8 @@ class SoundManager {
         invitedToSkipAfterBrush: boolean,
         brushExplanationComplete: boolean,
         brushExplanationPromise: Promise<void>,
+        worldBuilderExplanationComplete: boolean,
+        worldBuilderExplanationPromise: Promise<void>,
     }
     sounds: {
         voice1: HTMLAudioElement,
@@ -95,6 +97,8 @@ class SoundManager {
             invitedToSkipAfterBrush: false,
             brushExplanationComplete: false,
             brushExplanationPromise: null,
+            worldBuilderExplanationComplete: false,
+            worldBuilderExplanationPromise: null,
         }
         this.sounds.Musique_Ambiante.loop = true
         this.sounds.vagues_plage.loop = true
