@@ -261,3 +261,4 @@ export const SOUND_VOLUMES = {
     beach: 0.5,
     meadow: 0.15
 }
+export const WATER_Y = 155

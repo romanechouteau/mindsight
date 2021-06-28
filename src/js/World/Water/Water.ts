@@ -4,7 +4,7 @@ import Time from "../../Tools/Time"
 import { Water as WaterMesh } from 'three/examples/jsm/objects/Water'
 // @ts-ignore
 import waterNormalsSrc from '../../../images/textures/beach/waternormals.jpeg'
-import { WATER_SUN_COLOR, WATER_ALPHA, WATER_COLOR, WATER_SCALE, WATER_SIZE } from "../../constants"
+import { WATER_SUN_COLOR, WATER_ALPHA, WATER_COLOR, WATER_SCALE, WATER_SIZE, WATER_Y } from "../../constants"
 
 interface WaterParams {
     time: Time
@@ -49,7 +49,7 @@ export default class Water {
             }
         )
         this.waterMesh.rotation.x = -Math.PI/2
-        this.waterMesh.position.y -= 30
+        this.waterMesh.position.y = WATER_Y
         this.container.add(this.waterMesh)
         this.waterMesh.material.uniforms[ 'size' ].value = 10.
         this.waterMesh.material.transparent = true
