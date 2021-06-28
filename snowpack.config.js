@@ -24,7 +24,7 @@ module.exports = {
         '@snowpack/plugin-typescript',
         'snowpack-plugin-stylus',
         ["snowpack-plugin-raw-file-loader", {
-          exts: [".frag", ".vert", ".glsl", ".template", ".html"]
+          exts: [".frag", ".vert", ".glsl", ".template"]
         }],
         ["@snowpack/plugin-optimize", { /* see options below */ }],
         ["@snowpack/plugin-dotenv"],
