@@ -32,11 +32,13 @@ import eyetracking_02 from '../../audio/eyetracking_02.mp3'
 // @ts-ignore
 import eyetracking_03 from '../../audio/eyetracking_03.mp3'
 // @ts-ignore
-import Musique_Ambiante from '../../audio/Musique_Ambiante.mp3'
+import Musique_Ambiante from '../../audio/Musique_AmbianteSmallSmall.mp3'
 // @ts-ignore
 import vagues_plage from '../../audio/vagues_plage.mp3'
 // @ts-ignore
 import Vent_Herbes from '../../audio/Vent_Herbes.mp3'
+import gsap from 'gsap/all'
+import { SOUND_VOLUMES } from '../constants'
 
 class SoundManager {
     state: {
@@ -101,15 +103,15 @@ class SoundManager {
         this.sounds.Musique_Ambiante.loop = true
         this.sounds.vagues_plage.loop = true
         this.sounds.Vent_Herbes.loop = true
-        this.sounds.Musique_Ambiante.volume = 0.05
-        this.sounds.vagues_plage.volume = 0.5
-        this.sounds.Vent_Herbes.volume = 0.15
+        this.sounds.Musique_Ambiante.volume = SOUND_VOLUMES.music
+        this.sounds.vagues_plage.volume = SOUND_VOLUMES.beach
+        this.sounds.Vent_Herbes.volume = SOUND_VOLUMES.meadow
 
         const voiceParams = {
-            volume: 0.5
+            volume: SOUND_VOLUMES.voice
         }
 
-        this.changeVoiceVolume(0.5)
+        this.changeVoiceVolume(SOUND_VOLUMES.voice)
 
         setTimeout(() => {
             // @ts-ignore
@@ -156,6 +158,25 @@ class SoundManager {
                 this.sounds[id].play()
                 this.sounds[id].addEventListener('ended', resolve)
             }, timeout ?? 1);
+        })
+    }
+
+    fadeOut(id: string, duration = 2) {
+        gsap.to(this.sounds[id], { 
+            volume: 0, 
+            ease: 'none', 
+            duration,
+            onComplete: () => this.pause(id)
+        })
+    }
+
+    fadeIn(id: string, volume = 1, duration = 2) {
+        this.sounds[id].volume = 0
+        this.play(id)
+        gsap.to(this.sounds[id], { 
+            volume, 
+            ease: 'none', 
+            duration,
         })
     }
 

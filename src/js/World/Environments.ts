@@ -170,11 +170,11 @@ export default class Environments {
             const environment = index < 0 ? lastEnvironment : index
 
             if (environment === ENVIRONMENT_INDICES.meadow) {
-              SoundManager.pause('vagues_plage')
-              SoundManager.play('Vent_Herbes')
+              SoundManager.fadeOut('vagues_plage')
+              SoundManager.fadeIn('Vent_Herbes')
             } else {
-              SoundManager.play('vagues_plage')
-              SoundManager.pause('Vent_Herbes')
+              SoundManager.fadeIn('vagues_plage')
+              SoundManager.fadeOut('Vent_Herbes')
             }
 
             const water = this.environments[environment].getObjectByName('WaterContainer')
