@@ -130,3 +130,63 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+#pre-intro
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    z-index: 10
+
+    display flex
+    justify-content: space-evenly
+    align-items center
+    flex-direction: column
+
+    #grant-spotify, #toggle-subtitles, p
+        padding: 14px 30px
+        font-size: 0.875rem
+        color: white
+        text-decoration: none
+        text-shadow: white 0 0 4px
+        position relative
+        font-family: Lato, sans-serif
+        text-transform: uppercase
+
+    p
+        opacity 0.75
+
+    #toggle-subtitles
+        opacity 0.5
+        &.active
+            opacity 1
+            &::before
+                box-shadow: white 0 0 4px
+                content: ''
+                width: 100%
+                position absolute
+                top: 0
+                left 0
+                height: 1px
+                background-color: white
+
+    #grant-spotify
+        &::before
+            box-shadow: white 0 0 4px
+            content: ''
+            width: 100%
+            position absolute
+            top: 0
+            left 0
+            height: 1px
+            background-color: white
+        &::after
+            box-shadow: white 0 0 4px
+            content: ''
+            width: 100%
+            position absolute
+            top: 100%
+            left 0
+            height: 1px
+            background-color: white

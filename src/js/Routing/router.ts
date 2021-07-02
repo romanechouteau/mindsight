@@ -45,7 +45,7 @@ class FrontRouter {
                 this.root.style.pointerEvents = 'initial'
             }
             this.root.innerHTML = this.routes['/' + window.location.hash];
-            this.scripts['/' + window.location.hash]()
+            this.scripts['/' + window.location.hash]?.()
         }
     }
 
@@ -64,7 +64,7 @@ class FrontRouter {
         }
         window.history.pushState({}, pathname, window.location.origin + pathname);
         this.root.innerHTML = this.routes[pathname];
-        this.scripts[pathname]()
+        this.scripts[pathname]?.()
     }
 }
 
