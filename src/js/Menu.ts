@@ -1,4 +1,8 @@
-export default function initMenu(cb: Function) {
+export default function initMenu(spotifyCb: Function, soundCb: Function, cameraCb: Function) {
+    
+    /**
+     * Spotify
+     */
     let popup, token
     const spotifyButton = document.querySelector('#grant-spotify'), subtitlesButton = document.querySelector('#toggle-subtitles')
     spotifyButton.addEventListener('click', () => {
@@ -11,7 +15,7 @@ export default function initMenu(cb: Function) {
 
         // @ts-ignore
         window.spotifyCallback = (token: string) => {
-            cb(token)
+            spotifyCb(token)
             popup.close()
           }
     })
@@ -22,4 +26,29 @@ export default function initMenu(cb: Function) {
         // @ts-ignore
         window.opener.spotifyCallback(token)
     }
+
+    /**
+     * Subtitles
+     */
+    document.querySelector('#toggle-subtitles').addEventListener('click', e => {
+      e.preventDefault()
+      ;(e.target as HTMLDivElement).classList.toggle('active')
+      document.querySelector('#subtitles').classList.toggle('visible')
+    })
+    /**
+     * Sound
+     */
+    document.querySelector('#toggle-sound').addEventListener('click', e => {
+      e.preventDefault()
+      ;(e.target as HTMLDivElement).classList.toggle('active')
+      soundCb()
+    })
+    /**
+     * Camera
+     */
+    document.querySelector('#toggle-camera').addEventListener('click', e => {
+      e.preventDefault()
+      ;(e.target as HTMLDivElement).classList.toggle('active')
+      cameraCb()
+    })
 }

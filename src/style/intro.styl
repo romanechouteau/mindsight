@@ -90,11 +90,11 @@
 
 #intro, .intro, #sumup
     .bg-wrapper
-        height: 140vw
-        width: 140vw
+        height: 160vw
+        width: 160vw
         position: absolute
-        top: -80vh
-        left: -30vh
+        top: -75vh
+        left: -40vh
         animation: rotating 12s linear infinite
 
     .bg
@@ -146,7 +146,7 @@
     align-items center
     flex-direction: column
 
-    #grant-spotify, #toggle-subtitles, p
+    #grant-spotify, #toggle-subtitles, #toggle-sound, #toggle-camera, p
         padding: 14px 30px
         font-size: 0.875rem
         color: white
@@ -158,20 +158,6 @@
 
     p
         opacity 0.75
-
-    #toggle-subtitles
-        opacity 0.5
-        &.active
-            opacity 1
-            &::before
-                box-shadow: white 0 0 4px
-                content: ''
-                width: 100%
-                position absolute
-                top: 0
-                left 0
-                height: 1px
-                background-color: white
 
     #grant-spotify
         &::before
@@ -192,3 +178,35 @@
             left 0
             height: 1px
             background-color: white
+
+    .authorizations
+        display flex
+
+        #toggle-sound
+            margin-right: 10px
+        #toggle-subtitles
+            margin-right: 10px
+
+        #toggle-subtitles, #toggle-sound, #toggle-camera
+            opacity 0.5
+            transition: opacity 0.3s linear
+            width: 15vw
+            text-align: center
+            box-sizing: border-box
+            &.active
+                opacity 1
+                &::before
+                    box-shadow: white 0 0 4px
+                    content: ''
+                    width: 100%
+                    position absolute
+                    bottom: 0
+                    left 0
+                    height: 1px
+                    background-color: white
+                    animation appear 0.5s ease 1
+
+@keyframes appear {
+    from { width: 0 }
+    to { width: 100% }
+}

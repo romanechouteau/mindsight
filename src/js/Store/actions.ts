@@ -45,5 +45,11 @@ export default {
     },
     setSpotifyToken(context, payload: string) {
         context.commit('setSpotifyToken', payload)
+    },
+    toggleSound(context) {
+        context.commit('toggleSound')
+    },
+    toggleCamera(context) {
+        context.commit('toggleCamera')
     }
 }

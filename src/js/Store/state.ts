@@ -21,5 +21,7 @@ export default {
     begin: false,
     cursorMode: CURSOR_MODES.DEFAULT,
     worldMorphTargetInfluences: [0, 0, 0],
-    word: ''
+    word: '',
+    allowSound: true,
+    allowCamera: true
   };

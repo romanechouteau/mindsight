@@ -39,6 +39,9 @@ import vagues_plage from '../../audio/vagues_plage.mp3'
 import Vent_Herbes from '../../audio/Vent_Herbes.mp3'
 import gsap from 'gsap/all'
 import { SOUND_VOLUMES } from '../constants'
+import SubtitlesManager from './SubtitlesManager'
+// @ts-ignore
+import store from '@store/index'
 
 class SoundManager {
     state: {
@@ -143,6 +146,7 @@ class SoundManager {
     }
 
     playMusic() {
+        if (!store.state.allowSound) return
         this.sounds.Musique_Ambiante.play()
     }
 
@@ -156,15 +160,22 @@ class SoundManager {
     playVoice(id: number, timeout?: number) {
         this.stopAllVoices()
         this.state.currentIndex = id
+        setTimeout(() => {
+            SubtitlesManager.readVoiceGroup('voice'+id)
+        }, timeout ? timeout+50 : 50)
         return this.play('voice'+id, timeout)
     }
 
     play(id: string, timeout?: number) {
         return new Promise<void>(resolve => {
+            if (!store.state.allowSound) {
+                resolve()
+                return
+            }
             setTimeout(() => {
                 this.sounds[id].play()
                 this.sounds[id].addEventListener('ended', resolve)
-            }, timeout ?? 1);
+            }, timeout ?? 1)
         })
     }
 

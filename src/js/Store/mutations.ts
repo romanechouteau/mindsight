@@ -59,5 +59,15 @@ export default {
         state.spotifyToken = payload        
 
         return state
+    },
+    toggleSound(state) {
+        state.allowSound = !state.allowSound
+
+        return state
+    },
+    toggleCamera(state) {
+        state.allowCamera = !state.allowCamera
+
+        return state
     }
 }
