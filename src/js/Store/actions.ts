@@ -42,5 +42,8 @@ export default {
     },
     registerEmotionWord(context, payload) {
         context.commit('registerEmotionWord', payload)
+    },
+    setSpotifyToken(context, payload: string) {
+        context.commit('setSpotifyToken', payload)
     }
 }

@@ -37,6 +37,7 @@ export default class SpotifyManager {
             this.searchTracks = [];
             this.deviceId = device_id;
             this.player = player;
+            debugger
             player._options.getOAuthToken(access_token => this.accessToken = access_token)
         });
         // Not Ready
@@ -51,10 +52,11 @@ export default class SpotifyManager {
 
     async getToken(): Promise<string> {
         // see https://www.notion.so/aymericarn/API-6cf45e2e89b84034b7c8034863ea690d
-        const res = await fetch('https://notion-api.splitbee.io/v1/page/6cf45e2e89b84034b7c8034863ea690d')
-        const json = await res.json();
-        const token = json[Object.keys(json)[1]].value.properties.title[0][0]
-        return token
+        // const res = await fetch('https://notion-api.splitbee.io/v1/page/6cf45e2e89b84034b7c8034863ea690d')
+        // const json = await res.json();
+        // const token = json[Object.keys(json)[1]].value.properties.title[0][0]
+        // return token
+        return store.state.spotifyToken
     }
 
     addScript() {
@@ -162,16 +164,17 @@ export default class SpotifyManager {
                 },
             })
             .then(res => res.json().then(json => console.log(json)))
+            if (!this.player ) return
             this.player.setVolume( 0.25 )
             // repeat track
-            fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.accessToken}`
-                },
-            })
-            .then(res => res.json().then(json => console.log(json)))
+            // fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
+            //     method: 'PUT',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${this.accessToken}`
+            //     },
+            // })
+            // .then(res => res.json().then(json => console.log(json)))
             // repeat track
             fetch(`https://api.spotify.com/v1/me/player/repeat?device_id=${this.deviceId}&state=track`, {
                 method: 'PUT',
@@ -208,7 +211,7 @@ export default class SpotifyManager {
         })
         const meta = await res.json()
         this.playTracker = window.setInterval(async() => {
-            if (this.player.paused) return
+            if (!this.player || this.player.paused) return
             const state= await this.player.getCurrentState()
             if (!state?.position) return
             const { position } = state

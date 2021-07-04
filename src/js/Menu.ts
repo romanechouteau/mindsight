@@ -10,17 +10,9 @@ export default function initMenu(cb: Function) {
         )
 
         // @ts-ignore
-        window.spotifyCallback = (payload) => {
+        window.spotifyCallback = (token: string) => {
+            cb(token)
             popup.close()
-            fetch('https://api.spotify.com/v1/me', {
-              headers: {
-                'Authorization': `Bearer ${payload}`
-              }
-            }).then(response => {
-              return response.json()
-            }).then(data => {
-              cb(data)
-            })
           }
     })
 

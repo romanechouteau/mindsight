@@ -42,8 +42,12 @@ class AudioManager extends Component {
         SoundManager.playVoice(12).then(() => SoundManager.playVoice(13))
 
         // default mode is spotify
-        store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
-        this.spotify = new Spotify()
+        if (store.state.spotifyToken) {
+            store.dispatch('chooseAudio', AUDIO_INPUT_MODES.SPOTIFY)
+            this.spotify = new Spotify()
+        } else {
+            store.dispatch('chooseAudio', AUDIO_INPUT_MODES.VOICE)
+        }
         this.render()
     }
 
@@ -84,13 +88,15 @@ class AudioManager extends Component {
         }
 
         // spotify mode
-        htmlUtils.renderToDOM(this.element, spotifyTemplate, {})
-        document.querySelector('.spotify__input').addEventListener('keyup', el => {
-            this.spotify.handleSearch((el.target as HTMLInputElement).value)
-        })
-
-        if (this.spotify === undefined) {
-            this.spotify = new Spotify()
+        if (store.state.spotifyToken) {
+            htmlUtils.renderToDOM(this.element, spotifyTemplate, {})
+            document.querySelector('.spotify__input').addEventListener('keyup', el => {
+                this.spotify.handleSearch((el.target as HTMLInputElement).value)
+            })
+    
+            if (this.spotify === undefined) {
+                this.spotify = new Spotify()
+            }
         }
 
         if (VoiceManager.started === true) {

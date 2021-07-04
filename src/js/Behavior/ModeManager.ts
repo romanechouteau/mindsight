@@ -35,6 +35,16 @@ export default class ModeManager extends Component {
             audioInputMode0: `${AUDIO_INPUT_MODES.VOICE}`,
         })
 
+        // block spotify if no token
+        if (!store.state.spotifyToken) {
+            // @ts-ignore
+            this.element.querySelector(`.${AUDIO_INPUT_MODES.SPOTIFY}`).style.visibility = 'hidden'
+            // @ts-ignore
+            this.element.querySelector(`.${AUDIO_INPUT_MODES.SPOTIFY}`).style.pointerEvents = 'none'
+            // @ts-ignore
+            this.element.querySelector(`.${AUDIO_INPUT_MODES.SPOTIFY}`).style.display = 'none'
+        }
+
         // bind keys
         document.addEventListener('keyup', this.handleKeyUpBinded)
 

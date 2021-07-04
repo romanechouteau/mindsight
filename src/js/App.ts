@@ -259,7 +259,7 @@ export default class App extends Component {
   render = () => {
     // render intro
     if (store.state.isIntro && this.intro === undefined) {
-      initMenu()
+      initMenu((token: string) => { store.dispatch('setSpotifyToken', token) })
       this.intro = new IntroController({time: this.time, pointerCursor: this.pointerCursor, debug: this.debug})
     } else if (store.state.scene === SCENES.EYETRACKING && this.world.eyeTrackingManager === undefined && this.intro.hidden === false) {
       this.intro.hideLines()

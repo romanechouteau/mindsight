@@ -119,6 +119,10 @@ export default class IntroController {
     }
 
     initXp() {
+        // @ts-ignore
+        document.querySelector('#pre-intro').style.opacity = '0'
+        // @ts-ignore
+        document.querySelector('#pre-intro').style.pointerEvents = 'none'
         SoundManager.playMusic()
         store.dispatch('beginXp')
         this.initTicker()

@@ -54,5 +54,10 @@ export default {
         state.word = payload
 
         return state
+    },
+    setSpotifyToken(state, payload: string) {
+        state.spotifyToken = payload        
+
+        return state
     }
 }
